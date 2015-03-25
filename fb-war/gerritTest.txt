@@ -3,3 +3,7 @@ random message for gerrit core review
 some other change.
 
 test for Michal.
+
+how to push to gerrit:
+
+git push origin HEAD:refs/for/master
