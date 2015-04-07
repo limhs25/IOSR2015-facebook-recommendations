@@ -15,6 +15,7 @@
     <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
         <property name="preferFileSystemAccess" value="false"/>
         <property name="templateLoaderPath" value="classpath:/pl/quatrofantastico/fb/view/"/>
+        <property name="defaultEncoding" value="UTF-8"/>
     </bean>
 
     <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">
@@ -22,6 +23,7 @@
         <property name="cache" value="false"/>
         <property name="prefix" value=""/>
         <property name="suffix" value=".ftl"/>
+        <property name="contentType" value="text/html;charset=UTF-8"/>
     </bean>
 
     <mvc:annotation-driven/>

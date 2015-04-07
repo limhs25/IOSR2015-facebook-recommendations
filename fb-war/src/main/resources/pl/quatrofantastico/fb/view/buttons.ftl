@@ -1,3 +1,3 @@
-<#macro greenButton label class="">
-	<a href="#" class="greenButton ${class}">${label}</a>
+<#macro greenButton label name class="">
+	<a href="#" class="greenButton ${class}" id="${name}">${label}</a>
 </#macro>

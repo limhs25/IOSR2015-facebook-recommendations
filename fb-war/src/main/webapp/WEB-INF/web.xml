@@ -4,6 +4,15 @@
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
          http://java.sun.com/xml/ns/j2ee/web-app_3_0.xsd">
 
+    <filter>
+        <filter-name>FacebookLoggedFilter</filter-name>
+        <filter-class>pl.quatrofantastico.fb.auth.FacebookLoggedFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>FacebookLoggedFilter</filter-name>
+        <url-pattern>/fb/*</url-pattern>
+    </filter-mapping>
 
     <servlet>
         <servlet-name>spring</servlet-name>

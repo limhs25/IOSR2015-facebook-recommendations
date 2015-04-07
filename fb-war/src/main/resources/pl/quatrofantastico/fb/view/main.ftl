@@ -11,6 +11,7 @@
 	</head>
 	<body>
 		<@top.topBanner/>
-		empty page
+		Zalogowany jako: ${facebook.name}
+        <a href="logout.htm">Wyloguj</a>
 	</body>
 </html>

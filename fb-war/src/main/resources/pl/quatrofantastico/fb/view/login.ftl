@@ -11,25 +11,6 @@
 	</head>
 	<body>
 		<@top.topBanner/>
-
-		<div class="loginDiv">
-    		<div class="innerLoginBox">
-				<div class="loginBoxLine">
-					<div class="singleLinePadding">Login</div>
-					<div class="loginBoxInputLine">
-						<input class="inputLogin" name="login" type="text"/>
-					</div>
-				</div>
-				<div class="loginBoxLine">
-                	<div class="singleLinePadding">Password</div>
-                	<div class="loginBoxInputLine">
-						<input class="inputLogin" name="password" type="password"/>
-					</div>
-				</div>
-				<div class="loginBoxLine">
-					<@button.greenButton "Log in" "loginBoxButton"/>
-				</div>
-			</div>
-		</div>
+		<a href="facebook-login.htm">Zaloguj się używając Facebook'a</a>
 	</body>
 </html>
