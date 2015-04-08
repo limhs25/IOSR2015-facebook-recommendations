@@ -17,6 +17,7 @@
         <liquibase.db>FB-RECOMENDATION</liquibase.db>
         <liquibase.login>postgres</liquibase.login>
         <liquibase.password>postgres</liquibase.password>
+        <neo4j.version>2.1.8</neo4j.version>
     </properties>
 
     <build>
@@ -81,7 +82,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
+            <version>4.12</version>
             <scope>test</scope>
         </dependency>
 
@@ -111,9 +112,21 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-neo4j</artifactId>
             <version>${spring.neo4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j</artifactId>
+            <version>${neo4j.version}</version>
         </dependency>
 
         <!--        Freemarker      -->
@@ -143,6 +156,8 @@
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>
         </dependency>
+
+
 
     </dependencies>
 </project>
