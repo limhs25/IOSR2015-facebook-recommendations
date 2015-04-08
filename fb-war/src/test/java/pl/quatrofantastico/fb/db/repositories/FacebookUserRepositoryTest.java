@@ -7,8 +7,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.quatrofantastico.fb.db.FacebookentityFactory;
-import pl.quatrofantastico.fb.db.model.nodes.FacebookContent;
-import pl.quatrofantastico.fb.db.model.nodes.FacebookUser;
+import pl.quatrofantastico.fb.db.model.FacebookContent;
+import pl.quatrofantastico.fb.db.model.FacebookUser;
 
 import java.util.Set;
 

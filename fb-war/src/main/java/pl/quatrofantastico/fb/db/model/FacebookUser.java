@@ -1,4 +1,4 @@
-package pl.quatrofantastico.fb.db.model.nodes;
+package pl.quatrofantastico.fb.db.model;
 
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
