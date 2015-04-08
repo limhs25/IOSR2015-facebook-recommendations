@@ -6,14 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import pl.quatrofantastico.fb.db.model.FacebookContent;
+import pl.quatrofantastico.fb.db.FacebookentityFactory;
+import pl.quatrofantastico.fb.db.model.nodes.FacebookContent;
 
 import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring/applicationContext.xml")
 @Transactional
-public class FacebookContentServiceTest {
+public class FacebookContentRepositoryTest extends FacebookentityFactory {
 
     @Autowired
     private FacebookContentRepository userRepo;
@@ -30,11 +31,6 @@ public class FacebookContentServiceTest {
         assertEquals(expected, actual);
     }
 
-    private FacebookContent createFacebookContent(String name){
-        FacebookContent user = new FacebookContent();
-        user.setName(name);
 
-        return user;
-    }
 
 }
