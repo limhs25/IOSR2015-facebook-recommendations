@@ -1,7 +1,7 @@
 package pl.quatrofantastico.fb.db;
 
-import pl.quatrofantastico.fb.db.model.nodes.FacebookContent;
-import pl.quatrofantastico.fb.db.model.nodes.FacebookUser;
+import pl.quatrofantastico.fb.db.model.FacebookContent;
+import pl.quatrofantastico.fb.db.model.FacebookUser;
 
 public abstract class FacebookentityFactory {
     protected FacebookContent createFacebookContent(String name) {
