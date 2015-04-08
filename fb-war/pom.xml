@@ -11,6 +11,7 @@
 
     <properties>
         <spring.version>4.1.4.RELEASE</spring.version>
+        <spring.neo4j.version>3.3.0.RELEASE</spring.neo4j.version>
         <deployFolder>server/webapps</deployFolder>
         <liquibase.host>127.0.0.1:5432</liquibase.host>
         <liquibase.db>FB-RECOMENDATION</liquibase.db>
@@ -109,6 +110,12 @@
             <version>${spring.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-neo4j</artifactId>
+            <version>${spring.neo4j.version}</version>
+        </dependency>
+
         <!--        Freemarker      -->
         <dependency>
             <groupId>org.freemarker</groupId>
@@ -136,6 +143,6 @@
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>
         </dependency>
-        
+
     </dependencies>
 </project>
