@@ -1,10 +1,10 @@
-package pl.quatrofantastico.fb.db;
+package pl.quatrofantastico.fb.db.model;
 
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 
 @NodeEntity
-public class FacebookUser {
+public class FacebookContent {
     @GraphId
     private Long id;
 
@@ -13,8 +13,8 @@ public class FacebookUser {
     @Override
     public boolean equals(Object o) {
         if(this == o)return true;
-        if(!(o instanceof FacebookUser)) return false;
-        return ((FacebookUser) o).name.equals(name);
+        if(!(o instanceof FacebookContent)) return false;
+        return ((FacebookContent) o).name.equals(name);
     }
 
     public String getName() {
