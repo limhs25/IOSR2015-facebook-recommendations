@@ -13,36 +13,11 @@
         <spring.version>4.1.4.RELEASE</spring.version>
         <spring.neo4j.version>3.3.0.RELEASE</spring.neo4j.version>
         <deployFolder>server/webapps</deployFolder>
-        <liquibase.host>127.0.0.1:5432</liquibase.host>
-        <liquibase.db>FB-RECOMENDATION</liquibase.db>
-        <liquibase.login>postgres</liquibase.login>
-        <liquibase.password>postgres</liquibase.password>
-        <neo4j.version>2.1.8</neo4j.version>
+        <twitter4j.version>4.0.3</twitter4j.version>
     </properties>
 
     <build>
         <plugins>
-
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.3.2</version>
-                <configuration>
-                    <changeLogFile>${basedir}/src/main/resources/liquibase/master.xml</changeLogFile>
-                    <driver>org.postgresql.Driver</driver>
-                    <url>jdbc:postgresql://${liquibase.host}/${liquibase.db}</url>
-                    <username>${liquibase.login}</username>
-                    <password>${liquibase.password}</password>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                        <version>9.1-901-1.jdbc4</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
@@ -143,11 +118,11 @@
             <version>${spring.version}</version>
         </dependency>
 
-        <!--        Facebook API    -->
+        <!--        Twitter API    -->
         <dependency>
-            <groupId>org.facebook4j</groupId>
-            <artifactId>facebook4j-core</artifactId>
-            <version>2.2.2</version>
+            <groupId>org.twitter4j</groupId>
+            <artifactId>twitter4j-core</artifactId>
+            <version>${twitter4j.version}</version>
         </dependency>
 
         <!--        Java EE         -->
@@ -156,8 +131,5 @@
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>
         </dependency>
-
-
-
     </dependencies>
 </project>

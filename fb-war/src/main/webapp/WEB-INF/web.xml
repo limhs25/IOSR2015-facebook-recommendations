@@ -6,7 +6,7 @@
 
     <filter>
         <filter-name>FacebookLoggedFilter</filter-name>
-        <filter-class>pl.quatrofantastico.fb.auth.FacebookLoggedFilter</filter-class>
+        <filter-class>pl.recommendations.auth.FacebookLoggedFilter</filter-class>
     </filter>
 
     <filter-mapping>

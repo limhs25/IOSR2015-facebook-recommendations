@@ -1,7 +1,4 @@
-package pl.quatrofantastico.fb.auth;
-
-import facebook4j.Facebook;
-import pl.quatrofantastico.fb.slo.FacebookSLO;
+package pl.recommendations.auth;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -20,9 +17,9 @@ public class FacebookLoggedFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		String requestURI = ((HttpServletRequest) request).getRequestURI();
-		Facebook facebook = (Facebook) ((HttpServletRequest) request).getSession().getAttribute(FacebookSLO.FACEBOOK_SESSION_ATTRIBUTE);
+		//Facebook facebook = (Facebook) ((HttpServletRequest) request).getSession().getAttribute(FacebookSLO.FACEBOOK_SESSION_ATTRIBUTE);
 
-		if (!isUriAccessibleWithoutLogIn(requestURI) && facebook == null) {
+		if (!isUriAccessibleWithoutLogIn(requestURI)) {
 			((HttpServletResponse) response).sendRedirect("/fb/");
 			return;
 		}
