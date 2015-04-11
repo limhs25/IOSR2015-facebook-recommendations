@@ -1,4 +1,4 @@
-package pl.quatrofantastico.fb.db.repositories;
+package pl.recommendations.db;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -6,10 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import pl.quatrofantastico.fb.db.FacebookentityFactory;
-import pl.quatrofantastico.fb.db.model.FacebookContent;
-import pl.quatrofantastico.fb.db.model.FacebookUser;
+import pl.recommendations.db.interest.Interest;
+import pl.recommendations.db.user.Friendship;
+import pl.recommendations.db.user.User;
+import pl.recommendations.db.user.UserRepository;
 
+import java.util.Collection;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -18,19 +20,19 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring/applicationContext.xml")
 @Transactional
-public class FacebookUserRepositoryTest extends FacebookentityFactory {
+public class UserRepositoryTest extends FacebookentityFactory {
 
     @Autowired
-    private FacebookUserRepository userRepo;
+    private UserRepository userRepo;
 
     private static String name = "user";
 
     @Test
     public void saveAndGet() {
-        FacebookUser expected = createFacebookUser(name);
+        User expected = createUser(name);
         userRepo.save(expected);
 
-        FacebookUser actual = userRepo.findByName(name);
+        User actual = userRepo.findByName(name);
         assertEquals(expected, actual);
     }
 
@@ -40,9 +42,9 @@ public class FacebookUserRepositoryTest extends FacebookentityFactory {
         String name2 = name + "2";
         String name3 = name + "3";
 
-        FacebookUser user1 = createFacebookUser(name1);
-        FacebookUser user2 = createFacebookUser(name2);
-        FacebookUser user3 = createFacebookUser(name3);
+        User user1 = createUser(name1);
+        User user2 = createUser(name2);
+        User user3 = createUser(name3);
 
         user1.addFriend(user2);
         user1.addFriend(user3);
@@ -51,12 +53,15 @@ public class FacebookUserRepositoryTest extends FacebookentityFactory {
         userRepo.save(user3);
         userRepo.save(user1);
 
-        FacebookUser user = userRepo.findByName(name1);
-        Set<FacebookUser> friends = user.getFriends();
+        User user = userRepo.findByName(name1);
+        Set<Friendship> friendships = user.getFriendships();
 
-        assertEquals(friends.size(), 2);
-        assertTrue(friends.contains(user2));
-        assertTrue(friends.contains(user3));
+        assertEquals(friendships.size(), 2);
+
+        Collection<User> firends = userRepo.getFriendsOf(user1.getId());
+        assertEquals(firends.size(), 2);
+        assertTrue(firends.contains(user2));
+        assertTrue(firends.contains(user3));
     }
 
     @Test
@@ -65,17 +70,17 @@ public class FacebookUserRepositoryTest extends FacebookentityFactory {
         String name2 = name + "2";
         String name3 = name + "3";
 
-        FacebookUser user1 = createFacebookUser(name1);
-        FacebookContent interest1 = createFacebookContent(name2);
-        FacebookContent interest2 = createFacebookContent(name3);
+        User user1 = createUser(name1);
+        Interest interest1 = createInterest(name2);
+        Interest interest2 = createInterest(name3);
 
         user1.addInterest(interest1);
         user1.addInterest(interest2);
 
         userRepo.save(user1);
 
-        FacebookUser user = userRepo.findByName(name1);
-        Set<FacebookContent> interests = user.getInterests();
+        User user = userRepo.findByName(name1);
+        Set<Interest> interests = user.getInterests();
 
         assertEquals(interests.size(), 2);
         assertTrue(interests.contains(interest1));
