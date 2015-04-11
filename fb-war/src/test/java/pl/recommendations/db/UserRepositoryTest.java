@@ -20,31 +20,31 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring/applicationContext.xml")
 @Transactional
-public class UserRepositoryTest extends FacebookentityFactory {
+public class UserRepositoryTest extends EntityFactory {
 
     @Autowired
     private UserRepository userRepo;
 
-    private static String name = "user";
+    private static long uuid = 1l;
 
     @Test
     public void saveAndGet() {
-        User expected = createUser(name);
+        User expected = createUser(uuid);
         userRepo.save(expected);
 
-        User actual = userRepo.findByName(name);
+        User actual = userRepo.findByUuid(uuid);
         assertEquals(expected, actual);
     }
 
     @Test
     public void addFriends() {
-        String name1 = name + "1";
-        String name2 = name + "2";
-        String name3 = name + "3";
+        long uuid1 = 1l;
+        long uuid2 = 2l;
+        long uuid3 = 3l;
 
-        User user1 = createUser(name1);
-        User user2 = createUser(name2);
-        User user3 = createUser(name3);
+        User user1 = createUser(uuid1);
+        User user2 = createUser(uuid2);
+        User user3 = createUser(uuid3);
 
         user1.addFriend(user2);
         user1.addFriend(user3);
@@ -53,7 +53,7 @@ public class UserRepositoryTest extends FacebookentityFactory {
         userRepo.save(user3);
         userRepo.save(user1);
 
-        User user = userRepo.findByName(name1);
+        User user = userRepo.findByUuid(uuid1);
         Set<Friendship> friendships = user.getFriendships();
 
         assertEquals(friendships.size(), 2);
@@ -66,20 +66,20 @@ public class UserRepositoryTest extends FacebookentityFactory {
 
     @Test
     public void addInterests() {
-        String name1 = name + "1";
-        String name2 = name + "2";
-        String name3 = name + "3";
+        long uuid1 = 1l;
+        long uuid2 = 2l;
+        long uuid3 = 3l;
 
-        User user1 = createUser(name1);
-        Interest interest1 = createInterest(name2);
-        Interest interest2 = createInterest(name3);
+        User user1 = createUser(uuid1);
+        Interest interest1 = createInterest(uuid2);
+        Interest interest2 = createInterest(uuid3);
 
         user1.addInterest(interest1);
         user1.addInterest(interest2);
 
         userRepo.save(user1);
 
-        User user = userRepo.findByName(name1);
+        User user = userRepo.findByUuid(uuid1);
         Set<Interest> interests = user.getInterests();
 
         assertEquals(interests.size(), 2);

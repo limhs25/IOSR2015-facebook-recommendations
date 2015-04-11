@@ -13,7 +13,7 @@ public class User {
     @GraphId
     private Long graphID;
 
-    private String name;
+    private Long uuid;
 
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<Friendship> friendships = new HashSet<>();
@@ -42,22 +42,22 @@ public class User {
 
         User user = (User) o;
 
-        if (name != null ? !name.equals(user.name) : user.name != null) return false;
+        if (uuid != null ? !uuid.equals(user.uuid) : user.uuid != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return uuid != null ? uuid.hashCode() : 0;
     }
 
-    public String getName() {
-        return name;
+    public Long getUuid() {
+        return uuid;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setUuid(Long uuid) {
+        this.uuid = uuid;
     }
 
     public Set<Interest> getInterests() {

@@ -17,7 +17,7 @@ public class Interest {
     @GraphId
     private Long graphID;
 
-    private String name;
+    private Long uuid;
 
     @RelatedToVia(type = RelationshipType.SIMILARITY, direction = Direction.BOTH)
     private Set<Similarity> similarities = new HashSet<>();
@@ -52,26 +52,26 @@ public class Interest {
 
         Interest interest = (Interest) o;
 
-        if (name != null ? !name.equals(interest.name) : interest.name != null) return false;
+        if (uuid != null ? !uuid.equals(interest.uuid) : interest.uuid != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        return name != null ? name.hashCode() : 0;
+        return uuid != null ? uuid.hashCode() : 0;
+    }
+
+    public Long getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(Long uuid) {
+        this.uuid = uuid;
     }
 
     public Long getId() {
         return graphID;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public Set<Contrast> getContrasts() {

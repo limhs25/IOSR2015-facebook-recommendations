@@ -8,7 +8,7 @@ import pl.recommendations.db.interest.relationships.Similarity;
 
 
 public interface InterestRepository extends GraphRepository<Interest> {
-    Interest findByName(String name);
+    Interest findByUuid(Long uuid);
 
     @Query("start i1 = node({0}), i2 = node({1}) \n" +
             "match i1-[s:" + RelationshipType.SIMILARITY + "]->i2 \n" +

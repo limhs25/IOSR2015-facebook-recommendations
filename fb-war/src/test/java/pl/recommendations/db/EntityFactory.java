@@ -3,17 +3,17 @@ package pl.recommendations.db;
 import pl.recommendations.db.interest.Interest;
 import pl.recommendations.db.user.User;
 
-public abstract class FacebookentityFactory {
-    protected Interest createInterest(String name) {
+public abstract class EntityFactory {
+    protected Interest createInterest(long uuid) {
         Interest interest = new Interest();
-        interest.setName(name);
+        interest.setUuid(uuid);
 
         return interest;
     }
 
-    protected User createUser(String name) {
+    protected User createUser(long uuid) {
         User user = new User();
-        user.setName(name);
+        user.setUuid(uuid);
 
         return user;
     }

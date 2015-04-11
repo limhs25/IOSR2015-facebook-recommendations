@@ -7,7 +7,7 @@ import pl.recommendations.db.RelationshipType;
 import java.util.Collection;
 
 public interface UserRepository extends GraphRepository<User> {
-    User findByName(String name);
+    User findByUuid(Long uuid);
 
     @Query("start u = node({0}) " +
             "match u-[" + RelationshipType.FRIENDSHIP + "]->u2 " +
