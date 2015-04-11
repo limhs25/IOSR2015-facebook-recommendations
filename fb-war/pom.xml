@@ -13,11 +13,13 @@
         <spring.version>4.1.4.RELEASE</spring.version>
         <spring.neo4j.version>3.3.0.RELEASE</spring.neo4j.version>
         <deployFolder>server/webapps</deployFolder>
+        <neo4j.version>2.1.8</neo4j.version>
         <twitter4j.version>4.0.3</twitter4j.version>
     </properties>
 
     <build>
         <plugins>
+
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
