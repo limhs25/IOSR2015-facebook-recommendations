@@ -71,4 +71,8 @@ public class User {
     public Long getId() {
         return graphID;
     }
+
+    public void setInterests(Set<Interest> interests) {
+        this.interests = interests;
+    }
 }

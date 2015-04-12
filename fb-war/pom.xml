@@ -15,6 +15,7 @@
         <deployFolder>server/webapps</deployFolder>
         <neo4j.version>2.1.8</neo4j.version>
         <twitter4j.version>4.0.3</twitter4j.version>
+        <log4j.version>2.2</log4j.version>
     </properties>
 
     <build>
@@ -44,8 +45,8 @@
                 <version>3.0</version>
                 <configuration>
                     <outputFileName>fb</outputFileName>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
 
@@ -128,11 +129,29 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.0</version>
+        </dependency>
+
+
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava-collections</artifactId>
             <version>r03</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
 
         <!--        Java EE         -->
         <dependency>
