@@ -21,10 +21,10 @@ public class CrawlerSchedulerTest {
         long uuid = 17765013l;
         scheduler.scheduleCrawling(uuid);
 
-        while (true) {
-            Thread.sleep(TimeUnit.MILLISECONDS.convert(1000, TimeUnit.SECONDS));
+        while (!cache.hasPerson(uuid)) {
+            Thread.sleep(TimeUnit.MILLISECONDS.convert(10, TimeUnit.SECONDS));
         }
 
-//        System.out.println(cache.getPersonName(uuid));
+
     }
 }
