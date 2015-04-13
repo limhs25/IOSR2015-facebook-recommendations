@@ -6,12 +6,12 @@
 
     <filter>
         <filter-name>FacebookLoggedFilter</filter-name>
-        <filter-class>pl.quatrofantastico.fb.auth.FacebookLoggedFilter</filter-class>
+        <filter-class>pl.recommendations.auth.TwitterLoggedFilter</filter-class>
     </filter>
 
     <filter-mapping>
         <filter-name>FacebookLoggedFilter</filter-name>
-        <url-pattern>/fb/*</url-pattern>
+        <url-pattern>/twitter/*</url-pattern>
     </filter-mapping>
 
     <servlet>
@@ -22,7 +22,7 @@
 
     <servlet-mapping>
         <servlet-name>spring</servlet-name>
-        <url-pattern>/fb/*</url-pattern>
+        <url-pattern>/twitter/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

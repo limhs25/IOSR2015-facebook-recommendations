@@ -1,0 +1,11 @@
+package pl.recommendations.crawling;
+
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@Configuration
+@EnableScheduling
+@ComponentScan(basePackageClasses = {Crawler.class})
+public class CrawlerSpringConfiguration {
+}
