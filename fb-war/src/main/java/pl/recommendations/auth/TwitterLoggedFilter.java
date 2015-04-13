@@ -1,5 +1,8 @@
 package pl.recommendations.auth;
 
+import pl.recommendations.slo.TwitterSLO;
+import twitter4j.Twitter;
+
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -8,7 +11,7 @@ import java.io.IOException;
 /**
  * Created by marekmagik on 2015-04-06.
  */
-public class FacebookLoggedFilter implements Filter {
+public class TwitterLoggedFilter implements Filter {
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
@@ -17,10 +20,10 @@ public class FacebookLoggedFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		String requestURI = ((HttpServletRequest) request).getRequestURI();
-		//Facebook facebook = (Facebook) ((HttpServletRequest) request).getSession().getAttribute(FacebookSLO.FACEBOOK_SESSION_ATTRIBUTE);
+		Twitter twitter = (Twitter) ((HttpServletRequest) request).getSession().getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE);
 
-		if (!isUriAccessibleWithoutLogIn(requestURI)) {
-			((HttpServletResponse) response).sendRedirect("/fb/");
+		if (!isUriAccessibleWithoutLogIn(requestURI) && twitter == null) {
+			((HttpServletResponse) response).sendRedirect("/twitter/");
 			return;
 		}
 
@@ -28,7 +31,7 @@ public class FacebookLoggedFilter implements Filter {
 	}
 
 	private boolean isUriAccessibleWithoutLogIn(String uri){
-		return uri.contains("facebook-login") || uri.contains("/resources/") || (uri.endsWith("/fb/") || uri.endsWith("/fb"));
+		return uri.contains("twitter-login") || uri.contains("/resources/") || (uri.endsWith("/twitter/") || uri.endsWith("/twitter"));
 	}
 
 	@Override

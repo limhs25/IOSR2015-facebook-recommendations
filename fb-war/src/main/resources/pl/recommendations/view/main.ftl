@@ -11,7 +11,7 @@
 	</head>
 	<body>
 		<@top.topBanner/>
-		Zalogowany jako: ${facebook.name}
+		Zalogowany jako: ${twitter.screenName}
         <a href="logout.htm">Wyloguj</a>
 	</body>
 </html>

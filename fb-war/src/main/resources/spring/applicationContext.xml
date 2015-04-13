@@ -3,6 +3,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
+
        xsi:schemaLocation="
        	http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
@@ -18,12 +19,11 @@
     <tx:annotation-driven mode="proxy" transaction-manager="transactionManager"/>
 
     <bean id="neo4jConfiguration" class="org.springframework.data.neo4j.config.Neo4jConfiguration">
-        <property name="basePackage" value="pl.quatrofantastico.fb.db" />
+        <property name="basePackage" value="pl.quatrofantastico.fb.db"/>
     </bean>
 
     <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/fb1.db"/>
     <neo4j:repositories base-package="pl.recommendations"/>
 
     <context:component-scan base-package="pl.recommendations"/>
-    <task:annotation-driven/>
 </beans>

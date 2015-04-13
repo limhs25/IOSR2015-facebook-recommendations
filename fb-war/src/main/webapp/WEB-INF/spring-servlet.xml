@@ -9,10 +9,12 @@
        http://www.springframework.org/schema/mvc
        http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
 
+    <context:component-scan base-package="pl.recommendations"/>
+
     <!-- freemarker config -->
     <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">
         <property name="preferFileSystemAccess" value="false"/>
-        <property name="templateLoaderPath" value="classpath:/pl/quatrofantastico/fb/view/"/>
+        <property name="templateLoaderPath" value="classpath:/pl/recommendations/view/"/>
         <property name="defaultEncoding" value="UTF-8"/>
     </bean>
 
@@ -26,6 +28,5 @@
 
     <mvc:annotation-driven/>
 
-    <mvc:resources mapping="/resources/**" location="classpath:/pl/quatrofantastico/fb/view/" />
-
+    <mvc:resources mapping="/resources/**" location="classpath:/pl/recommendations/view/"/>
 </beans>

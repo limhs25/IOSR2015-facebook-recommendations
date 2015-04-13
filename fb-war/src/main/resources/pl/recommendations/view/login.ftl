@@ -11,6 +11,6 @@
 	</head>
 	<body>
 		<@top.topBanner/>
-		<a href="facebook-login.htm">Zaloguj się używając Facebook'a</a>
+		<a href="twitter-login.htm">Zaloguj się używając Twittera</a>
 	</body>
 </html>

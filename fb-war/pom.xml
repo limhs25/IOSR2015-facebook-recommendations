@@ -10,7 +10,7 @@
     <packaging>war</packaging>
 
     <properties>
-        <spring.version>4.1.4.RELEASE</spring.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
         <spring.neo4j.version>3.3.0.RELEASE</spring.neo4j.version>
         <deployFolder>server/webapps</deployFolder>
         <neo4j.version>2.1.8</neo4j.version>
@@ -158,6 +158,7 @@
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>
