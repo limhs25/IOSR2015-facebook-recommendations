@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class CrawlerCache implements CrawledDataListener, CrawlDataEmitter , CrawledDataStorage{
+public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter, CrawledDataStorage {
     private final Set<CrawledDataListener> listeners = Collections.newSetFromMap(new IdentityHashMap<>());
 
     private final Map<Long, String> users = new HashMap<>();

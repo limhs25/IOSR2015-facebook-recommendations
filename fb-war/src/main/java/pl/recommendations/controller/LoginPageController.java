@@ -19,7 +19,6 @@ import java.io.IOException;
 @Controller
 @SessionAttributes(TwitterSLO.TWITTER_SESSION_ATTRIBUTE)
 public class LoginPageController {
-
 	@Autowired
 	private TwitterSLO twitterSLO;
 

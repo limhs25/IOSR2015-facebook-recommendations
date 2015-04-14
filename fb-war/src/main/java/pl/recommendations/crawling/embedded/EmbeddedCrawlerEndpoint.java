@@ -2,14 +2,16 @@ package pl.recommendations.crawling.embedded;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.recommendations.crawling.*;
+import pl.recommendations.crawling.CrawledDataCache;
+import pl.recommendations.crawling.CrawlerEndpoint;
+import pl.recommendations.crawling.CrawlerScheduler;
 
 @Component
-public abstract class EmbeddedCrawlerService implements CrawlerService, CrawledDataListener, CrawledDataStorage {
+public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     @Autowired
     private CrawlerScheduler scheduler;
     @Autowired
-    protected CrawlerCache cache;
+    protected CrawledDataCache cache;
 
     @Override
     public Object getPersonName(Long uuid) {

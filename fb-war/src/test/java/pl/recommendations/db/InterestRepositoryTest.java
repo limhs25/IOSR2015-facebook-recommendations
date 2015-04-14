@@ -19,7 +19,6 @@ import static org.junit.Assert.assertNotNull;
 @ContextConfiguration("classpath:spring/applicationContext.xml")
 @Transactional
 public class InterestRepositoryTest extends EntityFactory {
-
     @Autowired
     private InterestRepository interestRepo;
 
@@ -42,7 +41,7 @@ public class InterestRepositoryTest extends EntityFactory {
         double val = 0.5;
         long uuid1 = 1;
         long uuid2 = 2;
-        
+
         Interest i1 = createInterest(uuid1);
         Interest i2 = createInterest(uuid2);
         i1.addContrast(i2, val);

@@ -7,9 +7,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.interest.Interest;
-import pl.recommendations.db.user.Friendship;
-import pl.recommendations.db.user.User;
-import pl.recommendations.db.user.UserRepository;
+import pl.recommendations.db.person.Friendship;
+import pl.recommendations.db.person.Person;
+import pl.recommendations.db.person.PersonRepository;
 
 import java.util.Collection;
 import java.util.Set;
@@ -20,19 +20,19 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:spring/applicationContext.xml")
 @Transactional
-public class UserRepositoryTest extends EntityFactory {
+public class PersonRepositoryTest extends EntityFactory {
 
     @Autowired
-    private UserRepository userRepo;
+    private PersonRepository personRepo;
 
     private static long uuid = 1l;
 
     @Test
     public void saveAndGet() {
-        User expected = createUser(uuid);
-        userRepo.save(expected);
+        Person expected = createUser(uuid);
+        personRepo.save(expected);
 
-        User actual = userRepo.findByUuid(uuid);
+        Person actual = personRepo.findByUuid(uuid);
         assertEquals(expected, actual);
     }
 
@@ -42,26 +42,26 @@ public class UserRepositoryTest extends EntityFactory {
         long uuid2 = 2l;
         long uuid3 = 3l;
 
-        User user1 = createUser(uuid1);
-        User user2 = createUser(uuid2);
-        User user3 = createUser(uuid3);
+        Person person1 = createUser(uuid1);
+        Person person2 = createUser(uuid2);
+        Person person3 = createUser(uuid3);
 
-        user1.addFriend(user2);
-        user1.addFriend(user3);
+        person1.addFriend(person2);
+        person1.addFriend(person3);
 
-        userRepo.save(user2);
-        userRepo.save(user3);
-        userRepo.save(user1);
+        personRepo.save(person2);
+        personRepo.save(person3);
+        personRepo.save(person1);
 
-        User user = userRepo.findByUuid(uuid1);
-        Set<Friendship> friendships = user.getFriendships();
+        Person person = personRepo.findByUuid(uuid1);
+        Set<Friendship> friendships = person.getFriendships();
 
         assertEquals(friendships.size(), 2);
 
-        Collection<User> firends = userRepo.getFriendsOf(user1.getId());
+        Collection<Person> firends = personRepo.getFriendsOf(person1.getId());
         assertEquals(firends.size(), 2);
-        assertTrue(firends.contains(user2));
-        assertTrue(firends.contains(user3));
+        assertTrue(firends.contains(person2));
+        assertTrue(firends.contains(person3));
     }
 
     @Test
@@ -70,17 +70,17 @@ public class UserRepositoryTest extends EntityFactory {
         long uuid2 = 2l;
         long uuid3 = 3l;
 
-        User user1 = createUser(uuid1);
+        Person person1 = createUser(uuid1);
         Interest interest1 = createInterest(uuid2);
         Interest interest2 = createInterest(uuid3);
 
-        user1.addInterest(interest1);
-        user1.addInterest(interest2);
+        person1.addInterest(interest1);
+        person1.addInterest(interest2);
 
-        userRepo.save(user1);
+        personRepo.save(person1);
 
-        User user = userRepo.findByUuid(uuid1);
-        Set<Interest> interests = user.getInterests();
+        Person person = personRepo.findByUuid(uuid1);
+        Set<Interest> interests = person.getInterests();
 
         assertEquals(interests.size(), 2);
         assertTrue(interests.contains(interest1));

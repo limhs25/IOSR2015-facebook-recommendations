@@ -5,19 +5,18 @@ import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class CacheTest {
-    private CrawlerCache cache;
+    private CrawledDataCache cache;
     private DummyCrawlDataListener listener;
 
     @Before
     public void before() {
-        cache = new CrawlerCache();
+        cache = new CrawledDataCache();
         listener = new DummyCrawlDataListener();
         cache.register(listener);
     }

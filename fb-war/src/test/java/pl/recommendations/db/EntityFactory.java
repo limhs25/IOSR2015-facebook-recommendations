@@ -1,7 +1,7 @@
 package pl.recommendations.db;
 
 import pl.recommendations.db.interest.Interest;
-import pl.recommendations.db.user.User;
+import pl.recommendations.db.person.Person;
 
 public abstract class EntityFactory {
     protected Interest createInterest(long uuid) {
@@ -11,10 +11,10 @@ public abstract class EntityFactory {
         return interest;
     }
 
-    protected User createUser(long uuid) {
-        User user = new User();
-        user.setUuid(uuid);
+    protected Person createUser(long uuid) {
+        Person person = new Person();
+        person.setUuid(uuid);
 
-        return user;
+        return person;
     }
 }

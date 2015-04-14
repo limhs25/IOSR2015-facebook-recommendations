@@ -12,7 +12,6 @@ import java.io.IOException;
  * Created by marekmagik on 2015-04-06.
  */
 public class TwitterLoggedFilter implements Filter {
-
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 	}
@@ -37,4 +36,5 @@ public class TwitterLoggedFilter implements Filter {
 	@Override
 	public void destroy() {
 	}
+
 }

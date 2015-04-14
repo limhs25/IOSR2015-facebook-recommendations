@@ -1,4 +1,4 @@
-package pl.recommendations.db.user;
+package pl.recommendations.db.person;
 
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @NodeEntity
-public class User {
+public class Person {
     @GraphId
     private Long graphID;
 
@@ -22,10 +22,10 @@ public class User {
     @RelatedTo(direction = Direction.OUTGOING)
     private Set<Interest> interests = new HashSet<>();
 
-    public void addFriend(User friend) {
+    public void addFriend(Person friend) {
         if (!this.equals(friend)) {
             Friendship relationship = new Friendship();
-            relationship.setUser(this);
+            relationship.setPerson(this);
             relationship.setFriend(friend);
             friendships.add(relationship);
         }
@@ -40,9 +40,9 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) o;
+        Person person = (Person) o;
 
-        if (uuid != null ? !uuid.equals(user.uuid) : user.uuid != null) return false;
+        if (uuid != null ? !uuid.equals(person.uuid) : person.uuid != null) return false;
 
         return true;
     }

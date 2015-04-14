@@ -29,7 +29,7 @@ public class TwitterCrawler implements Crawler {
         try {
             User user = twitter.showUser(uuid);
             String name = user.getScreenName();
-//            logger.debug("user[{}] name is {}", uuid, name);
+            logger.debug("user[{}] name is {}", uuid, name);
             return Optional.of(name);
         } catch (TwitterException e) {
             if (handledTwitterException(uuid, e)) return getPersonName(uuid);
@@ -42,7 +42,7 @@ public class TwitterCrawler implements Crawler {
         try {
             IDs friendsIDs = twitter.getFriendsIDs(uuid, cursor);
             Set<Long> uuids = Arrays.stream(friendsIDs.getIDs()).boxed().collect(Collectors.toSet());
-//            logger.debug("Crawled {} friends for user[{}]", uuids.size(), uuids);
+            logger.debug("Crawled {} friends for user[{}]", uuids.size(), uuids);
             return new CrawlResult(uuids, friendsIDs.getNextCursor());
         } catch (TwitterException e) {
             if (handledTwitterException(uuid, e)) return getPersonFriends(uuid, cursor);
@@ -83,65 +83,8 @@ public class TwitterCrawler implements Crawler {
     }
 
     @Scheduled(cron = "15 * * * * *")
-    public void resetRateLimit(){
+    public void resetRateLimit() {
         logger.debug("Reseting rate limit");
         rateLimitExceeded.signalAll();
     }
-
-   /* @Override
-    public Set<Long> getNewFriends(Long uuid, Set<Long> longs) throws CrawlerException, InterruptedException {
-        return addFriends(null,  DEPTH);
-    }
-
-    @Override
-    public Set<Interest> getInterests(Long uuid) throws InterruptedException {
-        try {
-            ResponseList<Status> timeline = twitter.getUserTimeline(uuid);
-            return ImmutableSet.of();
-        } catch (TwitterException e) {
-            if (exceededRateLimit(e)) {
-                logger.warn("Exceeded rate limit for crawling interests.");
-                waitForNewWindow();
-                return getInterests(uuid);
-            } else if (e.getStatusCode() == HttpResponseCode.UNAUTHORIZED ||
-                    e.getStatusCode() == HttpResponseCode.NOT_FOUND) {
-                logger.debug("Omitting interests crawling for {} due to {}", uuid, e.getMessage());
-            }
-
-            return ImmutableSet.of();
-        }
-    }
-
-
-    private Set<Long> addFriends(User user, int depth) throws CrawlerException, InterruptedException {
-        try {
-            ArrayList<Long> uuids = new ArrayList<>();
-
-            long cursor = -1;
-            do {
-                PagableResponseList<twitter4j.User> friendsList = twitter.getFriendsList(user.getUuid(), cursor);
-                for (twitter4j.User friend : friendsList) {
-
-                }
-                cursor = friendsList.getNextCursor();
-            } while (cursor != 0);
-
-            logger.info("{} friend count: {}", user.getUuid(), uuids.size());
-
-            for (long uuid : uuids) {
-//                User friend = scheduleCrawling(uuid, depth - 1);
-//                user.addFriend(friend);
-            }
-        } catch (TwitterException e) {
-            if (exceededRateLimit(e)) {
-                logger.warn("Exceeded rate limit for crawling friends.");
-                waitForNewWindow();
-                addFriends(user, depth);
-            } else if (e.getStatusCode() == HttpResponseCode.UNAUTHORIZED ||
-                    e.getStatusCode() == HttpResponseCode.NOT_FOUND) {
-                logger.debug("Omitting friends crawling for due to {}", user.getUuid(), e.getMessage());
-            }
-        }
-        return null;
-    }*/
 }

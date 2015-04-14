@@ -1,6 +1,9 @@
 package pl.recommendations.crawling;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class DummyCrawlDataListener implements CrawledDataListener {
     private final Map<Long, Object> users = new HashMap<>();

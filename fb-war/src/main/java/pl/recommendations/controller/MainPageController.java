@@ -15,21 +15,21 @@ import javax.servlet.http.HttpSession;
 @SessionAttributes(TwitterSLO.TWITTER_SESSION_ATTRIBUTE)
 public class MainPageController {
 
-	private static final String LOGIN_VIEW_NAME = "login";
+    private static final String LOGIN_VIEW_NAME = "login";
 
-	private static final String MAIN_VIEW_NAME = "main";
+    private static final String MAIN_VIEW_NAME = "main";
 
-	@RequestMapping("/")
-	public ModelAndView showLoginForm(){
-		return new ModelAndView(LOGIN_VIEW_NAME);
-	}
+    @RequestMapping("/")
+    public ModelAndView showLoginForm() {
+        return new ModelAndView(LOGIN_VIEW_NAME);
+    }
 
-	@RequestMapping("/main")
-	public ModelAndView showMainForm(HttpSession session) {
 
-		ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
-		mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
+    @RequestMapping("/main")
+    public ModelAndView showMainForm(HttpSession session) {
+        ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
+        mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
 
-		return mv;
-	}
+        return mv;
+    }
 }

@@ -19,7 +19,7 @@ public class CrawlerScheduler implements CrawlerService {
     private static long interestLimit = 20;
 
     @Autowired
-    private CrawlerCache cache;
+    private CrawledDataCache cache;
 
     @Autowired
     Crawler crawler;
@@ -39,7 +39,7 @@ public class CrawlerScheduler implements CrawlerService {
 
     @Scheduled(fixedDelay = 100l)
     public void consumeTask() {
-        if(tasks.isEmpty()){
+        if (tasks.isEmpty()) {
             return;
         }
 

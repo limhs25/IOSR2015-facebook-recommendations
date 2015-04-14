@@ -6,6 +6,7 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterConfiguration {
+
 	private static TwitterFactory tf;
 
 	public static Twitter getTwitterInstance() {

@@ -1,4 +1,4 @@
-package pl.recommendations.db.user;
+package pl.recommendations.db.person;
 
 import org.springframework.data.neo4j.annotation.EndNode;
 import org.springframework.data.neo4j.annotation.GraphId;
@@ -13,24 +13,24 @@ public class Friendship {
 
     @StartNode
     private
-    User user;
+    Person person;
 
     @EndNode
-    private User friend;
+    private Person friend;
 
-    public User getFriend() {
+    public Person getFriend() {
         return friend;
     }
 
-    public void setFriend(User friend) {
+    public void setFriend(Person friend) {
         this.friend = friend;
     }
 
-    public User getUser() {
-        return user;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }
