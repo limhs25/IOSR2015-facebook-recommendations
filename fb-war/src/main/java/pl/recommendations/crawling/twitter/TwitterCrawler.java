@@ -1,28 +1,32 @@
 package pl.recommendations.crawling.twitter;
 
+import com.google.common.primitives.Longs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import pl.recommendations.crawling.CrawlResult;
 import pl.recommendations.crawling.Crawler;
+import pl.recommendations.util.CollectionUtils;
 import twitter4j.*;
 
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 
 @Component(value = "TwitterCrawler")
 public class TwitterCrawler implements Crawler {
+
     private static final Logger logger = LogManager.getLogger(TwitterCrawler.class.getName());
+
+    private static final int FRIENDS_PER_PAGE_IN_TWITTER_API = 5000;
+
     private final ReentrantLock lock = new ReentrantLock();
+
     private final Condition rateLimitExceeded = lock.newCondition();
 
     private final Twitter twitter = TwitterConfiguration.getTwitterInstance();
+
 
     @Override
     public Optional<String> getPersonName(Long uuid) throws InterruptedException {
@@ -38,26 +42,46 @@ public class TwitterCrawler implements Crawler {
     }
 
     @Override
-    public CrawlResult getPersonFriends(Long uuid, long cursor) throws InterruptedException {
-        try {
-            IDs friendsIDs = twitter.getFriendsIDs(uuid, cursor);
-            Set<Long> uuids = Arrays.stream(friendsIDs.getIDs()).boxed().collect(Collectors.toSet());
+    public Set<Long> getPersonFriends(Long uuid, int maximumNumberOfFriends) throws InterruptedException {
+        Set<Long> uuids = new HashSet<>();
+        long cursor = -1;
+        IDs friendsIDs = null;
+
+        do {
+            try {
+                friendsIDs = twitter.getFriendsIDs(uuid, cursor);
+            } catch (TwitterException e) {
+                if (!handledTwitterException(uuid, e)) {
+                    return uuids;
+                }
+            }
+
+            uuids.addAll(Longs.asList(friendsIDs.getIDs()));
+
+            cursor = friendsIDs.getNextCursor();
             logger.debug("Crawled {} friends for user[{}]", uuids.size(), uuids);
-            return new CrawlResult(uuids, friendsIDs.getNextCursor());
-        } catch (TwitterException e) {
-            if (handledTwitterException(uuid, e)) return getPersonFriends(uuid, cursor);
-            return CrawlResult.empty();
         }
+        while (friendsIDs.hasNext() &&
+                maximumNumberOfFriends < (friendsIDs.getNextCursor() + 1) * FRIENDS_PER_PAGE_IN_TWITTER_API);
+
+        CollectionUtils.trimCollection(uuids, FRIENDS_PER_PAGE_IN_TWITTER_API);
+
+        return uuids;
     }
 
     @Override
-    public CrawlResult getPersoninterests(Long uuid, long cursor) throws InterruptedException {
+    public Map<Long, String> getPersonInterests(Long uuid, int maximumNumberOfIterests) throws InterruptedException {
+        Map<Long, String> interests = new HashMap<>();
+
         try {
-            //TODO crawl interests
+
+            //TODO crawl interests, see getPersonFriends
             throw new TwitterException("Dummy exception");
         } catch (TwitterException e) {
-            if (handledTwitterException(uuid, e)) return getPersonFriends(uuid, cursor);
-            return CrawlResult.empty();
+            if (handledTwitterException(uuid, e)) {
+            }
+            CollectionUtils.trimMap(interests, maximumNumberOfIterests);
+            return interests;
         }
     }
 
@@ -82,7 +106,7 @@ public class TwitterCrawler implements Crawler {
         return false;
     }
 
-    @Scheduled(cron = "15 * * * * *")
+    @Scheduled(cron = "* */15 * * * *")
     public void resetRateLimit() {
         logger.debug("Reseting rate limit");
         rateLimitExceeded.signalAll();

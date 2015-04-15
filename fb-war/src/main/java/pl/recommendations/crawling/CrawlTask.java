@@ -2,24 +2,24 @@ package pl.recommendations.crawling;
 
 public class CrawlTask {
     private final Long uuid;
-    private final CrawlLimit friendLimit;
-    private final CrawlLimit interestLimit;
+    private final int recursiveLimit;
+    private final int friendsLimit;
 
-    public CrawlTask(Long uuid, CrawlLimit friendLimit, CrawlLimit interestLimit) {
+    public CrawlTask(Long uuid, int recursiveLimit, int friendsLimit) {
         this.uuid = uuid;
-        this.friendLimit = friendLimit;
-        this.interestLimit = interestLimit;
+        this.recursiveLimit = recursiveLimit;
+        this.friendsLimit = friendsLimit;
     }
 
     public Long getUuid() {
         return uuid;
     }
 
-    public CrawlLimit getFriendLimit() {
-        return friendLimit;
+    public int getRecursiveLimit() {
+        return recursiveLimit;
     }
 
-    public CrawlLimit getInterestLimit() {
-        return interestLimit;
+    public int getFriendsLimit() {
+        return friendsLimit;
     }
 }

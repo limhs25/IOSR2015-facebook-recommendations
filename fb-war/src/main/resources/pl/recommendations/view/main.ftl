@@ -11,7 +11,9 @@
 	</head>
 	<body>
 		<@top.topBanner/>
-		Zalogowany jako: ${twitter.screenName}
-        <a href="logout.htm">Wyloguj</a>
+		Zalogowany jako: ${twitter.screenName}<br/>
+        TwitterID: ${twitter.id}<br/>
+        <a href="logout.htm">Wyloguj</a><br/>
+        <a href="crawl.htm">CRAWL NOW!</a><br/>
 	</body>
 </html>

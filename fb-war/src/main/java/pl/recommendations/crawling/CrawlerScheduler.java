@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -14,24 +15,30 @@ import java.util.concurrent.LinkedBlockingQueue;
 @Component
 public class CrawlerScheduler implements CrawlerService {
     private static final Logger logger = LogManager.getLogger(CrawlerScheduler.class.getName());
-    public static final int TASK_QUEUE_SIZE = 1000;
-    private static long friendLimit = 20;
-    private static long interestLimit = 20;
+    public static final int TASK_QUEUE_SIZE = 100000;
+    private static final int RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT = 3;
+    private static final int PROCESSED_FRIENDS_PER_USER_LIMIT = 1000;
+    private static final int PROCESSED_INTERESTS_PER_USER_LIMIT = 20;
 
     @Autowired
     private CrawledDataCache cache;
 
     @Autowired
-    Crawler crawler;
+    private Crawler crawler;
 
     private final BlockingQueue<CrawlTask> tasks = new LinkedBlockingQueue<>(TASK_QUEUE_SIZE);
 
     @Override
     public void scheduleCrawling(Long uuid) {
+        scheduleCrawling(uuid, RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT, PROCESSED_FRIENDS_PER_USER_LIMIT);
+    }
+
+    @Override
+    public void scheduleCrawling(Long uuid, int depthLimit, int friendsPerUserLimit) {
         if (cache.hasPerson(uuid)) {
             logger.info("Person {} alreaday crawled", uuid);
         } else {
-            CrawlTask task = createNewTask(uuid);
+            CrawlTask task = new CrawlTask(uuid, depthLimit, friendsPerUserLimit);
             tasks.add(task);
             logger.debug("Scheduled new task");
         }
@@ -51,12 +58,14 @@ public class CrawlerScheduler implements CrawlerService {
 
             crawlPersonName(uuid);
 
-            CrawlLimit friendsLimit = crawlFriends(uuid, task);
-            CrawlLimit interestsLimit = crawlInterests(uuid, task);
+            crawlInterests(uuid);
 
-            if (friendsLimit.getCount() > 0 || interestsLimit.getCount() > 0) {
-                task = new CrawlTask(uuid, friendsLimit, interestsLimit);
-                tasks.put(task);
+            Set<Long> friendsUuids = crawlFriends(uuid, task);
+
+            int recursiveDepthLimit = task.getRecursiveLimit();
+
+            if (recursiveDepthLimit > 1) {
+                friendsUuids.forEach(f -> scheduleCrawling(f, recursiveDepthLimit - 1, task.getFriendsLimit()));
             }
             logger.debug("Consumed task. Tasks in queue: {}", tasks.size());
         } catch (InterruptedException e) {
@@ -64,42 +73,21 @@ public class CrawlerScheduler implements CrawlerService {
         }
     }
 
-    private CrawlLimit crawlInterests(Long uuid, CrawlTask task) throws InterruptedException {
-        CrawlLimit limit = task.getInterestLimit();
-        long count = limit.getCount();
-        long cursor = limit.getCursor();
+    private void crawlInterests(Long uuid) throws InterruptedException {
+        Map<Long, String> interests = crawler.getPersonInterests(uuid, PROCESSED_INTERESTS_PER_USER_LIMIT);
 
-        if (count > 0 && cursor != 0) {
-            CrawlResult result = crawler.getPersoninterests(uuid, cursor);
-
-            Set<Long> interests = result.getUuids();
-            cache.onAddFriends(uuid, interests);
-
-            limit = new CrawlLimit(--count, result.getNextCursor());
+        for (Map.Entry<Long, String> interest : interests.entrySet()) {
+            cache.onNewInterest(interest.getKey(), interest.getValue());
         }
-        return limit;
+        cache.onAddInterests(uuid, interests.keySet());
     }
 
-    private CrawlLimit crawlFriends(Long uuid, CrawlTask task) throws InterruptedException {
-        CrawlLimit limit = task.getFriendLimit();
-        long count = limit.getCount();
-        long cursor = limit.getCursor();
+    private Set<Long> crawlFriends(Long uuid, CrawlTask task) throws InterruptedException {
+        Set<Long> friendsUuids = crawler.getPersonFriends(uuid, task.getRecursiveLimit());
 
-        if (count > 0 && cursor != 0) {
-            CrawlResult result = crawler.getPersonFriends(uuid, cursor);
-            Set<Long> friends = result.getUuids();
-            cache.onAddInterests(uuid, friends);
+        cache.onAddFriends(uuid, friendsUuids);
 
-            friends.forEach(this::scheduleCrawling);
-
-            limit = new CrawlLimit(--count, result.getNextCursor());
-        }
-
-        return limit;
-    }
-
-    private CrawlTask createNewTask(Long id) {
-        return new CrawlTask(id, new CrawlLimit(friendLimit), new CrawlLimit(interestLimit));
+        return friendsUuids;
     }
 
     private void crawlPersonName(Long uuid) throws InterruptedException {
@@ -111,11 +99,4 @@ public class CrawlerScheduler implements CrawlerService {
         }
     }
 
-    public static void setInterestLimit(long interestLimit) {
-        CrawlerScheduler.interestLimit = interestLimit;
-    }
-
-    public static void setFriendLimit(long friendLimit) {
-        CrawlerScheduler.friendLimit = friendLimit;
-    }
 }

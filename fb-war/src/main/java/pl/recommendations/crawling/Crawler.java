@@ -2,7 +2,9 @@ package pl.recommendations.crawling;
 
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @Component
 public interface Crawler {
@@ -10,7 +12,7 @@ public interface Crawler {
 
     Optional<String> getPersonName(Long uuid) throws InterruptedException;
 
-    CrawlResult getPersonFriends(Long uuid, long cursor) throws InterruptedException;
+    Set<Long> getPersonFriends(Long uuid, int maximumNumberOfFriends) throws InterruptedException;
 
-    CrawlResult getPersoninterests(Long uuid, long cursor) throws InterruptedException;
+    Map<Long, String> getPersonInterests(Long uuid, int maximumNumberOfInterests) throws InterruptedException;
 }
