@@ -3,6 +3,7 @@ package pl.recommendations.db.interest;
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.GraphId;
+import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedToVia;
 import pl.recommendations.db.RelationshipType;
@@ -17,7 +18,9 @@ public class Interest {
     @GraphId
     private Long graphID;
 
+    @Indexed(unique = true)
     private Long uuid;
+    private String name;
 
     @RelatedToVia(type = RelationshipType.SIMILARITY, direction = Direction.BOTH)
     private Set<Similarity> similarities = new HashSet<>();
@@ -68,6 +71,14 @@ public class Interest {
 
     public void setUuid(Long uuid) {
         this.uuid = uuid;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Long getId() {

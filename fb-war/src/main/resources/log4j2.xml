@@ -7,11 +7,11 @@
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{HH:mm:ss.SSS} %-6p(%F:%L) - %m%n"/>
         </Console>
-</Appenders>
-<Loggers>
-    <Root level="trace">
-        <AppenderRef ref="file" level="DEBUG"/>
-        <AppenderRef ref="Console" level="INFO"/>
-    </Root>
+    </Appenders>
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="file" level="DEBUG"/>
+            <AppenderRef ref="Console" level="INFO"/>
+        </Root>
     </Loggers>
 </Configuration>
