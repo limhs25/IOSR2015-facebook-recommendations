@@ -9,8 +9,10 @@ import java.util.Collection;
 public interface PersonRepository extends GraphRepository<Person> {
     Person findByUuid(Long uuid);
 
-    @Query("start u = node({0}) " +
-            "match u-[" + RelationshipType.FRIENDSHIP + "]->u2 " +
+    @Query("match u-[" + RelationshipType.FRIENDSHIP + "]->u2 " +
+            "where u.uuid = {0} " +
             "return u2")
     Collection<Person> getFriendsOf(Long id);
+
+
 }

@@ -58,7 +58,7 @@ public class PersonRepositoryTest extends EntityFactory {
 
         assertEquals(friendships.size(), 2);
 
-        Collection<Person> firends = personRepo.getFriendsOf(person1.getId());
+        Collection<Person> firends = personRepo.getFriendsOf(person1.getUuid());
         assertEquals(firends.size(), 2);
         assertTrue(firends.contains(person2));
         assertTrue(firends.contains(person3));
