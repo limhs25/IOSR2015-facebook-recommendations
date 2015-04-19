@@ -19,16 +19,17 @@ public class TwitterCrawler implements Crawler {
 
     private static final Logger logger = LogManager.getLogger(TwitterCrawler.class.getName());
 
-    private static final int FRIENDS_PER_PAGE = 5000;
+    private static final int FRIENDS_PER_PAGE_IN_TWITTER_API = 5000;
 
     private final ReentrantLock lock = new ReentrantLock();
-    private final Condition freeWindow = lock.newCondition();
+
+    private final Condition rateLimitExceeded = lock.newCondition();
 
     private final Twitter twitter = TwitterConfiguration.getTwitterInstance();
 
+
     @Override
     public Optional<String> getPersonName(Long uuid) throws InterruptedException {
-        lock.lock();
         try {
             User user = twitter.showUser(uuid);
             String name = user.getScreenName();
@@ -37,8 +38,6 @@ public class TwitterCrawler implements Crawler {
         } catch (TwitterException e) {
             if (handledTwitterException(uuid, e)) return getPersonName(uuid);
             return Optional.empty();
-        } finally {
-            lock.unlock();
         }
     }
 
@@ -49,23 +48,23 @@ public class TwitterCrawler implements Crawler {
         IDs friendsIDs = null;
 
         do {
-            lock.lock();
             try {
                 friendsIDs = twitter.getFriendsIDs(uuid, cursor);
-                uuids.addAll(Longs.asList(friendsIDs.getIDs()));
-                cursor = friendsIDs.getNextCursor();
             } catch (TwitterException e) {
                 if (!handledTwitterException(uuid, e)) {
                     return uuids;
                 }
-            } finally {
-                lock.unlock();
             }
-            logger.debug("Crawled {} friends for user[{}]", uuids.size(), uuids);
-        }while (friendsIDs != null && friendsIDs.hasNext() &&
-                maximumNumberOfFriends < (friendsIDs.getNextCursor() + 1) * FRIENDS_PER_PAGE);
 
-        CollectionUtils.trimCollection(uuids, FRIENDS_PER_PAGE);
+            uuids.addAll(Longs.asList(friendsIDs.getIDs()));
+
+            cursor = friendsIDs.getNextCursor();
+            logger.debug("Crawled {} friends for user[{}]", uuids.size(), uuids);
+        }
+        while (friendsIDs.hasNext() &&
+                maximumNumberOfFriends < (friendsIDs.getNextCursor() + 1) * FRIENDS_PER_PAGE_IN_TWITTER_API);
+
+        CollectionUtils.trimCollection(uuids, FRIENDS_PER_PAGE_IN_TWITTER_API);
 
         return uuids;
     }
@@ -73,7 +72,7 @@ public class TwitterCrawler implements Crawler {
     @Override
     public Map<Long, String> getPersonInterests(Long uuid, int maximumNumberOfIterests) throws InterruptedException {
         Map<Long, String> interests = new HashMap<>();
-        lock.lock();
+
         try {
 
             //TODO crawl interests, see getPersonFriends
@@ -83,8 +82,6 @@ public class TwitterCrawler implements Crawler {
             }
             CollectionUtils.trimMap(interests, maximumNumberOfIterests);
             return interests;
-        } finally {
-            lock.unlock();
         }
     }
 
@@ -92,11 +89,15 @@ public class TwitterCrawler implements Crawler {
         return e.getErrorCode() == 88;
     }
 
+    private void waitForNewWindow() throws InterruptedException {
+        logger.debug("Waiting for rate limit to be reset");
+        rateLimitExceeded.await();
+    }
+
     private boolean handledTwitterException(Long uuid, TwitterException e) throws InterruptedException {
         if (exceededRateLimit(e)) {
-            logger.info("Waiting for rate limit to be reset");
-            freeWindow.await();
-            logger.info("Resumed crawling");
+            logger.warn("Exceeded rate limit for Twitter.");
+            waitForNewWindow();
             return true;
         } else if (e.getStatusCode() == HttpResponseCode.UNAUTHORIZED ||
                 e.getStatusCode() == HttpResponseCode.NOT_FOUND) {
@@ -106,11 +107,9 @@ public class TwitterCrawler implements Crawler {
         return false;
     }
 
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "* */15 * * * *")
     public void resetRateLimit() {
-        logger.info("Resetting rate limit");
-        lock.lock();
-        freeWindow.signalAll();
-        lock.unlock();
+        logger.debug("Reseting rate limit");
+        rateLimitExceeded.signalAll();
     }
 }

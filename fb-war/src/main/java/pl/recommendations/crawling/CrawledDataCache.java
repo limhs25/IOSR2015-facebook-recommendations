@@ -3,16 +3,12 @@ package pl.recommendations.crawling;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 @Component
 public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter, CrawledDataStorage {
-    private final Logger logger = LogManager.getLogger(CrawledDataCache.class.getName());
-
     private final Set<CrawledDataListener> listeners = Collections.newSetFromMap(new IdentityHashMap<>());
 
     private final Map<Long, String> users = new HashMap<>();
@@ -92,7 +88,6 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     @Override
     public void register(CrawledDataListener listener) {
         listeners.add(listener);
-        logger.info("{} listeners", listeners.size());
     }
 
     @Override

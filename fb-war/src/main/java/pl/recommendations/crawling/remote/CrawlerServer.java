@@ -38,7 +38,7 @@ public class CrawlerServer {
     public static void main(String[] args) throws IOException {
         ApplicationContext context = new ClassPathXmlApplicationContext("classpath:spring/applicationContext.xml");
         CrawlerServer server = new CrawlerServer(PORT, context);
-        logger.info("Awaiting connection");
+
         while (true) {
             server.acceptConnection();
         }

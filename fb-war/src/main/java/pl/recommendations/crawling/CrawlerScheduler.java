@@ -3,6 +3,7 @@ package pl.recommendations.crawling;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -10,13 +11,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 @Component
-public class CrawlerScheduler implements CrawlerService, Runnable {
+public class CrawlerScheduler implements CrawlerService {
     private static final Logger logger = LogManager.getLogger(CrawlerScheduler.class.getName());
-
-    private static final int TASK_QUEUE_SIZE = 100000;
+    public static final int TASK_QUEUE_SIZE = 100000;
     private static final int RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT = 3;
     private static final int PROCESSED_FRIENDS_PER_USER_LIMIT = 1000;
     private static final int PROCESSED_INTERESTS_PER_USER_LIMIT = 20;
@@ -28,24 +27,12 @@ public class CrawlerScheduler implements CrawlerService, Runnable {
     private Crawler crawler;
 
     private final BlockingQueue<CrawlTask> tasks = new LinkedBlockingQueue<>(TASK_QUEUE_SIZE);
-    private final Thread schedulerThread;
-
-    public CrawlerScheduler() {
-        schedulerThread = new Thread(this, "Crawler Scheduler");
-        schedulerThread.start();
-    }
-
-    public void onShutdown() throws InterruptedException {
-        schedulerThread.join();
-        while (!tasks.isEmpty()){
-            consumeTask();
-        }
-    }
 
     @Override
     public void scheduleCrawling(Long uuid) {
         scheduleCrawling(uuid, RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT, PROCESSED_FRIENDS_PER_USER_LIMIT);
     }
+
 
     public void scheduleCrawling(Long uuid, int depthLimit, int friendsPerUserLimit) {
         if (cache.hasPerson(uuid)) {
@@ -53,29 +40,20 @@ public class CrawlerScheduler implements CrawlerService, Runnable {
         } else {
             CrawlTask task = new CrawlTask(uuid, depthLimit, friendsPerUserLimit);
             tasks.add(task);
+            logger.debug("Scheduled new task");
         }
     }
 
-    @Override
-    public void run() {
-        while (!Thread.currentThread().isInterrupted()) {
-            try {
-                if (tasks.isEmpty()) {
-                    Thread.sleep(TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS));
-                } else {
-                    consumeTask();
-                }
-            } catch (InterruptedException e) {
-                logger.info("Interrupted Crawler Scheduler.");
-                Thread.currentThread().interrupt();
-            }
+    @Scheduled(fixedDelay = 10l)
+    public void consumeTask() {
+        if (tasks.isEmpty()) {
+            return;
         }
-    }
 
-    public void consumeTask() throws InterruptedException {
+        try {
             CrawlTask task = tasks.poll();
 
-            logger.debug("Consuming new task. Tasks in queue: {}", tasks.size());
+            logger.debug("Consuming new task. Tasks in queue: {}");
             Long uuid = task.getUuid();
 
             crawlPersonName(uuid);
@@ -83,7 +61,9 @@ public class CrawlerScheduler implements CrawlerService, Runnable {
             crawlFriends(uuid, task);
 
             logger.debug("Consumed task. Tasks in queue: {}", tasks.size());
-
+        } catch (InterruptedException e) {
+            logger.warn("Interrupted while consuming task due to: {}", e.getMessage(), e);
+        }
     }
 
     private void crawlInterests(Long uuid) throws InterruptedException {
