@@ -96,12 +96,12 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     }
 
     @Override
-    public String getPersonName(Long uuid) {
+    public Object getPersonName(Long uuid) {
         return users.get(uuid);
     }
 
     @Override
-    public String getInterestName(Long uuid) {
+    public Object getInterestName(Long uuid) {
         return interests.get(uuid);
     }
 

@@ -10,11 +10,6 @@ import java.util.Map;
 public class CollectionUtils {
 
     public static void trimCollection(Collection collection, int numberOfElements){
-        if( collection.size() < numberOfElements){
-            return;
-        }
-
-        numberOfElements = collection.size() - numberOfElements;
         Iterator it = collection.iterator();
         int counter = 0;
 
@@ -28,12 +23,7 @@ public class CollectionUtils {
     }
 
     public static void trimMap(Map map, int numberOfElements) {
-        if( map.size() < numberOfElements){
-            return;
-        }
-
-        numberOfElements = map.size() - numberOfElements;
-        Iterator it = map.entrySet().iterator();
+        Iterator<Map.Entry<String, String>> it = map.entrySet().iterator();
         int counter = 0;
 
         while(it.hasNext()){

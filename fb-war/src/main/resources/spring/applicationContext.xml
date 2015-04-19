@@ -11,17 +11,18 @@
         http://www.springframework.org/schema/context
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/data/neo4j
-         http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd">
+        http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd">
+
 
     <context:component-scan base-package="pl.recommendations"/>
     <context:annotation-config/>
     <tx:annotation-driven mode="proxy" transaction-manager="transactionManager"/>
 
     <bean id="neo4jConfiguration" class="org.springframework.data.neo4j.config.Neo4jConfiguration">
-        <property name="basePackage" value="pl.recommendations.db"/>
+        <property name="basePackage" value="pl.quatrofantastico.fb.db"/>
     </bean>
 
-    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/fb"/>
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/fb1.db"/>
     <neo4j:repositories base-package="pl.recommendations"/>
 
     <context:component-scan base-package="pl.recommendations"/>

@@ -96,13 +96,12 @@ public class TwitterCrawler implements Crawler {
 
     private boolean handledTwitterException(Long uuid, TwitterException e) throws InterruptedException {
         if (exceededRateLimit(e)) {
-            logger.warn("Exceeded rate limit for Twitter.");
+            logger.warn("Exceeded rate limit for crawling interests.");
             waitForNewWindow();
             return true;
         } else if (e.getStatusCode() == HttpResponseCode.UNAUTHORIZED ||
                 e.getStatusCode() == HttpResponseCode.NOT_FOUND) {
-            logger.debug("Omitting Twitter crawling for {} due to {}", uuid, e.getMessage());
-            return true;
+            logger.debug("Omitting interests crawling for {} due to {}", uuid, e.getMessage());
         }
         return false;
     }

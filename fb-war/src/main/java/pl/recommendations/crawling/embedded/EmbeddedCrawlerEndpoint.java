@@ -14,6 +14,16 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     protected CrawledDataCache cache;
 
     @Override
+    public Object getPersonName(Long uuid) {
+        return cache.getPersonName(uuid);
+    }
+
+    @Override
+    public Object getInterestName(Long uuid) {
+        return cache.getInterestName(uuid);
+    }
+
+    @Override
     public void scheduleCrawling(Long uuid) {
         scheduler.scheduleCrawling(uuid);
 

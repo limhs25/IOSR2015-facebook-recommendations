@@ -33,10 +33,10 @@ public class CrawlerScheduler implements CrawlerService {
         scheduleCrawling(uuid, RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT, PROCESSED_FRIENDS_PER_USER_LIMIT);
     }
 
-
+    @Override
     public void scheduleCrawling(Long uuid, int depthLimit, int friendsPerUserLimit) {
         if (cache.hasPerson(uuid)) {
-            logger.debug("Person {} alreaday crawled", uuid);
+            logger.info("Person {} alreaday crawled", uuid);
         } else {
             CrawlTask task = new CrawlTask(uuid, depthLimit, friendsPerUserLimit);
             tasks.add(task);
@@ -44,7 +44,7 @@ public class CrawlerScheduler implements CrawlerService {
         }
     }
 
-    @Scheduled(fixedDelay = 10l)
+    @Scheduled(fixedDelay = 100l)
     public void consumeTask() {
         if (tasks.isEmpty()) {
             return;
@@ -57,9 +57,16 @@ public class CrawlerScheduler implements CrawlerService {
             Long uuid = task.getUuid();
 
             crawlPersonName(uuid);
-            crawlInterests(uuid);
-            crawlFriends(uuid, task);
 
+            crawlInterests(uuid);
+
+            Set<Long> friendsUuids = crawlFriends(uuid, task);
+
+            int recursiveDepthLimit = task.getRecursiveLimit();
+
+            if (recursiveDepthLimit > 1) {
+                friendsUuids.forEach(f -> scheduleCrawling(f, recursiveDepthLimit - 1, task.getFriendsLimit()));
+            }
             logger.debug("Consumed task. Tasks in queue: {}", tasks.size());
         } catch (InterruptedException e) {
             logger.warn("Interrupted while consuming task due to: {}", e.getMessage(), e);
@@ -75,15 +82,12 @@ public class CrawlerScheduler implements CrawlerService {
         cache.onAddInterests(uuid, interests.keySet());
     }
 
-    private void crawlFriends(Long uuid, CrawlTask task) throws InterruptedException {
-        int recursiveLimit = task.getRecursiveLimit();
-        Set<Long> friendsUuids = crawler.getPersonFriends(uuid, recursiveLimit);
+    private Set<Long> crawlFriends(Long uuid, CrawlTask task) throws InterruptedException {
+        Set<Long> friendsUuids = crawler.getPersonFriends(uuid, task.getRecursiveLimit());
 
         cache.onAddFriends(uuid, friendsUuids);
 
-        if (recursiveLimit > 0) {
-            friendsUuids.forEach(f -> scheduleCrawling(f, recursiveLimit - 1, task.getFriendsLimit()));
-        }
+        return friendsUuids;
     }
 
     private void crawlPersonName(Long uuid) throws InterruptedException {
