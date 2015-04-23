@@ -39,7 +39,6 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
         try {
             while (socket != null) {
                 Object msg = in.readObject();
-
                 if (msg instanceof NoticeMessage) {
                     dispatchNotice((NoticeMessage) msg);
                 } else {

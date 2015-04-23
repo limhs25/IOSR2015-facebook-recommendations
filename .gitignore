@@ -18,3 +18,5 @@ hs_err_pid*
 
 # neo4J database
 fb-war/data/*
+fb-war/csvDb/*
+fb-war/logs/*
