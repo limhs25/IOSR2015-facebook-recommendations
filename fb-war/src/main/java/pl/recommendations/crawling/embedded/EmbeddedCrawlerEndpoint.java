@@ -7,11 +7,12 @@ import org.springframework.stereotype.Component;
 import pl.recommendations.crawling.CrawledDataCache;
 import pl.recommendations.crawling.CrawlerEndpoint;
 import pl.recommendations.crawling.CrawlerScheduler;
-import pl.recommendations.db.interest.Interest;
+import pl.recommendations.db.interest.InterestEntity;
 import pl.recommendations.db.interest.InterestRepository;
 import pl.recommendations.db.person.Person;
 import pl.recommendations.db.person.PersonRepository;
 
+import java.util.Map;
 import java.util.Set;
 
 @Component
@@ -33,34 +34,33 @@ public class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     }
 
     @Override
-    public void onNewPerson(Long uuid, String name) {
-        if (peopleRepo.findByUuid(uuid) == null) {
+    public void onNewPerson(Long userId, String name) {
+        if (peopleRepo.findByUuid(userId) == null) {
             Person person = new Person();
-            person.setUuid(uuid);
+            person.setUuid(userId);
             person.setName(name);
 
             peopleRepo.save(person);
         } else {
-            logger.warn("User[{}] already exists", uuid);
+            logger.debug("User[{}] already exists", userId);
         }
     }
 
     @Override
-    public void onNewInterest(Long uuid, String name) {
-        if (interestsRepo.findByUuid(uuid) == null) {
-            Interest interest = new Interest();
-            interest.setUuid(uuid);
-            interest.setName(name);
+    public void onNewInterest(String interestName) {
+        if (interestsRepo.findByName(interestName) == null) {
+            InterestEntity interestEntity = new InterestEntity();
+            interestEntity.setName(interestName);
 
-            interestsRepo.save(interest);
+            interestsRepo.save(interestEntity);
         } else {
-            logger.warn("Interest[{}] already exists", uuid);
+            logger.debug("Interest[{}] already exists", interestName);
         }
     }
 
     @Override
-    public void onAddFriends(Long uuid, Set<Long> friends) {
-        Person person = peopleRepo.findByUuid(uuid);
+    public void onAddFriends(Long userId, Set<Long> friends) {
+        Person person = peopleRepo.findByUuid(userId);
         if (person != null) {
             friends.stream()
                     .map(peopleRepo::findByUuid)
@@ -72,13 +72,17 @@ public class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     }
 
     @Override
-    public void onAddInterests(Long uuid, Set<Long> interests) {
-        Person person = peopleRepo.findByUuid(uuid);
+    public void onAddInterests(Long userId, Map<String, Long> interests) {
+        Person person = peopleRepo.findByUuid(userId);
         if (person != null) {
-            interests.stream()
-                    .map(interestsRepo::findByUuid)
-                    .forEach(person::addInterest);
-            peopleRepo.save(person);
+            for (Map.Entry<String, Long> entry : interests.entrySet()) {
+                InterestEntity interest = interestsRepo.findByName(entry.getKey());
+                if(interest != null){
+                    person.addInterest(interest, entry.getValue());
+                }else{
+                    logger.warn("Interest {} does not exist", entry.getKey());
+                }
+            }
         } else {
             logger.warn("Cannot add interests to non-existing user");
         }

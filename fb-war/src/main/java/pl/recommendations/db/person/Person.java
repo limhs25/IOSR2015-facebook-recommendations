@@ -1,9 +1,10 @@
 package pl.recommendations.db.person;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
-import pl.recommendations.db.interest.Interest;
+import pl.recommendations.db.interest.InterestEntity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -15,13 +16,13 @@ public class Person {
 
     @Indexed(unique = true)
     private Long uuid;
+    @Fetch
     private String name;
 
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<Friendship> friendships = new HashSet<>();
 
-    @Fetch
-    @RelatedTo(direction = Direction.OUTGOING)
+    @RelatedToVia(direction = Direction.OUTGOING)
     private Set<Interest> interests = new HashSet<>();
 
     public void addFriend(Person friend) {
@@ -33,8 +34,15 @@ public class Person {
         }
     }
 
-    public void addInterest(Interest interest) {
-        if (interest != null) {
+    public void addInterest(InterestEntity interestEntity, Long weight) {
+        Preconditions.checkArgument(weight > 0);
+
+        Interest interest = new Interest();
+        interest.setPerson(this);
+        interest.setInterest(interestEntity);
+
+        if (interestEntity != null && !interests.contains(interest)) {
+            interest.setWeight(weight);
             interests.add(interest);
         }
     }
@@ -46,9 +54,7 @@ public class Person {
 
         Person person = (Person) o;
 
-        if (uuid != null ? !uuid.equals(person.uuid) : person.uuid != null) return false;
-
-        return true;
+        return !(uuid != null ? !uuid.equals(person.uuid) : person.uuid != null);
     }
 
     @Override
@@ -63,15 +69,13 @@ public class Person {
     public void setUuid(Long uuid) {
         this.uuid = uuid;
     }
+
     public void setName(String name) {
         this.name = name;
     }
 
     public String getName() {
         return name;
-    }
-    public Set<Interest> getInterests() {
-        return ImmutableSet.copyOf(interests);
     }
 
     public Set<Friendship> getFriendships() {
@@ -82,7 +86,7 @@ public class Person {
         return graphID;
     }
 
-    public void setInterests(Set<Interest> interests) {
-        this.interests = interests;
+    public Set<Interest> getInterests() {
+        return interests;
     }
 }

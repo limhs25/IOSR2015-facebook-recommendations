@@ -6,12 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import pl.recommendations.db.interest.Interest;
+import pl.recommendations.db.interest.InterestEntity;
+import pl.recommendations.db.interest.InterestRepository;
 import pl.recommendations.db.person.Friendship;
+import pl.recommendations.db.person.Interest;
 import pl.recommendations.db.person.Person;
 import pl.recommendations.db.person.PersonRepository;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -24,11 +28,12 @@ public class PersonRepositoryTest extends EntityFactory {
 
     @Autowired
     private PersonRepository personRepo;
-
-    private static long uuid = 1l;
+    @Autowired
+    private InterestRepository interestRepo;
 
     @Test
     public void saveAndGet() {
+        long uuid = 1l;
         Person expected = createUser(uuid);
         personRepo.save(expected);
 
@@ -67,24 +72,31 @@ public class PersonRepositoryTest extends EntityFactory {
     @Test
     public void addInterests() {
         long uuid1 = 1l;
-        long uuid2 = 2l;
-        long uuid3 = 3l;
+
+        String name1 = "name1";
+        String name2 = "name2";
+
+        Map<String, Long> weights = new HashMap<>();
+        weights.put(name1, 5l);
+        weights.put(name2, 3l);
 
         Person person1 = createUser(uuid1);
-        Interest interest1 = createInterest(uuid2);
-        Interest interest2 = createInterest(uuid3);
+        InterestEntity interestEntity1 = createInterest(name1);
+        InterestEntity interestEntity2 = createInterest(name2);
+        person1.addInterest(interestEntity1, weights.get(name1));
+        person1.addInterest(interestEntity2, weights.get(name2));
 
-        person1.addInterest(interest1);
-        person1.addInterest(interest2);
-
+        interestRepo.save(interestEntity1);
+        interestRepo.save(interestEntity2);
         personRepo.save(person1);
 
         Person person = personRepo.findByUuid(uuid1);
-        Set<Interest> interests = person.getInterests();
+        Set<Interest> interestEntities = person.getInterests();
 
-        assertEquals(interests.size(), 2);
-        assertTrue(interests.contains(interest1));
-        assertTrue(interests.contains(interest2));
+        assertEquals(interestEntities.size(), 2);
+        interestEntities.forEach(i ->
+            assertEquals(weights.get(i.getInterest().getName()), i.getWeight())
+        );
     }
 
 }

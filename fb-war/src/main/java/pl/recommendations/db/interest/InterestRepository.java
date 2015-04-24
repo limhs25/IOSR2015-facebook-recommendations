@@ -7,16 +7,16 @@ import pl.recommendations.db.interest.relationships.Contrast;
 import pl.recommendations.db.interest.relationships.Similarity;
 
 
-public interface InterestRepository extends GraphRepository<Interest> {
-    Interest findByUuid(Long uuid);
+public interface InterestRepository extends GraphRepository<InterestEntity> {
+    InterestEntity findByName(String interestName);
 
-    @Query("start i1 = node({0}), i2 = node({1}) \n" +
-            "match i1-[s:" + RelationshipType.SIMILARITY + "]->i2 \n" +
+    @Query("match i1-[s:" + RelationshipType.SIMILARITY + "]->i2 \n" +
+            "where i1.name = {0} and i2.name = {1} \n" +
             "return s")
-    Similarity getSimilarityOf(Long i1, Long i2);
+    Similarity getSimilarityOf(String name1, String name2);
 
-    @Query("start i1 = node({0}), i2 = node({1}) \n" +
-            "match i1-[s:" + RelationshipType.CONTRAST + "]->i2 \n" +
+    @Query("match i1-[s:" + RelationshipType.CONTRAST + "]->i2 \n" +
+            "where i1.name = {0} and i2.name = {1} \n" +
             "return s")
-    Contrast getContrastOf(Long id, Long id1);
+    Contrast getContrastOf(String name1, String name2);
 }

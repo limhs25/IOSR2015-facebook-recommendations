@@ -1,14 +1,15 @@
 package pl.recommendations.crawling;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Map;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class CacheTest {
     private CrawledDataCache cache;
@@ -64,25 +65,23 @@ public class CacheTest {
 
     @Test
     public void addInterest() {
-        long uuid = 1l;
         String name = "name";
-        cache.onNewInterest(uuid, name);
+        cache.onNewInterest( name);
         assertEquals(1, cache.getInterests().size());
         assertEquals(1, listener.getInterests().size());
-        assertEquals(name, cache.getInterests().get(uuid));
-        assertEquals(name, listener.getInterests().get(uuid));
+        assertTrue(cache.getInterests().contains(name));
+        assertTrue(listener.getInterests().contains(name));
     }
 
     @Test
     public void addSameInterestTwice() {
-        long uuid = 1l;
         String name = "name";
-        cache.onNewInterest(uuid, name);
-        cache.onNewInterest(uuid, name);
+        cache.onNewInterest( name);
+        cache.onNewInterest( name);
         assertEquals(1, cache.getInterests().size());
         assertEquals(1, listener.getInterests().size());
-        assertEquals(name, cache.getInterests().get(uuid));
-        assertEquals(name, listener.getInterests().get(uuid));
+        assertTrue(cache.getInterests().contains(name));
+        assertTrue(listener.getInterests().contains(name));
     }
 
     @Test
@@ -142,60 +141,24 @@ public class CacheTest {
     }
 
     @Test
-    public void addExistingInterests() {
+    public void addInterests() {
         long uuid = 1l;
         String name = "name";
-        Set<Long> interests = ImmutableSet.of(2l, 3l, 4l, 5l);
+        Map<String, Long> interests = ImmutableMap.of("name1", 1l, "name2", 2l, "name3", 3l);
 
         cache.onNewPerson(uuid, name);
-        interests.forEach(id -> cache.onNewInterest(id, id.toString()));
+        interests.keySet().forEach(cache::onNewInterest);
 
         cache.onAddInterests(uuid, interests);
 
         assertNotNull(cache.getUserInterests().get(uuid));
         assertEquals(interests.size(), cache.getUserInterests().get(uuid).size());
-        assertEquals(0, cache.getAwaitingInterests().size());
 
         assertNotNull(listener.getUserInterests().get(uuid));
         assertEquals(interests.size(), listener.getUserInterests().get(uuid).size());
     }
 
-    @Test
-    public void addUnexistingInterests() {
-        long uuid = 1l;
-        String name = "name";
-        Set<Long> interests = ImmutableSet.of(2l, 3l, 4l, 5l);
 
-        cache.onNewPerson(uuid, name);
-        cache.onAddInterests(uuid, interests);
-
-        assertNotNull(cache.getUserInterests().get(uuid));
-        assertEquals(0, cache.getUserInterests().get(uuid).size());
-        assertEquals(interests.size(), cache.getAwaitingInterests().size());
-
-        assertNotNull(listener.getUserInterests().get(uuid));
-        assertEquals(0, listener.getUserInterests().get(uuid).size());
-    }
-
-    @Test
-    public void addBothExistingAndUnexistingInterests() {
-        long uuid = 1l;
-        String name = "name";
-        Set<Long> crawledInterests = ImmutableSet.of(2l, 3l);
-        Set<Long> notCrawledInterests = ImmutableSet.of(4l, 5l);
-
-        cache.onNewPerson(uuid, name);
-        crawledInterests.forEach(id -> cache.onNewInterest(id, id.toString()));
-
-        cache.onAddInterests(uuid, Sets.union(crawledInterests, notCrawledInterests));
-
-        assertNotNull(cache.getUserInterests().get(uuid));
-        assertEquals(crawledInterests.size(), cache.getUserInterests().get(uuid).size());
-        assertEquals(notCrawledInterests.size(), cache.getAwaitingInterests().size());
-
-        assertNotNull(listener.getUserInterests().get(uuid));
-        assertEquals(crawledInterests.size(), listener.getUserInterests().get(uuid).size());
-    }
 
     @Test
     public void addAwaitingFriend() {
@@ -216,26 +179,4 @@ public class CacheTest {
         assertNotNull(listener.getUserFriends().get(uuid));
         assertEquals(1, listener.getUserFriends().get(uuid).size());
     }
-
-    @Test
-    public void addAwaitingInterest() {
-        long uuid = 1l;
-        long awaitingInterestUuid = 2l;
-        String name = "name";
-        Set<Long> interests = ImmutableSet.of(awaitingInterestUuid, 3l, 4l, 5l);
-
-        cache.onNewPerson(uuid, name);
-        cache.onAddInterests(uuid, interests);
-
-        cache.onNewInterest(awaitingInterestUuid, name);
-
-        assertNotNull(cache.getUserInterests().get(uuid));
-        assertEquals(1, cache.getUserInterests().get(uuid).size());
-        assertEquals(interests.size() - 1, cache.getAwaitingInterests().size());
-
-        assertNotNull(listener.getUserInterests().get(uuid));
-        assertEquals(1, listener.getUserInterests().get(uuid).size());
-    }
-
-
 }

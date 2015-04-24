@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -38,24 +39,25 @@ public class FileStoreClient extends CrawlerClient {
     }
 
     @Override
-    public void onNewPerson(Long uuid, String name) {
-        write(people, uuid, name);
+    public void onNewPerson(Long userId, String name) {
+        write(people, userId, name);
     }
 
 
     @Override
-    public void onNewInterest(Long uuid, String name) {
-        write(interests, uuid, name);
+    public void onNewInterest(String interestName) {
+        write(interests, interestName);
     }
 
     @Override
-    public void onAddFriends(Long uuid, Set<Long> friends) {
-        friends.forEach(f -> write(peopleRelations, uuid, f));
+    public void onAddFriends(Long userId, Set<Long> friends) {
+        friends.forEach(f -> write(peopleRelations, userId, f));
     }
 
     @Override
-    public void onAddInterests(Long uuid, Set<Long> interests) {
-        interests.forEach(i -> write(interestRelations, uuid, i));
+    public void onAddInterests(Long userId, Map<String, Long> interests) {
+        logger.info("adding {} interests", interests.size());
+        interests.entrySet().forEach(e -> write(interestRelations, userId, e.getKey(), e.getValue()));
     }
 
     private void write(FileWriter writer, Object... objects) {

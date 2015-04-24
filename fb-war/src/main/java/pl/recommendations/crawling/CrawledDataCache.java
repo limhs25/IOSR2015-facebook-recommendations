@@ -16,67 +16,53 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     private final Set<CrawledDataListener> listeners = Collections.newSetFromMap(new IdentityHashMap<>());
 
     private final Map<Long, String> users = new HashMap<>();
-    private final Map<Long, String> interests = new HashMap<>();
+    private final Set<String> interests = new HashSet<>();
     private final Map<Long, Set<Long>> userFriends = new HashMap<>();
-    private final Map<Long, Set<Long>> userInterests = new HashMap<>();
+    private final Map<Long, Map<String, Long>> userInterests = new HashMap<>();
 
     /**
      * friend -> userIds
      * Invariant: userIds are always contained by <code>users</code>
      */
     private final Map<Long, Set<Long>> awaitingFriends = new HashMap<>();
-    /**
-     * interest -> userIds
-     * Invariant: userIds are always contained by <code>users</code>
-     */
-    private final Map<Long, Set<Long>> awaitingInterests = new HashMap<>();
 
     @Override
-    public void onNewPerson(Long uuid, String name) {
-        users.put(uuid, name);
-        userFriends.put(uuid, new HashSet<>());
-        userInterests.put(uuid, new HashSet<>());
+    public void onNewPerson(Long userId, String name) {
+        users.put(userId, name);
+        userFriends.put(userId, new HashSet<>());
+        userInterests.put(userId, new HashMap<>());
 
-        listeners.forEach(l -> l.onNewPerson(uuid, name));
+        listeners.forEach(l -> l.onNewPerson(userId, name));
 
         awaitingFriends
-                .getOrDefault(uuid, Collections.emptySet())
-                .forEach(user -> addFriendAndNotify(user, uuid));
-        awaitingFriends.remove(uuid);
+                .getOrDefault(userId, Collections.emptySet())
+                .forEach(user -> addFriendAndNotify(user, userId));
+        awaitingFriends.remove(userId);
     }
 
     @Override
-    public void onNewInterest(Long uuid, String name) {
-        interests.put(uuid, name);
+    public void onNewInterest(String interestName) {
+        interests.add(interestName);
 
-        listeners.forEach(l -> l.onNewInterest(uuid, name));
-
-        awaitingInterests
-                .getOrDefault(uuid, Collections.emptySet())
-                .forEach(user -> addInterestAndNotify(user, uuid));
-        awaitingInterests.remove(uuid);
+        listeners.forEach(l -> l.onNewInterest(interestName));
     }
 
     @Override
-    public void onAddFriends(Long uuid, Set<Long> friends) {
+    public void onAddFriends(Long userId, Set<Long> friends) {
         Set<Long> crawledFriends = Sets.intersection(friends, users.keySet());
         Set<Long> notCrawled = Sets.difference(friends, crawledFriends);
 
-        getOrUpdate(userFriends, uuid).addAll(crawledFriends);
-        listeners.forEach(l -> l.onAddFriends(uuid, crawledFriends));
+        getOrUpdate(userFriends, userId).addAll(crawledFriends);
+        listeners.forEach(l -> l.onAddFriends(userId, crawledFriends));
 
-        notCrawled.forEach(friendUuid -> getOrUpdate(awaitingFriends, friendUuid).add(uuid));
+        notCrawled.forEach(friendUuid -> getOrUpdate(awaitingFriends, friendUuid).add(userId));
     }
 
     @Override
-    public void onAddInterests(Long uuid, Set<Long> newInterests) {
-        Set<Long> crawledInterests = Sets.intersection(newInterests, interests.keySet());
-        Set<Long> notCrawled = Sets.difference(newInterests, crawledInterests);
+    public void onAddInterests(Long userId, Map<String, Long> newInterests) {
+        userInterests.get(userId).putAll(newInterests);
 
-        getOrUpdate(userInterests, uuid).addAll(crawledInterests);
-        listeners.forEach(l -> l.onAddInterests(uuid, crawledInterests));
-
-        notCrawled.forEach(friendUuid -> getOrUpdate(awaitingInterests, friendUuid).add(uuid));
+        listeners.forEach(l -> l.onAddInterests(userId, newInterests));
     }
 
     private void addFriendAndNotify(Long user, Long friendUuid) {
@@ -84,15 +70,9 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
         listeners.forEach(l -> l.onAddFriends(user, ImmutableSet.of(friendUuid)));
     }
 
-    private void addInterestAndNotify(Long user, Long interestUuid) {
-        userInterests.get(user).add(interestUuid);
-        listeners.forEach(l -> l.onAddInterests(user, ImmutableSet.of(interestUuid)));
-    }
-
     @Override
     public void register(CrawledDataListener listener) {
         listeners.add(listener);
-        logger.info("{} listeners", listeners.size());
     }
 
     @Override
@@ -106,18 +86,13 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     }
 
     @Override
-    public String getInterestName(Long uuid) {
-        return interests.get(uuid);
-    }
-
-    @Override
     public boolean hasPerson(Long uuid) {
         return users.containsKey(uuid);
     }
 
     @Override
     public boolean hasInterest(Long uuid) {
-        return interests.containsKey(uuid);
+        return interests.contains(uuid);
     }
 
     private Set<Long> getOrUpdate(Map<Long, Set<Long>> map, Long uuid) {
@@ -127,30 +102,27 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     }
 
     Set<CrawledDataListener> getListeners() {
-        return listeners;
+        return ImmutableSet.copyOf(listeners);
     }
 
-    Map<Long, Object> getUsers() {
+    Map<Long, String> getUsers() {
         return ImmutableMap.copyOf(users);
     }
 
-    Map<Long, Object> getInterests() {
-        return ImmutableMap.copyOf(interests);
+    Set<String> getInterests() {
+        return ImmutableSet.copyOf(interests);
     }
 
     Map<Long, Set<Long>> getUserFriends() {
-        return userFriends;
+        return ImmutableMap.copyOf(userFriends);
     }
 
-    Map<Long, Set<Long>> getUserInterests() {
-        return userInterests;
+    Map<Long, Map<String, Long>> getUserInterests() {
+        return ImmutableMap.copyOf(userInterests);
     }
 
     Map<Long, Set<Long>> getAwaitingFriends() {
-        return awaitingFriends;
+        return ImmutableMap.copyOf(awaitingFriends);
     }
 
-    Map<Long, Set<Long>> getAwaitingInterests() {
-        return awaitingInterests;
-    }
 }

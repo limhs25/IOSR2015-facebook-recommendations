@@ -1,5 +1,6 @@
 package pl.recommendations.crawling;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,12 +9,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.crawling.embedded.EmbeddedCrawlerEndpoint;
-import pl.recommendations.db.interest.Interest;
+import pl.recommendations.db.interest.InterestEntity;
 import pl.recommendations.db.interest.InterestRepository;
 import pl.recommendations.db.person.Person;
 import pl.recommendations.db.person.PersonRepository;
 
 import java.util.Collection;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -23,6 +25,7 @@ import static org.junit.Assert.assertNotNull;
 @Transactional
 public class EmbeddedCrawlerEndpointTest {
     public static final long UUID = 1l;
+    public static final String NAME = "name";
     @Autowired
     EmbeddedCrawlerEndpoint endpoint;
     @Autowired
@@ -32,7 +35,7 @@ public class EmbeddedCrawlerEndpointTest {
 
     @Test
     public void addNewPerson() {
-        endpoint.onNewPerson(UUID, "");
+        endpoint.onNewPerson(UUID, NAME);
 
         assertNotNull(peopleRepo.findByUuid(UUID));
     }
@@ -40,24 +43,24 @@ public class EmbeddedCrawlerEndpointTest {
     @Test
     public void addExistingPerson() {
         peopleRepo.save(createPerson(UUID));
-        endpoint.onNewPerson(UUID, "");
+        endpoint.onNewPerson(UUID, NAME);
 
         assertNotNull(peopleRepo.findByUuid(UUID));
     }
 
     @Test
     public void addNewInterest() {
-        endpoint.onNewInterest(UUID, "");
+        endpoint.onNewInterest(NAME);
 
-        assertNotNull(interestsRepo.findByUuid(UUID));
+        assertNotNull(interestsRepo.findByName(NAME));
     }
 
     @Test
     public void addExistingInterest() {
-        interestsRepo.save(createInterest(UUID));
-        endpoint.onNewInterest(UUID, "");
+        interestsRepo.save(createInterest(NAME));
+        endpoint.onNewInterest(NAME);
 
-        assertNotNull(interestsRepo.findByUuid(UUID));
+        assertNotNull(interestsRepo.findByName(NAME));
     }
 
     @Test
@@ -97,7 +100,7 @@ public class EmbeddedCrawlerEndpointTest {
     @Test
     public void addNewInterestsNotInDb() {
         peopleRepo.save(createPerson(UUID));
-        endpoint.onAddInterests(UUID, ImmutableSet.of(2l, 3l, 4l));
+        endpoint.onAddInterests(UUID, ImmutableMap.of("name1", 1l, "name2", 2l, "name3", 3l));
 
         Person person = peopleRepo.findByUuid(UUID);
         assertNotNull(person);
@@ -107,21 +110,23 @@ public class EmbeddedCrawlerEndpointTest {
     @Test
     public void addNewInterests() {
         peopleRepo.save(createPerson(UUID));
-        ImmutableSet<Long> interestsUuids = ImmutableSet.of(2l, 3l, 4l);
-        interestsUuids.stream()
+        Map<String, Long> interests = ImmutableMap.of("name1", 1l, "name2", 2l, "name3", 3l);
+
+        interests.keySet().stream()
                 .map(this::createInterest)
                 .forEach(interestsRepo::save);
-        endpoint.onAddInterests(UUID, interestsUuids);
+
+        endpoint.onAddInterests(UUID, interests);
 
         Person person = peopleRepo.findByUuid(UUID);
         assertNotNull(person);
-        assertEquals(interestsUuids.size(), person.getInterests().size());
+        assertEquals(interests.size(), person.getInterests().size());
     }
 
-    private Interest createInterest(long l) {
-        Interest interest = new Interest();
-        interest.setUuid(l);
-        return interest;
+    private InterestEntity createInterest(String name) {
+        InterestEntity interestEntity = new InterestEntity();
+        interestEntity.setName(name);
+        return interestEntity;
     }
 
     private Person createPerson(long l) {

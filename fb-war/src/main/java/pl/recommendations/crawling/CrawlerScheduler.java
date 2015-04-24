@@ -37,7 +37,7 @@ public class CrawlerScheduler implements CrawlerService, Runnable {
 
     public void onShutdown() throws InterruptedException {
         schedulerThread.join();
-        while (!tasks.isEmpty()){
+        while (!tasks.isEmpty()) {
             consumeTask();
         }
     }
@@ -73,26 +73,25 @@ public class CrawlerScheduler implements CrawlerService, Runnable {
     }
 
     public void consumeTask() throws InterruptedException {
-            CrawlTask task = tasks.poll();
+        CrawlTask task = tasks.poll();
 
-            logger.debug("Consuming new task. Tasks in queue: {}", tasks.size());
-            Long uuid = task.getUuid();
+        logger.debug("Consuming new task. Tasks in queue: {}", tasks.size());
+        Long uuid = task.getUuid();
 
-            crawlPersonName(uuid);
-            crawlInterests(uuid);
-            crawlFriends(uuid, task);
+        crawlPersonName(uuid);
+        crawlInterests(uuid);
+        crawlFriends(uuid, task);
 
-            logger.debug("Consumed task. Tasks in queue: {}", tasks.size());
+        logger.debug("Consumed task. Tasks in queue: {}", tasks.size());
 
     }
 
     private void crawlInterests(Long uuid) throws InterruptedException {
-        Map<Long, String> interests = crawler.getPersonInterests(uuid, PROCESSED_INTERESTS_PER_USER_LIMIT);
+        Map<String, Long> interests = crawler.getPersonInterests(uuid, PROCESSED_INTERESTS_PER_USER_LIMIT);
 
-        for (Map.Entry<Long, String> interest : interests.entrySet()) {
-            cache.onNewInterest(interest.getKey(), interest.getValue());
-        }
-        cache.onAddInterests(uuid, interests.keySet());
+        interests.keySet().stream().forEach(cache::onNewInterest);
+
+        cache.onAddInterests(uuid, interests);
     }
 
     private void crawlFriends(Long uuid, CrawlTask task) throws InterruptedException {
