@@ -64,7 +64,7 @@ public class FileStoreClient extends CrawlerClient {
         try {
             Optional<Object> line = Arrays.stream(objects).reduce((s1, s2) -> s1 + "," + s2);
             if (line.isPresent()) {
-            logger.info("Writing {}", line.get());
+                logger.info("Writing {}", line.get());
                 writer.write(line.get() + "\n");
                 writer.flush();
             }
@@ -82,7 +82,7 @@ public class FileStoreClient extends CrawlerClient {
         new Thread(client).start();
 
         client.scheduleCrawling(17765013l);
-        while(true){
+        while (true) {
             Thread.sleep(TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS));
         }
     }

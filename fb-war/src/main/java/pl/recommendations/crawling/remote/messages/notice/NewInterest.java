@@ -1,6 +1,6 @@
 package pl.recommendations.crawling.remote.messages.notice;
 
-public class NewInterest extends NoticeMessage{
+public class NewInterest extends NoticeMessage {
     private final String name;
 
     public NewInterest(String name) {

@@ -2,13 +2,14 @@ package pl.recommendations.crawling;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import pl.recommendations.crawling.embedded.EmbeddedCrawlerEndpoint;
+import pl.recommendations.crawling.embedded.EmbeddedCrawler;
 import pl.recommendations.db.interest.InterestEntity;
 import pl.recommendations.db.interest.InterestRepository;
 import pl.recommendations.db.person.Person;
@@ -27,11 +28,16 @@ public class EmbeddedCrawlerEndpointTest {
     public static final long UUID = 1l;
     public static final String NAME = "name";
     @Autowired
-    EmbeddedCrawlerEndpoint endpoint;
+    EmbeddedCrawler endpoint;
     @Autowired
     InterestRepository interestsRepo;
     @Autowired
     PersonRepository peopleRepo;
+
+    @Before
+    public void before() {
+        endpoint.init();
+    }
 
     @Test
     public void addNewPerson() {

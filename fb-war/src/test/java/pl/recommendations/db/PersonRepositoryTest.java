@@ -95,7 +95,7 @@ public class PersonRepositoryTest extends EntityFactory {
 
         assertEquals(interestEntities.size(), 2);
         interestEntities.forEach(i ->
-            assertEquals(weights.get(i.getInterest().getName()), i.getWeight())
+                        assertEquals(weights.get(i.getInterest().getName()), i.getWeight())
         );
     }
 

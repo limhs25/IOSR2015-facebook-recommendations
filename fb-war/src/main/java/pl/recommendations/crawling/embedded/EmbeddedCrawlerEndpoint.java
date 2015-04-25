@@ -4,9 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.recommendations.crawling.CrawledDataCache;
 import pl.recommendations.crawling.CrawlerEndpoint;
-import pl.recommendations.crawling.CrawlerScheduler;
 import pl.recommendations.db.interest.InterestEntity;
 import pl.recommendations.db.interest.InterestRepository;
 import pl.recommendations.db.person.Person;
@@ -16,13 +14,9 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
+public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     private final static Logger logger = LogManager.getLogger(EmbeddedCrawlerEndpoint.class.getName());
 
-    @Autowired
-    private CrawlerScheduler scheduler;
-    @Autowired
-    protected CrawledDataCache cache;
     @Autowired
     InterestRepository interestsRepo;
     @Autowired
@@ -30,7 +24,7 @@ public class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
 
     @Override
     public void scheduleCrawling(Long uuid) {
-        scheduler.scheduleCrawling(uuid);
+
     }
 
     @Override
@@ -77,9 +71,9 @@ public class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
         if (person != null) {
             for (Map.Entry<String, Long> entry : interests.entrySet()) {
                 InterestEntity interest = interestsRepo.findByName(entry.getKey());
-                if(interest != null){
+                if (interest != null) {
                     person.addInterest(interest, entry.getValue());
-                }else{
+                } else {
                     logger.warn("Interest {} does not exist", entry.getKey());
                 }
             }

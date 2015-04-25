@@ -1,11 +1,11 @@
 package pl.recommendations.crawling.remote.messages.notice;
 
-public class NewPerson extends NoticeMessage{
+public class NewPerson extends NoticeMessage {
     private final Long userID;
     private final String name;
 
     public NewPerson(Long userID, String name) {
-                this.userID = userID;
+        this.userID = userID;
         this.name = name;
     }
 

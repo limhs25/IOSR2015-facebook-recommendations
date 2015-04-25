@@ -66,7 +66,7 @@ public class CacheTest {
     @Test
     public void addInterest() {
         String name = "name";
-        cache.onNewInterest( name);
+        cache.onNewInterest(name);
         assertEquals(1, cache.getInterests().size());
         assertEquals(1, listener.getInterests().size());
         assertTrue(cache.getInterests().contains(name));
@@ -76,8 +76,8 @@ public class CacheTest {
     @Test
     public void addSameInterestTwice() {
         String name = "name";
-        cache.onNewInterest( name);
-        cache.onNewInterest( name);
+        cache.onNewInterest(name);
+        cache.onNewInterest(name);
         assertEquals(1, cache.getInterests().size());
         assertEquals(1, listener.getInterests().size());
         assertTrue(cache.getInterests().contains(name));
@@ -157,7 +157,6 @@ public class CacheTest {
         assertNotNull(listener.getUserInterests().get(uuid));
         assertEquals(interests.size(), listener.getUserInterests().get(uuid).size());
     }
-
 
 
     @Test
