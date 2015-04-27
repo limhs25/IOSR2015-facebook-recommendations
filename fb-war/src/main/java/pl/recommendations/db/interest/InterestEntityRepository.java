@@ -7,7 +7,7 @@ import pl.recommendations.db.interest.relationships.Contrast;
 import pl.recommendations.db.interest.relationships.Similarity;
 
 
-public interface InterestRepository extends GraphRepository<InterestEntity> {
+public interface InterestEntityRepository extends GraphRepository<InterestEntity> {
     InterestEntity findByName(String interestName);
 
     @Query("match i1-[s:" + RelationshipType.SIMILARITY + "]->i2 \n" +

@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.recommendations.crawling.CrawlerEndpoint;
 import pl.recommendations.db.interest.InterestEntity;
-import pl.recommendations.db.interest.InterestRepository;
+import pl.recommendations.db.interest.InterestEntityRepository;
 import pl.recommendations.db.person.Person;
 import pl.recommendations.db.person.PersonRepository;
 
@@ -18,7 +18,7 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     private final static Logger logger = LogManager.getLogger(EmbeddedCrawlerEndpoint.class.getName());
 
     @Autowired
-    InterestRepository interestsRepo;
+    InterestEntityRepository interestsRepo;
     @Autowired
     PersonRepository peopleRepo;
 

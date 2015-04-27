@@ -8,7 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.interest.InterestEntity;
-import pl.recommendations.db.interest.InterestRepository;
+import pl.recommendations.db.interest.InterestEntityRepository;
 import pl.recommendations.db.interest.relationships.Contrast;
 import pl.recommendations.db.interest.relationships.Similarity;
 
@@ -19,38 +19,37 @@ import static org.junit.Assert.assertNotNull;
 @ContextConfiguration("classpath:spring/applicationContext.xml")
 @Transactional
 public class InterestEntityRepositoryTest extends EntityFactory {
-    @Autowired
-    private InterestRepository interestRepo;
+    public static final String NAME = "name1";
+    public static final String NAME1 = "name1";
+    public static final String NAME2 = "name2";
 
+    @Autowired
+    private InterestEntityRepository interestRepo;
     @Autowired
     Neo4jTemplate template;
 
     @Test
     public void saveAndGet() {
-        String name = "name";
-
-        InterestEntity expected = createInterest(name);
+        InterestEntity expected = createInterest(NAME);
         interestRepo.save(expected);
 
-        InterestEntity actual = interestRepo.findByName(name);
+        InterestEntity actual = interestRepo.findByName(NAME);
         assertEquals(expected, actual);
     }
 
     @Test
     public void saveContrast() {
         double val = 0.5;
-        String name1 = "name1";
-        String name2 = "name2";
 
-        InterestEntity i1 = createInterest(name1);
-        InterestEntity i2 = createInterest(name2);
+        InterestEntity i1 = createInterest(NAME1);
+        InterestEntity i2 = createInterest(NAME2);
         i1.addContrast(i2, val);
 
         interestRepo.save(i2);
         interestRepo.save(i1);
 
-        InterestEntity i1FromDb = interestRepo.findByName(name1);
-        InterestEntity i2FromDb = interestRepo.findByName(name2);
+        InterestEntity i1FromDb = interestRepo.findByName(NAME1);
+        InterestEntity i2FromDb = interestRepo.findByName(NAME2);
 
         Contrast contrast = interestRepo.getContrastOf(i1.getName(), i2.getName());
 
@@ -62,18 +61,16 @@ public class InterestEntityRepositoryTest extends EntityFactory {
     @Test
     public void saveSimilarity() {
         double val = 0.5;
-        String name1 = "name1";
-        String name2 = "name2";
 
-        InterestEntity i1 = createInterest(name1);
-        InterestEntity i2 = createInterest(name2);
+        InterestEntity i1 = createInterest(NAME1);
+        InterestEntity i2 = createInterest(NAME2);
         i1.addSimilarity(i2, val);
 
         interestRepo.save(i2);
         interestRepo.save(i1);
 
-        InterestEntity i1FromDb = interestRepo.findByName(name1);
-        InterestEntity i2FromDb = interestRepo.findByName(name2);
+        InterestEntity i1FromDb = interestRepo.findByName(NAME1);
+        InterestEntity i2FromDb = interestRepo.findByName(NAME2);
 
         Similarity similarity = interestRepo.getSimilarityOf(i1.getName(), i2.getName());
 
@@ -85,11 +82,9 @@ public class InterestEntityRepositoryTest extends EntityFactory {
     @Test
     public void supportMoreThanOneConnectionBetweenNodes() {
         double val = 0.5;
-        String name1 = "name1";
-        String name2 = "name2";
 
-        InterestEntity i1 = createInterest(name1);
-        InterestEntity i2 = createInterest(name2);
+        InterestEntity i1 = createInterest(NAME1);
+        InterestEntity i2 = createInterest(NAME2);
         i1.addSimilarity(i2, val);
         i1.addContrast(i2, val);
 

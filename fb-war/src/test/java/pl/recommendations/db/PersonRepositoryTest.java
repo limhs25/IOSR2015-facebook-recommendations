@@ -7,7 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.interest.InterestEntity;
-import pl.recommendations.db.interest.InterestRepository;
+import pl.recommendations.db.interest.InterestEntityRepository;
 import pl.recommendations.db.person.Friendship;
 import pl.recommendations.db.person.Interest;
 import pl.recommendations.db.person.Person;
@@ -29,7 +29,7 @@ public class PersonRepositoryTest extends EntityFactory {
     @Autowired
     private PersonRepository personRepo;
     @Autowired
-    private InterestRepository interestRepo;
+    private InterestEntityRepository interestRepo;
 
     @Test
     public void saveAndGet() {

@@ -11,7 +11,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.crawling.embedded.EmbeddedCrawler;
 import pl.recommendations.db.interest.InterestEntity;
-import pl.recommendations.db.interest.InterestRepository;
+import pl.recommendations.db.interest.InterestEntityRepository;
 import pl.recommendations.db.person.Person;
 import pl.recommendations.db.person.PersonRepository;
 
@@ -30,7 +30,7 @@ public class EmbeddedCrawlerEndpointTest {
     @Autowired
     EmbeddedCrawler endpoint;
     @Autowired
-    InterestRepository interestsRepo;
+    InterestEntityRepository interestsRepo;
     @Autowired
     PersonRepository peopleRepo;
 
