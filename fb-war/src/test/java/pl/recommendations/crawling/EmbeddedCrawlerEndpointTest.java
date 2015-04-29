@@ -6,15 +6,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import pl.recommendations.crawling.embedded.EmbeddedCrawler;
 import pl.recommendations.db.interest.InterestEntity;
 import pl.recommendations.db.interest.InterestEntityRepository;
 import pl.recommendations.db.person.Person;
 import pl.recommendations.db.person.PersonRepository;
 
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
 import java.util.Collection;
 import java.util.Map;
 
@@ -22,17 +25,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("classpath:spring/applicationContext.xml")
+@ContextConfiguration("classpath:testContext.xml")
+@PropertySource("classpath:conf/neo4j.properties")
 @Transactional
 public class EmbeddedCrawlerEndpointTest {
-    public static final long UUID = 1l;
-    public static final String NAME = "name";
+
+    private static final long UUID = 1l;
+    private static final String NAME = "name";
+
     @Autowired
-    EmbeddedCrawler endpoint;
+    @Qualifier("embeddedCrawlerService")
+    private CrawlerEndpoint endpoint;
+
     @Autowired
-    InterestEntityRepository interestsRepo;
+    private InterestEntityRepository interestsRepo;
+
     @Autowired
-    PersonRepository peopleRepo;
+    private PersonRepository peopleRepo;
 
     @Before
     public void before() {
@@ -80,7 +89,7 @@ public class EmbeddedCrawlerEndpointTest {
     }
 
     @Test
-    public void addNewFriendsNotInDb() {
+    public void addNewFriendsWhenNoneExistsInDb() {
         peopleRepo.save(createPerson(UUID));
         endpoint.onAddFriends(UUID, ImmutableSet.of(2l, 3l, 4l));
 
@@ -90,7 +99,7 @@ public class EmbeddedCrawlerEndpointTest {
     }
 
     @Test
-    public void addNewFriends() {
+    public void addNewFriends() throws SystemException, NotSupportedException {
         ImmutableSet<Long> friendsUuids = ImmutableSet.of(2l, 3l, 4l);
         peopleRepo.save(createPerson(UUID));
         friendsUuids.stream()
@@ -104,7 +113,7 @@ public class EmbeddedCrawlerEndpointTest {
     }
 
     @Test
-    public void addNewInterestsNotInDb() {
+    public void addNewInterestsWhenNoneExistsInDb() {
         peopleRepo.save(createPerson(UUID));
         endpoint.onAddInterests(UUID, ImmutableMap.of("name1", 1l, "name2", 2l, "name3", 3l));
 

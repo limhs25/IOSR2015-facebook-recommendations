@@ -2,11 +2,13 @@ package pl.recommendations.db.person;
 
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
+import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.RelationshipType;
 import pl.recommendations.db.interest.InterestEntity;
 
 import java.util.Collection;
 
+@Transactional
 public interface PersonRepository extends GraphRepository<Person> {
     Person findByUuid(Long uuid);
 

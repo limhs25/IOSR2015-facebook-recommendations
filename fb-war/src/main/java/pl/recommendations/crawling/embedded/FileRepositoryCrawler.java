@@ -6,14 +6,17 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@Component
+@Transactional
+@Service("fileCrawlerService")
 public class FileRepositoryCrawler extends EmbeddedCrawlerEndpoint implements Runnable {
     private static final Logger logger = LogManager.getLogger(FileRepositoryCrawler.class.getName());
     public static final String SEPARATOR = ",";
@@ -30,6 +33,7 @@ public class FileRepositoryCrawler extends EmbeddedCrawlerEndpoint implements Ru
         this.dbDir = file;
     }
 
+    @Override
     public void init() {
         Preconditions.checkState(dbDir != null);
 
