@@ -46,6 +46,7 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
             logger.info("SockeT {} closed", socket);
         } catch (IOException e) {
             logger.error("Error during connection: {}", e.getMessage());
+            e.printStackTrace();
             socket = null;
         } catch (ClassNotFoundException e) {
             logger.error("Invalid object sent: {}", e.getMessage());
@@ -62,7 +63,7 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
     }
 
     private void dispatchNotice(NoticeMessage msg) {
-//        logger.info("Got " + msg);
+        logger.debug("Got " + msg);
         if (msg instanceof NewInterest) {
             onNewInterest(((NewInterest) msg).getName());
         } else if (msg instanceof NewPerson) {

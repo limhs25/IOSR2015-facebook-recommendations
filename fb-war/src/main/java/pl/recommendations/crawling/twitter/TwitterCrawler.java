@@ -64,9 +64,10 @@ public class TwitterCrawler implements Crawler {
             } finally {
                 lock.unlock();
             }
-            logger.info("Crawled {} friends for user[{}]", uuids.size(), uuid);
         } while (friendsIDs != null && friendsIDs.hasNext() &&
                 friendsLimit < (friendsIDs.getNextCursor() + 1) * FRIENDS_PER_PAGE);
+
+        logger.info("Crawled {} friends for user[{}]", uuids.size(), uuid);
 
         return uuids.stream().limit(friendsLimit).collect(Collectors.toSet());
     }
@@ -100,8 +101,9 @@ public class TwitterCrawler implements Crawler {
                 lock.unlock();
                 ++page;
             }
-            logger.info("New interests: {}", interests.size());
         } while (page < PAGE_LIMIT && interests.size() < interestLimit);
+
+        logger.info("New interests: {}", interests.size());
 
         return interests.entrySet().stream()
                 .limit(interestLimit)
@@ -114,7 +116,7 @@ public class TwitterCrawler implements Crawler {
 
     private boolean handledTwitterException(Long uuid, TwitterException e) throws InterruptedException {
         if (exceededRateLimit(e)) {
-            logger.info("Waiting for rate limit to be reset");
+            logger.info(Thread.currentThread().getName() + " waiting for rate limit to be reset");
             freeWindow.await();
             logger.info("Resumed crawling");
             return true;

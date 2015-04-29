@@ -38,7 +38,7 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     private final ConcurrentLinkedQueue<CrawlerConnectionMessage> commands = new ConcurrentLinkedQueue<>();
     private Socket socket;
 
-    public void setStreams(Socket s) throws IOException {
+    public synchronized void setStreams(Socket s) throws IOException {
         socket = s;
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
@@ -66,32 +66,32 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     }
 
     @Override
-    public void onNewPerson(Long uuid, String name) {
+    public synchronized void onNewPerson(Long uuid, String name) {
         NoticeMessage msg = new NewPerson(uuid, name);
         send(msg);
     }
 
     @Override
-    public void onNewInterest(String interestName) {
+    public synchronized void onNewInterest(String interestName) {
         NoticeMessage msg = new NewInterest(interestName);
         send(msg);
     }
 
     @Override
-    public void onAddFriends(Long userId, Set<Long> friends) {
+    public synchronized void onAddFriends(Long userId, Set<Long> friends) {
         NoticeMessage msg = new AddFriends(userId, new HashSet<>(friends));
         send(msg);
     }
 
 
     @Override
-    public void onAddInterests(Long userId, Map<String, Long> interests) {
+    public synchronized void onAddInterests(Long userId, Map<String, Long> interests) {
         NoticeMessage msg = new AddInterests(userId, new HashMap<>(interests));
         send(msg);
     }
 
     @Override
-    public void scheduleCrawling(Long uuid) {
+    public synchronized void scheduleCrawling(Long uuid) {
         scheduler.scheduleCrawling(uuid);
     }
 

@@ -41,12 +41,13 @@ public class FileStoreClient extends CrawlerClient {
     @Override
     public void onNewPerson(Long userId, String name) {
         write(people, userId, name);
+        logger.info("added new person: {}", name);
     }
-
 
     @Override
     public void onNewInterest(String interestName) {
         write(interests, interestName);
+        logger.info("added new interest: {}", interestName);
     }
 
     @Override

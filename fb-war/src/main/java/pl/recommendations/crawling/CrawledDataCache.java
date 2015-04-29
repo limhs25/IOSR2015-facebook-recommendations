@@ -29,14 +29,20 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     @Override
     public void onNewPerson(Long userId, String name) {
         users.put(userId, name);
-        userFriends.put(userId, new HashSet<>());
-        userInterests.put(userId, new HashMap<>());
+        if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
+        if (!userFriends.containsKey(userId)) userFriends.put(userId, new HashSet<>());
 
         listeners.forEach(l -> l.onNewPerson(userId, name));
 
         awaitingFriends
                 .getOrDefault(userId, Collections.emptySet())
                 .forEach(user -> addFriendAndNotify(user, userId));
+
+        Map<String, Long> interests = userInterests.get(userId);
+        if (interests.size() > 0) {
+            listeners.forEach(l -> l.onAddInterests(userId, interests));
+        }
+
         awaitingFriends.remove(userId);
     }
 
@@ -60,14 +66,21 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
 
     @Override
     public void onAddInterests(Long userId, Map<String, Long> newInterests) {
+        if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
+
         userInterests.get(userId).putAll(newInterests);
 
-        listeners.forEach(l -> l.onAddInterests(userId, newInterests));
+        if (users.containsKey(userId)) {
+            listeners.forEach(l -> l.onAddInterests(userId, newInterests));
+        }
     }
 
-    private void addFriendAndNotify(Long user, Long friendUuid) {
-        userFriends.get(user).add(friendUuid);
-        listeners.forEach(l -> l.onAddFriends(user, ImmutableSet.of(friendUuid)));
+    private void addFriendAndNotify(Long userId, Long friendUuid) {
+        if (!userFriends.containsKey(userId)) userFriends.put(userId, new HashSet<>());
+
+        userFriends.get(userId).add(friendUuid);
+
+        listeners.forEach(l -> l.onAddFriends(userId, ImmutableSet.of(friendUuid)));
     }
 
     @Override
