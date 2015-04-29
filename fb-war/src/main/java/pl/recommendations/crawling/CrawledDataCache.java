@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter, CrawledDataStorage {
@@ -28,29 +29,33 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
 
     @Override
     public void onNewPerson(Long userId, String name) {
-        users.put(userId, name);
-        if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
-        if (!userFriends.containsKey(userId)) userFriends.put(userId, new HashSet<>());
+        if (!users.containsKey(userId)) {
+            users.put(userId, name);
+            if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
+            if (!userFriends.containsKey(userId)) userFriends.put(userId, new HashSet<>());
 
-        listeners.forEach(l -> l.onNewPerson(userId, name));
+            listeners.forEach(l -> l.onNewPerson(userId, name));
 
-        awaitingFriends
-                .getOrDefault(userId, Collections.emptySet())
-                .forEach(user -> addFriendAndNotify(user, userId));
+            awaitingFriends
+                    .getOrDefault(userId, Collections.emptySet())
+                    .forEach(user -> addFriendAndNotify(user, userId));
 
-        Map<String, Long> interests = userInterests.get(userId);
-        if (interests.size() > 0) {
-            listeners.forEach(l -> l.onAddInterests(userId, interests));
+            Map<String, Long> interests = userInterests.get(userId);
+            if (interests.size() > 0) {
+                listeners.forEach(l -> l.onAddInterests(userId, interests));
+            }
+
+            awaitingFriends.remove(userId);
         }
-
-        awaitingFriends.remove(userId);
     }
 
     @Override
     public void onNewInterest(String interestName) {
-        interests.add(interestName);
+        if (!interests.contains(interestName)) {
+            interests.add(interestName);
 
-        listeners.forEach(l -> l.onNewInterest(interestName));
+            listeners.forEach(l -> l.onNewInterest(interestName));
+        }
     }
 
     @Override
@@ -68,10 +73,16 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     public void onAddInterests(Long userId, Map<String, Long> newInterests) {
         if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
 
-        userInterests.get(userId).putAll(newInterests);
+        Set<String> newKeys = Sets.difference(newInterests.keySet(), userInterests.get(userId).keySet());
+
+        Map<String, Long> interestsToAdd = newInterests.entrySet().stream()
+                .filter(e -> newKeys.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        userInterests.get(userId).putAll(interestsToAdd);
 
         if (users.containsKey(userId)) {
-            listeners.forEach(l -> l.onAddInterests(userId, newInterests));
+            listeners.forEach(l -> l.onAddInterests(userId, interestsToAdd));
         }
     }
 
