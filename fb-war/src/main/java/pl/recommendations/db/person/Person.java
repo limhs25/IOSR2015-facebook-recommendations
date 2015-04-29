@@ -1,10 +1,8 @@
 package pl.recommendations.db.person;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.*;
-import pl.recommendations.db.interest.InterestEntity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,27 +23,6 @@ public class Person {
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<Interest> interests = new HashSet<>();
 
-    public void addFriend(Person friend) {
-        if (friend != null && !this.equals(friend)) {
-            Friendship relationship = new Friendship();
-            relationship.setPerson(this);
-            relationship.setFriend(friend);
-            friendships.add(relationship);
-        }
-    }
-
-    public void addInterest(InterestEntity interestEntity, Long weight) {
-        Preconditions.checkArgument(weight > 0);
-
-        Interest interest = new Interest();
-        interest.setPerson(this);
-        interest.setInterest(interestEntity);
-
-        if (interestEntity != null && !interests.contains(interest)) {
-            interest.setWeight(weight);
-            interests.add(interest);
-        }
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -88,5 +65,17 @@ public class Person {
 
     public Set<Interest> getInterests() {
         return interests;
+    }
+
+    public void addFriendship(Friendship relationship) {
+        if (!friendships.contains(relationship)) {
+            friendships.add(relationship);
+        }
+    }
+
+    public void addInterest(Interest interest) {
+        if(!interests.contains(interest)){
+            interests.add(interest);
+        }
     }
 }

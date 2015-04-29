@@ -52,19 +52,20 @@ public class FileStoreClient extends CrawlerClient {
     @Override
     public void onAddFriends(Long userId, Set<Long> friends) {
         friends.forEach(f -> write(peopleRelations, userId, f));
+        logger.info("added {} friends", friends.size());
     }
 
     @Override
     public void onAddInterests(Long userId, Map<String, Long> interests) {
-        logger.info("adding {} interests", interests.size());
         interests.entrySet().forEach(e -> write(interestRelations, userId, e.getKey(), e.getValue()));
+        logger.info("added {} interests", interests.size());
     }
 
     private void write(FileWriter writer, Object... objects) {
         try {
             Optional<Object> line = Arrays.stream(objects).reduce((s1, s2) -> s1 + "," + s2);
             if (line.isPresent()) {
-                logger.info("Writing {}", line.get());
+//                logger.info("Writing {}", line.get());
                 writer.write(line.get() + "\n");
                 writer.flush();
             }

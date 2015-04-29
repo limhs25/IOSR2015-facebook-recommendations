@@ -21,7 +21,7 @@ public class TwitterCrawler implements Crawler {
     private static final Logger logger = LogManager.getLogger(TwitterCrawler.class.getName());
 
     private static final int FRIENDS_PER_PAGE = 5000;
-    private static final int INTERESTS_PER_PAGE = 200;
+    private static final int INTERESTS_PER_PAGE = 30;
     public static final int PAGE_LIMIT = 5;
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -35,7 +35,7 @@ public class TwitterCrawler implements Crawler {
         try {
             User user = twitter.showUser(uuid);
             String name = user.getScreenName();
-            logger.debug("user[{}] name is {}", uuid, name);
+            logger.info("user[{}] name is {}", uuid, name);
             return Optional.of(name);
         } catch (TwitterException e) {
             if (handledTwitterException(uuid, e)) return getPersonName(uuid);
@@ -64,7 +64,7 @@ public class TwitterCrawler implements Crawler {
             } finally {
                 lock.unlock();
             }
-            logger.debug("Crawled {} friends for user[{}]", uuids.size(), uuids);
+            logger.info("Crawled {} friends for user[{}]", uuids.size(), uuid);
         } while (friendsIDs != null && friendsIDs.hasNext() &&
                 friendsLimit < (friendsIDs.getNextCursor() + 1) * FRIENDS_PER_PAGE);
 
@@ -100,7 +100,7 @@ public class TwitterCrawler implements Crawler {
                 lock.unlock();
                 ++page;
             }
-            logger.debug("New interests: {}", interests.size());
+            logger.info("New interests: {}", interests.size());
         } while (page < PAGE_LIMIT && interests.size() < interestLimit);
 
         return interests.entrySet().stream()
@@ -120,7 +120,7 @@ public class TwitterCrawler implements Crawler {
             return true;
         } else if (e.getStatusCode() == HttpResponseCode.UNAUTHORIZED ||
                 e.getStatusCode() == HttpResponseCode.NOT_FOUND) {
-            logger.debug("Omitting Twitter crawling for {} due to {}", uuid, e.getMessage());
+            logger.info("Omitting Twitter crawling for {} due to {}", uuid, e.getMessage());
             return true;
         }
         return false;

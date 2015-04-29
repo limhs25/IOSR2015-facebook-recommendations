@@ -51,8 +51,8 @@ public class PersonRepositoryTest extends EntityFactory {
         Person person2 = createUser(uuid2);
         Person person3 = createUser(uuid3);
 
-        person1.addFriend(person2);
-        person1.addFriend(person3);
+        personRepo.addFriend(person1 ,person2);
+        personRepo.addFriend(person1 ,person3);
 
         personRepo.save(person2);
         personRepo.save(person3);
@@ -83,8 +83,8 @@ public class PersonRepositoryTest extends EntityFactory {
         Person person1 = createUser(uuid1);
         InterestEntity interestEntity1 = createInterest(name1);
         InterestEntity interestEntity2 = createInterest(name2);
-        person1.addInterest(interestEntity1, weights.get(name1));
-        person1.addInterest(interestEntity2, weights.get(name2));
+        personRepo.addInterest(person1, interestEntity1, weights.get(name1));
+        personRepo.addInterest(person1, interestEntity2, weights.get(name2));
 
         interestRepo.save(interestEntity1);
         interestRepo.save(interestEntity2);

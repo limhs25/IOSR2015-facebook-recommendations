@@ -58,7 +58,7 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
         if (person != null) {
             friends.stream()
                     .map(peopleRepo::findByUuid)
-                    .forEach(person::addFriend);
+                    .forEach(friend -> peopleRepo.addFriend(person, friend));
             ;
         } else {
             logger.warn("Cannot add friends to non-existing user");
@@ -72,7 +72,7 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
             for (Map.Entry<String, Long> entry : interests.entrySet()) {
                 InterestEntity interest = interestsRepo.findByName(entry.getKey());
                 if (interest != null) {
-                    person.addInterest(interest, entry.getValue());
+                    peopleRepo.addInterest(person, interest, entry.getValue());
                 } else {
                     logger.warn("Interest {} does not exist", entry.getKey());
                 }

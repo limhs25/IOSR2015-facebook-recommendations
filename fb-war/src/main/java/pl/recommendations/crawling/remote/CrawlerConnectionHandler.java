@@ -109,6 +109,4 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
             logger.error("Could not send message: {} due to {}", msg, e.getMessage());
         }
     }
-
-
 }

@@ -29,7 +29,7 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
-        logger.debug("Connected to {}:{}", address, port);
+        logger.info("Connected to {}:{}", address, port);
     }
 
     @Override
@@ -43,7 +43,7 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
                     logger.warn("Invalid message: " + msg.toString());
                 }
             }
-            logger.debug("SockeT {} closed", socket);
+            logger.info("SockeT {} closed", socket);
         } catch (IOException e) {
             logger.error("Error during connection: {}", e.getMessage());
             socket = null;
@@ -62,7 +62,7 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
     }
 
     private void dispatchNotice(NoticeMessage msg) {
-        logger.info("Got " + msg);
+//        logger.info("Got " + msg);
         if (msg instanceof NewInterest) {
             onNewInterest(((NewInterest) msg).getName());
         } else if (msg instanceof NewPerson) {

@@ -17,9 +17,9 @@ public class CrawlerScheduler implements CrawlerService, Runnable {
     private static final Logger logger = LogManager.getLogger(CrawlerScheduler.class.getName());
 
     private static final int TASK_QUEUE_SIZE = 100000;
-    private static final int RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT = 3;
+    private static final int RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT = 5;
     private static final int PROCESSED_FRIENDS_PER_USER_LIMIT = 1000;
-    private static final int PROCESSED_INTERESTS_PER_USER_LIMIT = 20;
+    private static final int PROCESSED_INTERESTS_PER_USER_LIMIT = 30;
 
     @Autowired
     private CrawledDataCache cache;
