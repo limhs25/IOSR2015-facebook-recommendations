@@ -88,4 +88,8 @@ public class FileStoreClient extends CrawlerClient {
             Thread.sleep(TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS));
         }
     }
+
+    @Override
+    public void init() {
+    }
 }

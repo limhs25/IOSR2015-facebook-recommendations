@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.crawling.CrawlerEndpoint;
 import pl.recommendations.db.interest.InterestEntity;
 import pl.recommendations.db.interest.InterestEntityRepository;
@@ -13,18 +15,18 @@ import pl.recommendations.db.person.PersonRepository;
 import java.util.Map;
 import java.util.Set;
 
-@Component
+@Transactional
+@Service
 public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     private final static Logger logger = LogManager.getLogger(EmbeddedCrawlerEndpoint.class.getName());
 
     @Autowired
-    InterestEntityRepository interestsRepo;
+    private InterestEntityRepository interestsRepo;
     @Autowired
-    PersonRepository peopleRepo;
+    private PersonRepository peopleRepo;
 
     @Override
     public void scheduleCrawling(Long uuid) {
-
     }
 
     @Override
