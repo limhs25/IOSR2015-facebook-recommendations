@@ -10,4 +10,6 @@ public interface FileRepositoryCrawler extends Runnable {
     public void init();
 
     public void setDbDir(File file);
+
+    void setSeparator(String separator);
 }
