@@ -1,0 +1,79 @@
+body {
+    /* background: seagreen; */
+    /* background: slateblue; */
+    background: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.loginDiv {
+    /* background: darkorange; */
+    background: #000000;
+
+    border-radius: 20px;
+    box-shadow: 3px 3px 3px #111111;
+
+    height: 160px;
+    width: 350px;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -75px;
+    margin-left: -175px;
+}
+
+.innerLoginBox {
+    font-weight: bold;
+    color: #ffffff;
+    height: 100px;
+    margin-top: 20px;
+    margin-left: 30px;
+    width: 300px;
+}
+
+.loginBoxLine {
+    padding-bottom: 10px;
+    margin-top: 30px;
+    width: 300px;
+
+}
+
+.singleLinePadding {
+    float: left;
+    width: 75px;
+}
+
+.loginBoxInputLine {
+    float: right;
+    width: 225px;
+}
+
+.inputLogin {
+    width: 200px;
+}
+
+.topDiv {
+    background: black;
+    color: white;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 50px;
+}
+
+.loginBoxButton {
+    float: right;
+    margin-right: 20px;
+    margin-top: 5px;
+}
+
+.innerInlineElement {
+    float: left;
+}
+
+.bannerLoggedAsCenteredVertically {
+    padding-top: 15px;
+    width: 50%;
+    text-align: right;
+}

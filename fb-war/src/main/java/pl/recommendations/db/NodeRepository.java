@@ -1,14 +1,15 @@
-package pl.recommendations.db.interest;
+package pl.recommendations.db;
+
 
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
-import pl.recommendations.db.RelationshipType;
-import pl.recommendations.db.interest.relationships.Contrast;
-import pl.recommendations.db.interest.relationships.Similarity;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import pl.recommendations.db.relationships.Contrast;
+import pl.recommendations.db.relationships.Similarity;
 
-
-public interface InterestEntityRepository extends GraphRepository<InterestEntity> {
-    InterestEntity findByName(String interestName);
+@Transactional
+public interface NodeRepository extends GraphRepository<Node> {
 
     @Query("match i1-[s:" + RelationshipType.SIMILARITY + "]->i2 \n" +
             "where i1.name = {0} and i2.name = {1} \n" +
@@ -19,4 +20,5 @@ public interface InterestEntityRepository extends GraphRepository<InterestEntity
             "where i1.name = {0} and i2.name = {1} \n" +
             "return s")
     Contrast getContrastOf(String name1, String name2);
+
 }

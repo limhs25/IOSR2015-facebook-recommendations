@@ -4,83 +4,88 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import pl.recommendations.crawling.CrawledDataCache;
 import pl.recommendations.crawling.CrawlerEndpoint;
-import pl.recommendations.db.interest.InterestEntity;
-import pl.recommendations.db.interest.InterestEntityRepository;
-import pl.recommendations.db.person.Person;
-import pl.recommendations.db.person.PersonRepository;
+import pl.recommendations.crawling.CrawlerScheduler;
+import pl.recommendations.db.interest.InterestNode;
+import pl.recommendations.db.interest.InterestNodeRepository;
+import pl.recommendations.db.person.PersonNode;
+import pl.recommendations.db.person.PersonNodeRepository;
 
 import java.util.Map;
 import java.util.Set;
 
-@Transactional
-@Service
+@Component
 public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     private final static Logger logger = LogManager.getLogger(EmbeddedCrawlerEndpoint.class.getName());
 
     @Autowired
-    private InterestEntityRepository interestsRepo;
+    private CrawlerScheduler scheduler;
     @Autowired
-    private PersonRepository peopleRepo;
+    protected CrawledDataCache cache;
+    @Autowired
+    protected InterestNodeRepository interestsRepo;
+    @Autowired
+    protected PersonNodeRepository peopleRepo;
 
     @Override
     public void scheduleCrawling(Long uuid) {
+        scheduler.scheduleCrawling(uuid);
     }
 
     @Override
-    public void onNewPerson(Long userId, String name) {
-        if (peopleRepo.findByUuid(userId) == null) {
-            Person person = new Person();
-            person.setUuid(userId);
-            person.setName(name);
+    public void onNewPerson(Long uuid, String name) {
+        if (peopleRepo.findByUuid(uuid) == null) {
+            PersonNode personNode = new PersonNode();
+            personNode.setUuid(uuid);
+            personNode.setName(name);
 
-            peopleRepo.save(person);
+            peopleRepo.save(personNode);
         } else {
-            logger.debug("User[{}] already exists", userId);
+            logger.debug("User[{}] already exists", uuid);
         }
     }
+
+
 
     @Override
     public void onNewInterest(String interestName) {
         if (interestsRepo.findByName(interestName) == null) {
-            InterestEntity interestEntity = new InterestEntity();
-            interestEntity.setName(interestName);
+            InterestNode interestNode = new InterestNode();
+            interestNode.setName(interestName);
 
-            interestsRepo.save(interestEntity);
+            interestsRepo.save(interestNode);
         } else {
-            logger.debug("Interest[{}] already exists", interestName);
+            logger.debug("InterestNode[{}] already exists", interestName);
         }
     }
 
     @Override
-    public void onAddFriends(Long userId, Set<Long> friends) {
-        Person person = peopleRepo.findByUuid(userId);
-        if (person != null) {
+    public void onAddFriends(Long uuid, Set<Long> friends) {
+        PersonNode personNode = peopleRepo.findByUuid(uuid);
+        if (personNode != null) {
             friends.stream()
                     .map(peopleRepo::findByUuid)
-                    .forEach(friend -> peopleRepo.addFriend(person, friend));
-            ;
+                    .forEach(personNode::addFriend);
         } else {
-            logger.warn("Cannot add friends to non-existing user");
+            logger.debug("Cannot add friends to non-existing user");
         }
     }
 
     @Override
     public void onAddInterests(Long userId, Map<String, Long> interests) {
-        Person person = peopleRepo.findByUuid(userId);
+        PersonNode person = peopleRepo.findByUuid(userId);
         if (person != null) {
             for (Map.Entry<String, Long> entry : interests.entrySet()) {
-                InterestEntity interest = interestsRepo.findByName(entry.getKey());
+                InterestNode interest = interestsRepo.findByName(entry.getKey());
                 if (interest != null) {
                     peopleRepo.addInterest(person, interest, entry.getValue());
                 } else {
-                    logger.warn("Interest {} does not exist", entry.getKey());
+                    logger.debug("Interest {} does not exist", entry.getKey());
                 }
             }
         } else {
-            logger.warn("Cannot add interests to non-existing user");
+            logger.debug("Cannot add interests to non-existing user");
         }
     }
 }
