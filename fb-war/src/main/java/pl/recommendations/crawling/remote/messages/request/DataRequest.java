@@ -2,7 +2,7 @@ package pl.recommendations.crawling.remote.messages.request;
 
 import pl.recommendations.crawling.remote.messages.CrawlerDataType;
 
-public class DataRequest extends RequestMessage{
+public class DataRequest extends RequestMessage {
 
     private final CrawlerDataType dataType;
 

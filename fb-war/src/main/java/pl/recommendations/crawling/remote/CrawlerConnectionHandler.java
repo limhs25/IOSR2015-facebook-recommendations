@@ -9,10 +9,7 @@ import pl.recommendations.crawling.CrawledDataListener;
 import pl.recommendations.crawling.CrawlerScheduler;
 import pl.recommendations.crawling.CrawlerService;
 import pl.recommendations.crawling.remote.messages.CrawlerConnectionMessage;
-import pl.recommendations.crawling.remote.messages.CrawlerDataType;
-import pl.recommendations.crawling.remote.messages.notice.AddRelations;
-import pl.recommendations.crawling.remote.messages.notice.NewEntity;
-import pl.recommendations.crawling.remote.messages.notice.NoticeMessage;
+import pl.recommendations.crawling.remote.messages.notice.*;
 import pl.recommendations.crawling.remote.messages.request.RequestCrawling;
 import pl.recommendations.crawling.remote.messages.request.RequestMessage;
 
@@ -20,7 +17,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -39,7 +38,7 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     private final ConcurrentLinkedQueue<CrawlerConnectionMessage> commands = new ConcurrentLinkedQueue<>();
     private Socket socket;
 
-    public void setStreams(Socket s) throws IOException {
+    public synchronized void setStreams(Socket s) throws IOException {
         socket = s;
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
@@ -67,31 +66,32 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     }
 
     @Override
-    public void onNewPerson(Long uuid, String name) {
-        NoticeMessage msg = new NewEntity(CrawlerDataType.PERSON, uuid, name);
+    public synchronized void onNewPerson(Long uuid, String name) {
+        NoticeMessage msg = new NewPerson(uuid, name);
         send(msg);
     }
 
     @Override
-    public void onNewInterest(Long uuid, String name) {
-        NoticeMessage msg = new NewEntity(CrawlerDataType.INTEREST, uuid, name);
+    public synchronized void onNewInterest(String interestName) {
+        NoticeMessage msg = new NewInterest(interestName);
         send(msg);
     }
 
     @Override
-    public void onAddFriends(Long uuid, Set<Long> friends) {
-        NoticeMessage msg = new AddRelations(CrawlerDataType.PERSON, uuid, new HashSet<>(friends));
+    public synchronized void onAddFriends(Long userId, Set<Long> friends) {
+        NoticeMessage msg = new AddFriends(userId, new HashSet<>(friends));
+        send(msg);
+    }
+
+
+    @Override
+    public synchronized void onAddInterests(Long userId, Map<String, Long> interests) {
+        NoticeMessage msg = new AddInterests(userId, new HashMap<>(interests));
         send(msg);
     }
 
     @Override
-    public void onAddInterests(Long uuid, Set<Long> interests) {
-        NoticeMessage msg = new AddRelations(CrawlerDataType.INTEREST, uuid, new HashSet<>(interests));
-        send(msg);
-    }
-
-    @Override
-    public void scheduleCrawling(Long uuid) {
+    public synchronized void scheduleCrawling(Long uuid) {
         scheduler.scheduleCrawling(uuid);
     }
 
@@ -109,6 +109,4 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
             logger.error("Could not send message: {} due to {}", msg, e.getMessage());
         }
     }
-
-
 }

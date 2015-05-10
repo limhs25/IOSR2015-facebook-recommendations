@@ -6,12 +6,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import pl.recommendations.crawling.Crawler;
-import pl.recommendations.util.CollectionUtils;
 import twitter4j.*;
 
 import java.util.*;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Component(value = "TwitterCrawler")
@@ -20,6 +21,8 @@ public class TwitterCrawler implements Crawler {
     private static final Logger logger = LogManager.getLogger(TwitterCrawler.class.getName());
 
     private static final int FRIENDS_PER_PAGE = 5000;
+    private static final int INTERESTS_PER_PAGE = 30;
+    public static final int PAGE_LIMIT = 5;
 
     private final ReentrantLock lock = new ReentrantLock();
     private final Condition freeWindow = lock.newCondition();
@@ -32,7 +35,7 @@ public class TwitterCrawler implements Crawler {
         try {
             User user = twitter.showUser(uuid);
             String name = user.getScreenName();
-            logger.debug("user[{}] name is {}", uuid, name);
+            logger.info("user[{}] name is {}", uuid, name);
             return Optional.of(name);
         } catch (TwitterException e) {
             if (handledTwitterException(uuid, e)) return getPersonName(uuid);
@@ -43,7 +46,7 @@ public class TwitterCrawler implements Crawler {
     }
 
     @Override
-    public Set<Long> getPersonFriends(Long uuid, int maximumNumberOfFriends) throws InterruptedException {
+    public Set<Long> getPersonFriends(Long uuid, int friendsLimit) throws InterruptedException {
         Set<Long> uuids = new HashSet<>();
         long cursor = -1;
         IDs friendsIDs = null;
@@ -61,31 +64,50 @@ public class TwitterCrawler implements Crawler {
             } finally {
                 lock.unlock();
             }
-            logger.debug("Crawled {} friends for user[{}]", uuids.size(), uuids);
-        }while (friendsIDs != null && friendsIDs.hasNext() &&
-                maximumNumberOfFriends < (friendsIDs.getNextCursor() + 1) * FRIENDS_PER_PAGE);
+        } while (friendsIDs != null && friendsIDs.hasNext() &&
+                friendsLimit < (friendsIDs.getNextCursor() + 1) * FRIENDS_PER_PAGE);
 
-        CollectionUtils.trimCollection(uuids, FRIENDS_PER_PAGE);
+        logger.info("Crawled {} friends for user[{}]", uuids.size(), uuid);
 
-        return uuids;
+        return uuids.stream().limit(friendsLimit).collect(Collectors.toSet());
     }
 
     @Override
-    public Map<Long, String> getPersonInterests(Long uuid, int maximumNumberOfIterests) throws InterruptedException {
-        Map<Long, String> interests = new HashMap<>();
-        lock.lock();
-        try {
+    public Map<String, Long> getPersonInterests(Long uuid, int interestLimit) throws InterruptedException {
+        Map<String, Long> interests = new HashMap<>();
 
-            //TODO crawl interests, see getPersonFriends
-            throw new TwitterException("Dummy exception");
-        } catch (TwitterException e) {
-            if (handledTwitterException(uuid, e)) {
+        int page = 1;
+        do {
+            lock.lock();
+
+            try {
+                ResponseList<Status> statuses = twitter.getUserTimeline(uuid, new Paging(page, INTERESTS_PER_PAGE));
+                Map<String, Long> newInterests = statuses.stream()
+                        .flatMap(s -> Stream.of(s.getHashtagEntities()))
+                        .map(HashtagEntity::getText)
+                        .map(String::toLowerCase)
+                        .collect(Collectors.groupingBy(h -> h, Collectors.counting()));
+
+                newInterests.keySet().stream()
+                        .filter(interests::containsKey)
+                        .forEach(key -> newInterests.put(key, newInterests.get(key) + interests.get(key)));
+
+                interests.putAll(newInterests);
+            } catch (TwitterException e) {
+                if (!handledTwitterException(uuid, e)) {
+                    return interests;
+                }
+            } finally {
+                lock.unlock();
+                ++page;
             }
-            CollectionUtils.trimMap(interests, maximumNumberOfIterests);
-            return interests;
-        } finally {
-            lock.unlock();
-        }
+        } while (page < PAGE_LIMIT && interests.size() < interestLimit);
+
+        logger.info("New interests: {}", interests.size());
+
+        return interests.entrySet().stream()
+                .limit(interestLimit)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private boolean exceededRateLimit(TwitterException e) {
@@ -94,13 +116,13 @@ public class TwitterCrawler implements Crawler {
 
     private boolean handledTwitterException(Long uuid, TwitterException e) throws InterruptedException {
         if (exceededRateLimit(e)) {
-            logger.info("Waiting for rate limit to be reset");
+            logger.info(Thread.currentThread().getName() + " waiting for rate limit to be reset");
             freeWindow.await();
             logger.info("Resumed crawling");
             return true;
         } else if (e.getStatusCode() == HttpResponseCode.UNAUTHORIZED ||
                 e.getStatusCode() == HttpResponseCode.NOT_FOUND) {
-            logger.debug("Omitting Twitter crawling for {} due to {}", uuid, e.getMessage());
+            logger.info("Omitting Twitter crawling for {} due to {}", uuid, e.getMessage());
             return true;
         }
         return false;

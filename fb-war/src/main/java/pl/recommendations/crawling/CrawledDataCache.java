@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter, CrawledDataStorage {
@@ -16,83 +17,86 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     private final Set<CrawledDataListener> listeners = Collections.newSetFromMap(new IdentityHashMap<>());
 
     private final Map<Long, String> users = new HashMap<>();
-    private final Map<Long, String> interests = new HashMap<>();
+    private final Set<String> interests = new HashSet<>();
     private final Map<Long, Set<Long>> userFriends = new HashMap<>();
-    private final Map<Long, Set<Long>> userInterests = new HashMap<>();
+    private final Map<Long, Map<String, Long>> userInterests = new HashMap<>();
 
     /**
      * friend -> userIds
      * Invariant: userIds are always contained by <code>users</code>
      */
     private final Map<Long, Set<Long>> awaitingFriends = new HashMap<>();
-    /**
-     * interest -> userIds
-     * Invariant: userIds are always contained by <code>users</code>
-     */
-    private final Map<Long, Set<Long>> awaitingInterests = new HashMap<>();
 
     @Override
-    public void onNewPerson(Long uuid, String name) {
-        users.put(uuid, name);
-        userFriends.put(uuid, new HashSet<>());
-        userInterests.put(uuid, new HashSet<>());
+    public void onNewPerson(Long userId, String name) {
+        if (!users.containsKey(userId)) {
+            users.put(userId, name);
+            if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
+            if (!userFriends.containsKey(userId)) userFriends.put(userId, new HashSet<>());
 
-        listeners.forEach(l -> l.onNewPerson(uuid, name));
+            listeners.forEach(l -> l.onNewPerson(userId, name));
 
-        awaitingFriends
-                .getOrDefault(uuid, Collections.emptySet())
-                .forEach(user -> addFriendAndNotify(user, uuid));
-        awaitingFriends.remove(uuid);
+            awaitingFriends
+                    .getOrDefault(userId, Collections.emptySet())
+                    .forEach(user -> addFriendAndNotify(user, userId));
+
+            Map<String, Long> interests = userInterests.get(userId);
+            if (interests.size() > 0) {
+                listeners.forEach(l -> l.onAddInterests(userId, interests));
+            }
+
+            awaitingFriends.remove(userId);
+        }
     }
 
     @Override
-    public void onNewInterest(Long uuid, String name) {
-        interests.put(uuid, name);
+    public void onNewInterest(String interestName) {
+        if (!interests.contains(interestName)) {
+            interests.add(interestName);
 
-        listeners.forEach(l -> l.onNewInterest(uuid, name));
-
-        awaitingInterests
-                .getOrDefault(uuid, Collections.emptySet())
-                .forEach(user -> addInterestAndNotify(user, uuid));
-        awaitingInterests.remove(uuid);
+            listeners.forEach(l -> l.onNewInterest(interestName));
+        }
     }
 
     @Override
-    public void onAddFriends(Long uuid, Set<Long> friends) {
+    public void onAddFriends(Long userId, Set<Long> friends) {
         Set<Long> crawledFriends = Sets.intersection(friends, users.keySet());
         Set<Long> notCrawled = Sets.difference(friends, crawledFriends);
 
-        getOrUpdate(userFriends, uuid).addAll(crawledFriends);
-        listeners.forEach(l -> l.onAddFriends(uuid, crawledFriends));
+        getOrUpdate(userFriends, userId).addAll(crawledFriends);
+        listeners.forEach(l -> l.onAddFriends(userId, crawledFriends));
 
-        notCrawled.forEach(friendUuid -> getOrUpdate(awaitingFriends, friendUuid).add(uuid));
+        notCrawled.forEach(friendUuid -> getOrUpdate(awaitingFriends, friendUuid).add(userId));
     }
 
     @Override
-    public void onAddInterests(Long uuid, Set<Long> newInterests) {
-        Set<Long> crawledInterests = Sets.intersection(newInterests, interests.keySet());
-        Set<Long> notCrawled = Sets.difference(newInterests, crawledInterests);
+    public void onAddInterests(Long userId, Map<String, Long> newInterests) {
+        if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
 
-        getOrUpdate(userInterests, uuid).addAll(crawledInterests);
-        listeners.forEach(l -> l.onAddInterests(uuid, crawledInterests));
+        Set<String> newKeys = Sets.difference(newInterests.keySet(), userInterests.get(userId).keySet());
 
-        notCrawled.forEach(friendUuid -> getOrUpdate(awaitingInterests, friendUuid).add(uuid));
+        Map<String, Long> interestsToAdd = newInterests.entrySet().stream()
+                .filter(e -> newKeys.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        userInterests.get(userId).putAll(interestsToAdd);
+
+        if (users.containsKey(userId)) {
+            listeners.forEach(l -> l.onAddInterests(userId, interestsToAdd));
+        }
     }
 
-    private void addFriendAndNotify(Long user, Long friendUuid) {
-        userFriends.get(user).add(friendUuid);
-        listeners.forEach(l -> l.onAddFriends(user, ImmutableSet.of(friendUuid)));
-    }
+    private void addFriendAndNotify(Long userId, Long friendUuid) {
+        if (!userFriends.containsKey(userId)) userFriends.put(userId, new HashSet<>());
 
-    private void addInterestAndNotify(Long user, Long interestUuid) {
-        userInterests.get(user).add(interestUuid);
-        listeners.forEach(l -> l.onAddInterests(user, ImmutableSet.of(interestUuid)));
+        userFriends.get(userId).add(friendUuid);
+
+        listeners.forEach(l -> l.onAddFriends(userId, ImmutableSet.of(friendUuid)));
     }
 
     @Override
     public void register(CrawledDataListener listener) {
         listeners.add(listener);
-        logger.info("{} listeners", listeners.size());
     }
 
     @Override
@@ -106,18 +110,13 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     }
 
     @Override
-    public String getInterestName(Long uuid) {
-        return interests.get(uuid);
-    }
-
-    @Override
     public boolean hasPerson(Long uuid) {
         return users.containsKey(uuid);
     }
 
     @Override
     public boolean hasInterest(Long uuid) {
-        return interests.containsKey(uuid);
+        return interests.contains(uuid);
     }
 
     private Set<Long> getOrUpdate(Map<Long, Set<Long>> map, Long uuid) {
@@ -127,30 +126,27 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     }
 
     Set<CrawledDataListener> getListeners() {
-        return listeners;
+        return ImmutableSet.copyOf(listeners);
     }
 
-    Map<Long, Object> getUsers() {
+    Map<Long, String> getUsers() {
         return ImmutableMap.copyOf(users);
     }
 
-    Map<Long, Object> getInterests() {
-        return ImmutableMap.copyOf(interests);
+    Set<String> getInterests() {
+        return ImmutableSet.copyOf(interests);
     }
 
     Map<Long, Set<Long>> getUserFriends() {
-        return userFriends;
+        return ImmutableMap.copyOf(userFriends);
     }
 
-    Map<Long, Set<Long>> getUserInterests() {
-        return userInterests;
+    Map<Long, Map<String, Long>> getUserInterests() {
+        return ImmutableMap.copyOf(userInterests);
     }
 
     Map<Long, Set<Long>> getAwaitingFriends() {
-        return awaitingFriends;
+        return ImmutableMap.copyOf(awaitingFriends);
     }
 
-    Map<Long, Set<Long>> getAwaitingInterests() {
-        return awaitingInterests;
-    }
 }

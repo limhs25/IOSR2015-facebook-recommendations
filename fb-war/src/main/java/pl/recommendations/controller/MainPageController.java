@@ -9,6 +9,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 
 /**
  * Created by marekmagik on 2015-01-19.
@@ -26,11 +27,17 @@ public class MainPageController {
         return new ModelAndView(LOGIN_VIEW_NAME);
     }
 
-
     @RequestMapping("/main")
     public ModelAndView showMainForm(HttpSession session) {
         ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
         mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
+
+        /* Test users list until analiser is implemented */
+        ArrayList<String> users = new ArrayList<String>();
+        users.add("User1");
+        users.add("User2");
+        users.add("User3");
+        mv.addObject("recommendedUsers", users);
 
         return mv;
     }

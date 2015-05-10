@@ -12,8 +12,7 @@ public class Friendship {
     private Long graphId;
 
     @StartNode
-    private
-    Person person;
+    private Person person;
 
     @EndNode
     private Person friend;

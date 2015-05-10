@@ -2,15 +2,25 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:neo4j="http://www.springframework.org/schema/data/neo4j"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans-4.1.xsd
        http://www.springframework.org/schema/context
        http://www.springframework.org/schema/context/spring-context-4.1.xsd
        http://www.springframework.org/schema/mvc
-       http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd">
-
+       http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+       http://www.springframework.org/schema/data/neo4j
+       http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd">
 
     <context:component-scan base-package="pl.recommendations"/>
+
+    <bean id="neo4jConfiguration" class="org.springframework.data.neo4j.config.Neo4jConfiguration">
+        <property name="basePackage" value="pl.recommendations.db"/>
+    </bean>
+
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/tw121"/>
+
+    <neo4j:repositories base-package="pl.recommendations"/>
 
     <!-- freemarker config -->
     <bean id="freemarkerConfig" class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">

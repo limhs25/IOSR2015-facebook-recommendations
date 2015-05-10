@@ -8,11 +8,10 @@ import java.util.Set;
 
 @Component
 public interface Crawler {
-    static final int DEPTH = 1;
-
     Optional<String> getPersonName(Long uuid) throws InterruptedException;
 
-    Set<Long> getPersonFriends(Long uuid, int maximumNumberOfFriends) throws InterruptedException;
+    Set<Long> getPersonFriends(Long uuid, int friendsLimit) throws InterruptedException;
 
-    Map<Long, String> getPersonInterests(Long uuid, int maximumNumberOfInterests) throws InterruptedException;
+    //TODO Long -> (String, Int) ?
+    Map<String, Long> getPersonInterests(Long uuid, int interestLimit) throws InterruptedException;
 }

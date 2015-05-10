@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -38,31 +39,34 @@ public class FileStoreClient extends CrawlerClient {
     }
 
     @Override
-    public void onNewPerson(Long uuid, String name) {
-        write(people, uuid, name);
-    }
-
-
-    @Override
-    public void onNewInterest(Long uuid, String name) {
-        write(interests, uuid, name);
+    public void onNewPerson(Long userId, String name) {
+        write(people, userId, name);
+        logger.info("added new person: {}", name);
     }
 
     @Override
-    public void onAddFriends(Long uuid, Set<Long> friends) {
-        friends.forEach(f -> write(peopleRelations, uuid, f));
+    public void onNewInterest(String interestName) {
+        write(interests, interestName);
+        logger.info("added new interest: {}", interestName);
     }
 
     @Override
-    public void onAddInterests(Long uuid, Set<Long> interests) {
-        interests.forEach(i -> write(interestRelations, uuid, i));
+    public void onAddFriends(Long userId, Set<Long> friends) {
+        friends.forEach(f -> write(peopleRelations, userId, f));
+        logger.info("added {} friends", friends.size());
+    }
+
+    @Override
+    public void onAddInterests(Long userId, Map<String, Long> interests) {
+        interests.entrySet().forEach(e -> write(interestRelations, userId, e.getKey(), e.getValue()));
+        logger.info("added {} interests", interests.size());
     }
 
     private void write(FileWriter writer, Object... objects) {
         try {
             Optional<Object> line = Arrays.stream(objects).reduce((s1, s2) -> s1 + "," + s2);
             if (line.isPresent()) {
-            logger.info("Writing {}", line.get());
+//                logger.info("Writing {}", line.get());
                 writer.write(line.get() + "\n");
                 writer.flush();
             }
@@ -80,8 +84,12 @@ public class FileStoreClient extends CrawlerClient {
         new Thread(client).start();
 
         client.scheduleCrawling(17765013l);
-        while(true){
+        while (true) {
             Thread.sleep(TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS));
         }
+    }
+
+    @Override
+    public void init() {
     }
 }

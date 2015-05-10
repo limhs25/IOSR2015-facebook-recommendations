@@ -13,27 +13,27 @@ public class InterestRelationship {
     protected Long graphId;
 
     @StartNode
-    private Interest firstInterest;
+    private InterestEntity firstInterestEntity;
 
     @EndNode
-    private Interest secondInterest;
+    private InterestEntity secondInterestEntity;
 
     private double value;
 
-    public Set<Interest> getInterests() {
-        return ImmutableSet.of(firstInterest, secondInterest);
+    public Set<InterestEntity> getInterests() {
+        return ImmutableSet.of(firstInterestEntity, secondInterestEntity);
     }
 
     public double getValue() {
         return value;
     }
 
-    public void setFirstInterest(Interest firstInterest) {
-        this.firstInterest = firstInterest;
+    public void setFirstInterest(InterestEntity firstInterestEntity) {
+        this.firstInterestEntity = firstInterestEntity;
     }
 
-    public void setSecondInterest(Interest secondInterest) {
-        this.secondInterest = secondInterest;
+    public void setSecondInterest(InterestEntity secondInterestEntity) {
+        this.secondInterestEntity = secondInterestEntity;
     }
 
     public void setValue(double value) {
