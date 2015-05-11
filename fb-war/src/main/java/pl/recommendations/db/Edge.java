@@ -6,7 +6,7 @@ import org.springframework.data.neo4j.annotation.RelationshipEntity;
 @RelationshipEntity
 public abstract class Edge {
     @GraphId
-    private Long graphID;
+    protected Long graphID;
     public Long getId() {
         return graphID;
     }

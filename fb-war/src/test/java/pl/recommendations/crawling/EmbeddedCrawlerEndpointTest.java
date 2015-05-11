@@ -64,7 +64,7 @@ public class EmbeddedCrawlerEndpointTest {
         interestsRepo.save(createInterestNode(NAME));
         endpoint.onNewInterest(NAME);
 
-        assertNotNull(interestsRepo.findByUuid(UUID));
+        assertNotNull(interestsRepo.findByName(NAME));
     }
 
     @Test
