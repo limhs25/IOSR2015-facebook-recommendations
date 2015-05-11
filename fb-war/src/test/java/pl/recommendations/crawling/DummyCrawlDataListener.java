@@ -13,7 +13,7 @@ public class DummyCrawlDataListener implements CrawledDataListener {
     private final Map<Long, Map<String, Long>> userInterests = new HashMap<>();
 
     @Override
-    public void onNewPerson(Long userId, String name) {
+    public void onNewPersonNode(Long userId, String name) {
         users.put(userId, name);
         userFriends.put(userId, new HashSet<>());
         userInterests.put(userId, new HashMap<>());

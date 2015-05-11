@@ -2,6 +2,7 @@ package pl.recommendations.db.person;
 
 import com.google.common.base.Preconditions;
 import org.springframework.data.neo4j.annotation.Query;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.NodeRepository;
 import pl.recommendations.db.RelationshipType;
@@ -10,9 +11,8 @@ import pl.recommendations.db.interest.InterestNode;
 import java.util.Collection;
 
 @Transactional
+@Component
 public interface PersonNodeRepository extends NodeRepository {
-    PersonNode findByUuid(Long uuid);
-
     @Query("match u-[" + RelationshipType.FRIENDSHIP + "]->u2 " +
             "where u.uuid = {0} " +
             "return u2")
@@ -22,6 +22,8 @@ public interface PersonNodeRepository extends NodeRepository {
             "where u.uuid = {0} " +
             "return u2")
     Collection<InterestNode> getInterestsOf(Long id);
+
+    PersonNode findByUuid(Long uuid);
 
     default void addFriend(PersonNode personNode, PersonNode friend) {
         if (friend != null && !friend.equals(personNode)) {

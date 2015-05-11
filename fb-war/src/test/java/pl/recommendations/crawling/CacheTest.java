@@ -44,7 +44,7 @@ public class CacheTest {
     public void addUser() {
         long uuid = 1l;
         String name = "name";
-        cache.onNewPerson(uuid, name);
+        cache.onNewPersonNode(uuid, name);
         assertEquals(1, cache.getUsers().size());
         assertEquals(1, listener.getUsers().size());
         assertEquals(name, cache.getUsers().get(uuid));
@@ -55,8 +55,8 @@ public class CacheTest {
     public void addSameUserTwice() {
         long uuid = 1l;
         String name = "name";
-        cache.onNewPerson(uuid, name);
-        cache.onNewPerson(uuid, name);
+        cache.onNewPersonNode(uuid, name);
+        cache.onNewPersonNode(uuid, name);
         assertEquals(1, cache.getUsers().size());
         assertEquals(1, listener.getUsers().size());
         assertEquals(name, cache.getUsers().get(uuid));
@@ -90,8 +90,8 @@ public class CacheTest {
         String name = "name";
         Set<Long> friends = ImmutableSet.of(2l, 3l, 4l, 5l);
 
-        cache.onNewPerson(uuid, name);
-        friends.forEach(id -> cache.onNewPerson(id, id.toString()));
+        cache.onNewPersonNode(uuid, name);
+        friends.forEach(id -> cache.onNewPersonNode(id, id.toString()));
 
         cache.onAddFriends(uuid, friends);
 
@@ -109,7 +109,7 @@ public class CacheTest {
         String name = "name";
         Set<Long> friends = ImmutableSet.of(2l, 3l, 4l, 5l);
 
-        cache.onNewPerson(uuid, name);
+        cache.onNewPersonNode(uuid, name);
         cache.onAddFriends(uuid, friends);
 
         assertNotNull(cache.getUserFriends().get(uuid));
@@ -127,8 +127,8 @@ public class CacheTest {
         Set<Long> crawledFriends = ImmutableSet.of(2l, 3l);
         Set<Long> notCrawledFriends = ImmutableSet.of(4l, 5l);
 
-        cache.onNewPerson(uuid, name);
-        crawledFriends.forEach(id -> cache.onNewPerson(id, id.toString()));
+        cache.onNewPersonNode(uuid, name);
+        crawledFriends.forEach(id -> cache.onNewPersonNode(id, id.toString()));
 
         cache.onAddFriends(uuid, Sets.union(crawledFriends, notCrawledFriends));
 
@@ -146,7 +146,7 @@ public class CacheTest {
         String name = "name";
         Map<String, Long> interests = ImmutableMap.of("name1", 1l, "name2", 2l, "name3", 3l);
 
-        cache.onNewPerson(uuid, name);
+        cache.onNewPersonNode(uuid, name);
         interests.keySet().forEach(cache::onNewInterest);
 
         cache.onAddInterests(uuid, interests);
@@ -166,10 +166,10 @@ public class CacheTest {
         String name = "name";
         Set<Long> friends = ImmutableSet.of(awaitingFriendUuid, 3l, 4l, 5l);
 
-        cache.onNewPerson(uuid, name);
+        cache.onNewPersonNode(uuid, name);
         cache.onAddFriends(uuid, friends);
 
-        cache.onNewPerson(awaitingFriendUuid, name);
+        cache.onNewPersonNode(awaitingFriendUuid, name);
 
         assertNotNull(cache.getUserFriends().get(uuid));
         assertEquals(1, cache.getUserFriends().get(uuid).size());
