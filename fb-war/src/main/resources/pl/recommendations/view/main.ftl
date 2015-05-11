@@ -6,14 +6,23 @@
 <#import "pageTop.ftl" as top/>
 
 <html>
-	<head>
-		<@top.commonHeader/>
-	</head>
-	<body>
-		<@top.topBanner/>
-		Zalogowany jako: ${twitter.screenName}<br/>
-        TwitterID: ${twitter.id}<br/>
-        <a href="logout.htm">Wyloguj</a><br/>
-        <a href="crawl.htm">CRAWL NOW!</a><br/>
-	</body>
+<head>
+<@top.commonHeader/>
+</head>
+<body>
+<@spring.bind "graphFiles"/>
+<form id="updateUser" method="post" action="/twitter/upload" >
+    <fieldset>
+    <@spring.bind "graphFiles.peopleNodes"/>
+        <input type="file" name="peopleNodes" id="file"/>
+    <@spring.bind "graphFiles.interestNodes"/>
+        <input type="file" name="interestNodes" id="file"/>
+    <@spring.bind "graphFiles.peopleRelations"/>
+        <input type="file" name="peopleRelations" id="file"/>
+    <@spring.bind "graphFiles.interestRelations"/>
+        <input type="file" name="interestRelations" id="file"/>
+    </fieldset>
+    <input type="submit"/>
+</form>
+</body>
 </html>
