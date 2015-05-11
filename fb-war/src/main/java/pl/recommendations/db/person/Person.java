@@ -14,10 +14,7 @@ public class Person {
 
     @Indexed(unique = true)
     private Long uuid;
-<<<<<<< HEAD
-=======
     @Fetch
->>>>>>> 2970d6393f3fc719ea5af4dd6a1e5192a2a92647
     private String name;
 
     @RelatedToVia(direction = Direction.OUTGOING)
@@ -26,23 +23,6 @@ public class Person {
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<Interest> interests = new HashSet<>();
 
-<<<<<<< HEAD
-    public void addFriend(Person friend) {
-        if (friend != null && !this.equals(friend)) {
-            Friendship relationship = new Friendship();
-            relationship.setPerson(this);
-            relationship.setFriend(friend);
-            friendships.add(relationship);
-        }
-    }
-
-    public void addInterest(Interest interest) {
-        if (interest != null) {
-            interests.add(interest);
-        }
-    }
-=======
->>>>>>> 2970d6393f3fc719ea5af4dd6a1e5192a2a92647
 
     @Override
     public boolean equals(Object o) {
@@ -66,24 +46,13 @@ public class Person {
     public void setUuid(Long uuid) {
         this.uuid = uuid;
     }
-    public void setName(String name) {
-        this.name = name;
-    }
 
-<<<<<<< HEAD
-    public String getName() {
-        return name;
-    }
-    public Set<Interest> getInterests() {
-        return ImmutableSet.copyOf(interests);
-=======
     public void setName(String name) {
         this.name = name;
     }
 
     public String getName() {
         return name;
->>>>>>> 2970d6393f3fc719ea5af4dd6a1e5192a2a92647
     }
 
     public Set<Friendship> getFriendships() {

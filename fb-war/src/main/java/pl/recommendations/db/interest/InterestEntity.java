@@ -19,10 +19,6 @@ public class InterestEntity {
     private Long graphID;
 
     @Indexed(unique = true)
-<<<<<<< HEAD:fb-war/src/main/java/pl/recommendations/db/interest/Interest.java
-    private Long uuid;
-=======
->>>>>>> 2970d6393f3fc719ea5af4dd6a1e5192a2a92647:fb-war/src/main/java/pl/recommendations/db/interest/InterestEntity.java
     private String name;
 
     @RelatedToVia(type = RelationshipType.SIMILARITY, direction = Direction.BOTH)
@@ -72,25 +68,8 @@ public class InterestEntity {
         return name;
     }
 
-<<<<<<< HEAD:fb-war/src/main/java/pl/recommendations/db/interest/Interest.java
-    public void setUuid(Long uuid) {
-        this.uuid = uuid;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Long getId() {
-        return graphID;
-=======
-    public void setName(String name) {
-        this.name = name;
->>>>>>> 2970d6393f3fc719ea5af4dd6a1e5192a2a92647:fb-war/src/main/java/pl/recommendations/db/interest/InterestEntity.java
     }
 
     public Set<Contrast> getContrasts() {

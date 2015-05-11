@@ -18,9 +18,6 @@ public interface PersonRepository extends GraphRepository<Person> {
             "return u2")
     Collection<Person> getFriendsOf(Long id);
 
-<<<<<<< HEAD
-
-=======
     @Query("match u-[" + RelationshipType.INTEREST + "]->u2 " +
             "where u.uuid = {0} " +
             "return u2")
@@ -47,5 +44,4 @@ public interface PersonRepository extends GraphRepository<Person> {
         person.addInterest(interest);
 
     }
->>>>>>> 2970d6393f3fc719ea5af4dd6a1e5192a2a92647
 }
