@@ -1,33 +1,35 @@
 package pl.recommendations.db.person;
 
 import org.springframework.data.neo4j.annotation.EndNode;
+import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 import org.springframework.data.neo4j.annotation.StartNode;
-import pl.recommendations.db.Edge;
 import pl.recommendations.db.RelationshipType;
 
 @RelationshipEntity(type = RelationshipType.FRIENDSHIP)
-public class FriendshipEdge extends Edge {
+public class Friendship {
+    @GraphId
+    private Long graphId;
 
     @StartNode
-    private PersonNode personNode;
+    private Person person;
 
     @EndNode
-    private PersonNode friend;
+    private Person friend;
 
-    public PersonNode getFriend() {
+    public Person getFriend() {
         return friend;
     }
 
-    public void setFriend(PersonNode friend) {
+    public void setFriend(Person friend) {
         this.friend = friend;
     }
 
-    public PersonNode getPersonNode() {
-        return personNode;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPersonNode(PersonNode personNode) {
-        this.personNode = personNode;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }

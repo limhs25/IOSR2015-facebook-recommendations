@@ -55,7 +55,7 @@ public class CrawlerScheduler implements CrawlerService {
 
     public void scheduleCrawling(Long uuid, int depthLimit, int friendsPerUserLimit) {
         if (cache.hasPerson(uuid) || crawlFriendsQueue.size() == TASK_QUEUE_SIZE) {
-            logger.debug("PersonNode {} already crawled", uuid);
+            logger.debug("Person {} already crawled", uuid);
         } else {
             CrawlFriendsTask task1 = new CrawlFriendsTask(uuid, depthLimit, friendsPerUserLimit);
             SimpleCrawlTask task2 = new SimpleCrawlTask(uuid);
@@ -97,7 +97,7 @@ public class CrawlerScheduler implements CrawlerService {
         if (!cache.hasPerson(uuid)) {
             Optional<String> name = crawler.getPersonName(uuid);
             if (name.isPresent()) {
-                cache.onNewPersonNode(uuid, name.get());
+                cache.onNewPerson(uuid, name.get());
             }
         }
     }

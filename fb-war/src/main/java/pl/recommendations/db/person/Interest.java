@@ -1,36 +1,37 @@
 package pl.recommendations.db.person;
 
 import org.springframework.data.neo4j.annotation.*;
-import pl.recommendations.db.Edge;
 import pl.recommendations.db.RelationshipType;
-import pl.recommendations.db.interest.InterestNode;
+import pl.recommendations.db.interest.InterestEntity;
 
 @RelationshipEntity(type = RelationshipType.INTEREST)
-public class InterestEdge extends Edge {
+public class Interest {
+    @GraphId
+    private Long graphId;
 
     @Fetch
     @StartNode
-    private PersonNode personNode;
+    private Person person;
 
     @Fetch
     @EndNode
-    private InterestNode interest;
+    private InterestEntity interest;
 
     private Long weight;
 
-    public PersonNode getPersonNode() {
-        return personNode;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setPersonNode(PersonNode personNode) {
-        this.personNode = personNode;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
-    public InterestNode getInterest() {
+    public InterestEntity getInterest() {
         return interest;
     }
 
-    public void setInterestNode(InterestNode interest) {
+    public void setInterest(InterestEntity interest) {
         this.interest = interest;
     }
 

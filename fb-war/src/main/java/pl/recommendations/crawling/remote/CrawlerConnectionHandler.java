@@ -66,7 +66,7 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     }
 
     @Override
-    public synchronized void onNewPersonNode(Long uuid, String name) {
+    public synchronized void onNewPerson(Long uuid, String name) {
         NoticeMessage msg = new NewPerson(uuid, name);
         send(msg);
     }

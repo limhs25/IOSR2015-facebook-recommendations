@@ -67,7 +67,7 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
         if (msg instanceof NewInterest) {
             onNewInterest(((NewInterest) msg).getName());
         } else if (msg instanceof NewPerson) {
-            onNewPersonNode(((NewPerson) msg).getUserID(), ((NewPerson) msg).getName());
+            onNewPerson(((NewPerson) msg).getUserID(), ((NewPerson) msg).getName());
         } else if (msg instanceof AddFriends) {
             Set<Long> friends = ((AddFriends) msg).getFriendsIds();
             onAddFriends(((AddFriends) msg).getUserId(), friends);

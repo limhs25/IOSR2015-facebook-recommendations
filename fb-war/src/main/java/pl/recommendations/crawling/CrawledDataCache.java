@@ -28,13 +28,13 @@ public class CrawledDataCache implements CrawledDataListener, CrawledDataEmitter
     private final Map<Long, Set<Long>> awaitingFriends = new HashMap<>();
 
     @Override
-    public void onNewPersonNode(Long userId, String name) {
+    public void onNewPerson(Long userId, String name) {
         if (!users.containsKey(userId)) {
             users.put(userId, name);
             if (!userInterests.containsKey(userId)) userInterests.put(userId, new HashMap<>());
             if (!userFriends.containsKey(userId)) userFriends.put(userId, new HashSet<>());
 
-            listeners.forEach(l -> l.onNewPersonNode(userId, name));
+            listeners.forEach(l -> l.onNewPerson(userId, name));
 
             awaitingFriends
                     .getOrDefault(userId, Collections.emptySet())

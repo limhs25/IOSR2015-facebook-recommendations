@@ -61,7 +61,7 @@ public class FileRepositoryCrawlerService extends EmbeddedCrawlerEndpoint implem
             String[] split = line.split(",");
             long userId = Long.parseLong(split[0]);
             String userName = split[1];
-            onNewPersonNode(userId, userName);
+            onNewPerson(userId, userName);
             logger.info("read people");
         });
     }

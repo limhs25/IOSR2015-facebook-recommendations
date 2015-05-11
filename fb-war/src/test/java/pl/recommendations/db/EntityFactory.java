@@ -1,18 +1,18 @@
 package pl.recommendations.db;
 
-import pl.recommendations.db.interest.InterestNode;
-import pl.recommendations.db.person.PersonNode;
+import pl.recommendations.db.interest.InterestEntity;
+import pl.recommendations.db.person.Person;
 
 public abstract class EntityFactory {
-    protected InterestNode createInterestNode(String name) {
-        InterestNode interestEntity = new InterestNode();
+    protected InterestEntity createInterest(String name) {
+        InterestEntity interestEntity = new InterestEntity();
         interestEntity.setName(name);
 
         return interestEntity;
     }
 
-    protected PersonNode createUser(long uuid) {
-        PersonNode person = new PersonNode();
+    protected Person createUser(long uuid) {
+        Person person = new Person();
         person.setUuid(uuid);
 
         return person;
