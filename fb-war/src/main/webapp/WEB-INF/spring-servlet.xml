@@ -14,11 +14,16 @@
 
     <context:component-scan base-package="pl.recommendations"/>
 
-    <bean id="neo4jConfiguration" class="org.springframework.data.neo4j.config.Neo4jConfiguration">
-        <property name="basePackage" value="pl.recommendations.db"/>
+
+    <bean id="graphDatabaseFactory" class="org.neo4j.graphdb.factory.GraphDatabaseFactory">
+
     </bean>
 
-    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/tw121"/>
+    <bean id="neo4jConfiguration" factory-bean="graphDatabaseFactory" factory-method="newEmbeddedDatabase">
+        <constructor-arg name="path" value="data/db/twdb2"/>
+    </bean>
+
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/db/twdb1"/>
 
     <neo4j:repositories base-package="pl.recommendations"/>
 
@@ -35,6 +40,11 @@
         <property name="prefix" value=""/>
         <property name="suffix" value=".ftl"/>
         <property name="contentType" value="text/html;charset=UTF-8"/>
+    </bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- maxUploadSize in bytes: 15MB -->
+        <property name="maxUploadSize" value="15728640"/>
     </bean>
 
     <mvc:annotation-driven/>

@@ -1,11 +1,12 @@
 package pl.recommendations.controller;
 
-import org.springframework.validation.BindingResult;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
 import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
@@ -17,6 +18,9 @@ import javax.servlet.http.HttpSession;
 public class MainPageController {
     private static final String LOGIN_VIEW_NAME = "login";
     private static final String MAIN_VIEW_NAME = "main";
+
+    @Autowired
+    FileRepositoryCrawler fileRepositoryCrawler;
 
     @RequestMapping("/")
     public ModelAndView showLoginForm() {
@@ -32,12 +36,14 @@ public class MainPageController {
     }
 
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public String fillDatabase(@ModelAttribute("graphFiles") GraphFiles form, BindingResult result) {
-        if (result.hasErrors()) {
-            return "user_create";
-        }
-        System.out.println(form.getPeopleNodes());
+    public void fillDatabase(@ModelAttribute("graphFiles") GraphFiles files) {
+        String separator = files.getSeparator();
 
-        return "redirect:/user_list.html";
+        fileRepositoryCrawler.readPeopleNodes(files.getPeopleNodesStream(), separator);
+        fileRepositoryCrawler.readInterestNodes(files.getInterestNodesStream(), separator);
+        fileRepositoryCrawler.readPeopleEdges(files.getPeopleEdgesStream(), separator);
+        fileRepositoryCrawler.readInterestEdges(files.getInterestEdgesStream(), separator);
+
+        fileRepositoryCrawler.persist();
     }
 }

@@ -10,19 +10,30 @@
 <@top.commonHeader/>
 </head>
 <body>
+<@top.topBanner/>
+
 <@spring.bind "graphFiles"/>
-<form id="updateUser" method="post" action="/twitter/upload" >
+<form id="fill" method="post" action="/twitter/upload" enctype="multipart/form-data">
     <fieldset>
     <@spring.bind "graphFiles.peopleNodes"/>
         <input type="file" name="peopleNodes" id="file"/>
     <@spring.bind "graphFiles.interestNodes"/>
         <input type="file" name="interestNodes" id="file"/>
-    <@spring.bind "graphFiles.peopleRelations"/>
-        <input type="file" name="peopleRelations" id="file"/>
-    <@spring.bind "graphFiles.interestRelations"/>
-        <input type="file" name="interestRelations" id="file"/>
+    <@spring.bind "graphFiles.peopleEdges"/>
+        <input type="file" name="peopleEdges" id="file"/>
+    <@spring.bind "graphFiles.interestEdges"/>
+        <input type="file" name="interestEdges" id="file"/>
+
+    <@spring.formInput "graphFiles.separator"/>
+        <label for="text">Separator</label>
     </fieldset>
-    <input type="submit"/>
+    <button id="fill-button" value="Submit">
 </form>
 </body>
+<script>
+    $("#fill-button").onclick(function () {
+        $("#fill").submit({url: '/twitter/upload', type: 'post'});
+    });
+
+</script>
 </html>

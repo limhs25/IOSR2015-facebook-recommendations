@@ -1,151 +1,148 @@
 package pl.recommendations.crawling.embedded;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.recommendations.db.interest.InterestEntity;
+import pl.recommendations.db.interest.InterestEntityRepository;
+import pl.recommendations.db.person.Friendship;
+import pl.recommendations.db.person.Interest;
+import pl.recommendations.db.person.Person;
+import pl.recommendations.db.person.PersonRepository;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.HashMap;
 
 @Transactional
 @Service("fileCrawlerService")
-public class FileRepositoryCrawlerService extends EmbeddedCrawlerEndpoint implements FileRepositoryCrawler {
+public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
     private static final Logger logger = LogManager.getLogger(FileRepositoryCrawlerService.class.getName());
 
-    private File dbDir;
-    private String separator = ",";
+    @Autowired
+    protected InterestEntityRepository interestsRepo;
+    @Autowired
+    protected PersonRepository peopleRepo;
 
-    private File peopleFile;
-    private File interestsFile;
-    private File peopleRelationsFile;
-    private File interestRelationsFile;
+    private final HashMap<Long, Person> people = new HashMap<>();
+    private final HashMap<String, InterestEntity> interests = new HashMap<>();
 
-    public void setDbDir(File file) {
-        this.dbDir = file;
-        Preconditions.checkArgument(dbDir != null && dbDir.isDirectory(), "invalid directory " + file.getAbsolutePath());
-    }
 
     @Override
-    public void init() {
-        Preconditions.checkState(dbDir != null);
+    public void persist() {
+        long start = System.currentTimeMillis();
 
-        peopleFile = new File(dbDir, "people.csv");
-        interestsFile = new File(dbDir, "interests.csv");
-        peopleRelationsFile = new File(dbDir, "peopleRelations.csv");
-        interestRelationsFile = new File(dbDir, "interestRelations.csv");
+        peopleRepo.save(people.values());
+        logger.info("saved database in {}s", ( System.currentTimeMillis() - start) / 1000.0);
     }
 
-    @Override
-    public void run() {
-        try {
-            readPeople();
-            readInterestEntities();
-            readFriendships();
-            readInterest();
-        } catch (IOException e) {
-            logger.error("Error while interest nodes people due to {}", e.getMessage(), e);
-        }
-    }
 
-    @Override
-    public void onAddFriends(Long userId, Set<Long> friends) {
-        super.onNewPerson(userId, Long.toString(userId));
-        friends.forEach(id -> super.onNewPerson(userId, Long.toString(id)));
-
-        super.onAddFriends(userId, friends);
-    }
-
-    @Override
-    public void onAddInterests(Long userId, Map<String, Long> interests) {
-        super.onNewPerson(userId, Long.toString(userId));
-        interests.keySet().forEach(super::onNewInterest);
-
-        super.onAddInterests(userId, interests);
-    }
-
-    private void readPeople() throws IOException {
-        if (!peopleFile.exists()) {
-            return;
-        }
-
-        Files.lines(peopleFile.toPath()).forEach(line -> {
+    public void readPeopleNodes(InputStream in, String separator) {
+        BufferedReader stream = new BufferedReader(new InputStreamReader(in));
+        stream.lines().forEach((String line) -> {
             String[] split = line.split(separator);
             long userId = Long.parseLong(split[0]);
             String userName = split[1];
-            onNewPerson(userId, userName);
-            logger.info("read people");
+
+            Person person = new Person();
+            person.setUuid(userId);
+            person.setName(userName);
+
+            people.put(userId, person);
         });
+
+        peopleRepo.save(people.values());
     }
 
-    private void readInterestEntities() throws IOException {
-        if (!interestsFile.exists()) {
-            return;
-        }
+    public void readInterestNodes(InputStream in, String separator) {
+        BufferedReader stream = new BufferedReader(new InputStreamReader(in));
 
-        logger.info("reading interest entities");
-        Files.lines(interestsFile.toPath()).forEach(this::onNewInterest);
-        logger.info("read interest entities");
+        stream.lines().forEach(interestName -> {
+            InterestEntity interestEntity = new InterestEntity();
+            interestEntity.setName(interestName);
 
+            interests.put(interestName, interestEntity);
+        });
+
+        interestsRepo.save(interests.values());
     }
 
-    private void readFriendships() throws IOException {
-        if (!peopleRelationsFile.exists()) {
-            return;
-        }
-
-        logger.info("reading friendships");
-        Files.lines(peopleRelationsFile.toPath()).forEach(line -> {
+    public void readPeopleEdges(InputStream in, String separator) {
+        BufferedReader stream = new BufferedReader(new InputStreamReader(in));
+        stream.lines().forEach(line -> {
             String[] split = line.split(separator);
             long id1 = Long.parseLong(split[0]);
             long id2 = Long.parseLong(split[1]);
-            onAddFriends(id1, ImmutableSet.of(id2));
+
+            Person person = resolvePerson(id1);
+            Person friend = resolvePerson(id2);
+
+            Friendship friendship = new Friendship();
+            friendship.setPerson(person);
+            friendship.setFriend(friend);
+
+            person.addFriendship(friendship);
         });
         logger.info("read friendships");
 
     }
 
-    private void readInterest() throws IOException {
-        if (!interestRelationsFile.exists()) {
-            return;
+    public void readInterestEdges(InputStream in, String separator) {
+        BufferedReader stream = new BufferedReader(new InputStreamReader(in));
+        stream.lines().forEach((String line) -> {
+                    String[] split = line.split(separator);
+                    long userId = Long.parseLong(split[0]);
+                    String interestName = split[1];
+                    long weight = Long.parseLong(split[2]);
+
+                    Person person = resolvePerson(userId);
+                    InterestEntity interestEntity = resolveInterest(interestName);
+
+                    Interest interest = new Interest();
+                    interest.setPerson(person);
+                    interest.setInterest(interestEntity);
+                    interest.setWeight(weight);
+
+                    person.addInterest(interest);
+                }
+        );
+        logger.info("read interests");
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring/applicationContext.xml");
+        FileRepositoryCrawlerService fileRepositoryCrawler = context.getBean(FileRepositoryCrawlerService.class);
+
+        String separator = ",";
+        fileRepositoryCrawler.readPeopleNodes(new FileInputStream(new File("db/peopleNodes.csv")), separator);
+        fileRepositoryCrawler.readInterestNodes(new FileInputStream(new File("db/interestNodes.csv")), separator);
+        fileRepositoryCrawler.readPeopleEdges(new FileInputStream(new File("db/peopleRelations.csv")), separator);
+        fileRepositoryCrawler.readInterestEdges(new FileInputStream(new File("db/interestRelations.csv")), separator);
+    }
+
+    private InterestEntity resolveInterest(String interestName) {
+        InterestEntity interest = interests.get(interestName);
+
+        if (interest == null) {
+            interest = new InterestEntity();
+            interest.setName(interestName);
+            interests.put(interestName, interest);
         }
 
-        logger.info("reading interests");
-        Files.lines(interestRelationsFile.toPath()).forEach(line -> {
-            String[] split = line.split(separator);
-            long userId = Long.parseLong(split[0]);
-            String interestName = split[1];
-            long weight = Long.parseLong(split[2]);
-            onAddInterests(userId, ImmutableMap.of(interestName, weight));
-        });
-        logger.info("read interests");
-
+        return interest;
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        File db = new File("fbDb");
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring/applicationContext.xml");
+    private Person resolvePerson(Long userId) {
+        Person person = people.get(userId);
 
-        FileRepositoryCrawler crawler = (FileRepositoryCrawler) context.getBean("fileCrawlerService");
-        crawler.setSeparator(" ");
-        crawler.setDbDir(db);
-
-        crawler.init();
-
-        Thread thread = new Thread(crawler);
-
-        thread.start();
-        thread.join();
-    }
-
-    public void setSeparator(String separator) {
-        this.separator = separator;
+        if (person == null) {
+            person = new Person();
+            person.setUuid(userId);
+            peopleRepo.save(person);
+            people.put(userId, person);
+        }
+        return person;
     }
 }

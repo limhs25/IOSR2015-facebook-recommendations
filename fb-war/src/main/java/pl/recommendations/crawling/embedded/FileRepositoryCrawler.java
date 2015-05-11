@@ -1,15 +1,12 @@
 package pl.recommendations.crawling.embedded;
 
-import java.io.File;
+import java.io.InputStream;
 
-/**
- * Created by marekmagik on 2015-05-06.
- */
-public interface FileRepositoryCrawler extends Runnable {
+public interface FileRepositoryCrawler {
+    void readPeopleNodes(InputStream in, String separator);
+    void readInterestNodes(InputStream in, String separator);
+    void readPeopleEdges(InputStream in, String separator);
+    void readInterestEdges(InputStream in, String separator);
 
-    public void init();
-
-    public void setDbDir(File file);
-
-    void setSeparator(String separator);
+    void persist();
 }
