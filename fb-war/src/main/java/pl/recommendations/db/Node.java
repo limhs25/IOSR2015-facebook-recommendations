@@ -14,7 +14,9 @@ import java.util.Set;
 @NodeEntity
 public abstract class Node {
     @GraphId
-    protected Long graphID;
+    private Long graphID;
+
+
 
     @RelatedToVia(type = RelationshipType.SIMILARITY, direction = Direction.BOTH)
     private Set<Similarity> similarities = new HashSet<>();
