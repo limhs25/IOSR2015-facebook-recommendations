@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface CrawledDataListener {
-    void onNewPerson(Long userId, String name);
+    void onNewPersonNode(Long userId, String name);
 
     void onNewInterest(String interestName);
 

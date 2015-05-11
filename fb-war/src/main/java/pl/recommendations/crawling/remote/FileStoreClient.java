@@ -39,7 +39,7 @@ public class FileStoreClient extends CrawlerClient {
     }
 
     @Override
-    public void onNewPerson(Long userId, String name) {
+    public void onNewPersonNode(Long userId, String name) {
         write(people, userId, name);
         logger.info("added new person: {}", name);
     }

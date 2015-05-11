@@ -7,12 +7,12 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import pl.recommendations.db.interest.InterestEntity;
-import pl.recommendations.db.interest.InterestEntityRepository;
-import pl.recommendations.db.person.Friendship;
-import pl.recommendations.db.person.Interest;
-import pl.recommendations.db.person.Person;
-import pl.recommendations.db.person.PersonRepository;
+import pl.recommendations.db.interest.InterestNode;
+import pl.recommendations.db.interest.InterestNodeRepository;
+import pl.recommendations.db.person.FriendshipEdge;
+import pl.recommendations.db.person.InterestEdge;
+import pl.recommendations.db.person.PersonNode;
+import pl.recommendations.db.person.PersonNodeRepository;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,20 +26,20 @@ import static org.junit.Assert.assertTrue;
 @ContextConfiguration("classpath:testContext.xml")
 @PropertySource("classpath:conf/neo4j.properties")
 @Transactional
-public class PersonRepositoryTest extends EntityFactory {
+public class PersonNodeRepositoryTest extends EntityFactory {
 
     @Autowired
-    private PersonRepository personRepo;
+    private PersonNodeRepository personRepo;
     @Autowired
-    private InterestEntityRepository interestRepo;
+    private InterestNodeRepository interestRepo;
 
     @Test
     public void saveAndGet() {
         long uuid = 1l;
-        Person expected = createUser(uuid);
+        PersonNode expected = createUser(uuid);
         personRepo.save(expected);
 
-        Person actual = personRepo.findByUuid(uuid);
+        PersonNode actual = personRepo.findByUuid(uuid);
         assertEquals(expected, actual);
     }
 
@@ -49,9 +49,9 @@ public class PersonRepositoryTest extends EntityFactory {
         long uuid2 = 2l;
         long uuid3 = 3l;
 
-        Person person1 = createUser(uuid1);
-        Person person2 = createUser(uuid2);
-        Person person3 = createUser(uuid3);
+        PersonNode person1 = createUser(uuid1);
+        PersonNode person2 = createUser(uuid2);
+        PersonNode person3 = createUser(uuid3);
 
         personRepo.addFriend(person1 ,person2);
         personRepo.addFriend(person1 ,person3);
@@ -60,12 +60,12 @@ public class PersonRepositoryTest extends EntityFactory {
         personRepo.save(person3);
         personRepo.save(person1);
 
-        Person person = personRepo.findByUuid(uuid1);
-        Set<Friendship> friendships = person.getFriendships();
+        PersonNode person = personRepo.findByUuid(uuid1);
+        Set<FriendshipEdge> friendships = person.getFriendshipEdges();
 
         assertEquals(friendships.size(), 2);
 
-        Collection<Person> firends = personRepo.getFriendsOf(person1.getUuid());
+        Collection<PersonNode> firends = personRepo.getFriendsOf(person1.getUuid());
         assertEquals(firends.size(), 2);
         assertTrue(firends.contains(person2));
         assertTrue(firends.contains(person3));
@@ -82,9 +82,9 @@ public class PersonRepositoryTest extends EntityFactory {
         weights.put(name1, 5l);
         weights.put(name2, 3l);
 
-        Person person1 = createUser(uuid1);
-        InterestEntity interestEntity1 = createInterest(name1);
-        InterestEntity interestEntity2 = createInterest(name2);
+        PersonNode person1 = createUser(uuid1);
+        InterestNode interestEntity1 = createInterestNode(name1);
+        InterestNode interestEntity2 = createInterestNode(name2);
         personRepo.addInterest(person1, interestEntity1, weights.get(name1));
         personRepo.addInterest(person1, interestEntity2, weights.get(name2));
 
@@ -92,8 +92,8 @@ public class PersonRepositoryTest extends EntityFactory {
         interestRepo.save(interestEntity2);
         personRepo.save(person1);
 
-        Person person = personRepo.findByUuid(uuid1);
-        Set<Interest> interestEntities = person.getInterests();
+        PersonNode person = personRepo.findByUuid(uuid1);
+        Set<InterestEdge> interestEntities = person.getInterestEdges();
 
         assertEquals(interestEntities.size(), 2);
         interestEntities.forEach(i ->
