@@ -12,7 +12,7 @@ import java.util.Set;
 public class PersonNode extends Node {
 
     @Indexed(unique = true)
-    protected Long uuid;
+    private Long uuid;
 
     @Fetch
     private String name;
@@ -22,20 +22,7 @@ public class PersonNode extends Node {
 
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<InterestEdge> interestEdges = new HashSet<>();
-
-    @Override
-    public int hashCode() {
-        return uuid != null ? uuid.hashCode() : 0;
-    }
-
-    public Long getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(Long uuid) {
-        this.uuid = uuid;
-    }
-
+    
     public void addFriend(PersonNode friend) {
         if (friend != null && !this.equals(friend)) {
             FriendshipEdge relationship = new FriendshipEdge();
@@ -55,6 +42,18 @@ public class PersonNode extends Node {
         return !(uuid != null ? !uuid.equals(personNode.uuid) : personNode.uuid != null);
     }
 
+    @Override
+    public int hashCode() {
+        return uuid != null ? uuid.hashCode() : 0;
+    }
+
+    public Long getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(Long uuid) {
+        this.uuid = uuid;
+    }
     public void setName(String name) {
         this.name = name;
     }

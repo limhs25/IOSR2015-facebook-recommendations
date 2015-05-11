@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Component
-public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
+public class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     private final static Logger logger = LogManager.getLogger(EmbeddedCrawlerEndpoint.class.getName());
 
     @Autowired

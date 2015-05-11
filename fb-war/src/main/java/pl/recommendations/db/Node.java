@@ -3,7 +3,6 @@ package pl.recommendations.db;
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
 import org.springframework.data.neo4j.annotation.GraphId;
-import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedToVia;
 import pl.recommendations.db.relationships.Contrast;
 import pl.recommendations.db.relationships.Similarity;
@@ -11,12 +10,9 @@ import pl.recommendations.db.relationships.Similarity;
 import java.util.HashSet;
 import java.util.Set;
 
-@NodeEntity
 public abstract class Node {
     @GraphId
     private Long graphID;
-
-
 
     @RelatedToVia(type = RelationshipType.SIMILARITY, direction = Direction.BOTH)
     private Set<Similarity> similarities = new HashSet<>();
@@ -43,7 +39,6 @@ public abstract class Node {
 
         contrasts.add(contrast);
     }
-
     public Long getId() {
         return graphID;
     }
