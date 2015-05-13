@@ -14,28 +14,15 @@
 
     <context:component-scan base-package="pl.recommendations"/>
     <context:annotation-config/>
+    <tx:annotation-driven mode="proxy" transaction-manager="transactionManager"/>
 
-    <tx:annotation-driven proxy-target-class="false" transaction-manager="neo4jTransactionManager"/>
+    <bean id="neo4jConfiguration" class="org.springframework.data.neo4j.config.Neo4jConfiguration">
+        <property name="basePackage" value="pl.recommendations.db"/>
+    </bean>
 
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="testDB/test2"/>
     <neo4j:repositories base-package="pl.recommendations"/>
-    <neo4j:config base-package="pl.recommendations" graphDatabaseService="graphDatabaseService"/>
 
-    <bean id="graphDatabaseService" class="org.springframework.data.neo4j.rest.SpringCypherRestGraphDatabase">
-        <constructor-arg index="0" value="http://localhost:7003/db/data"/>
-    </bean>
+    <context:component-scan base-package="pl.recommendations"/>
 
-    <bean id="neo4jTransactionManager"
-          class="org.springframework.transaction.jta.JtaTransactionManager">
-        <property name="transactionManager" ref="neo4jTransactionManagerService" />
-        <property name="userTransaction" ref="neo4jUserTransactionService" />
-    </bean>
-
-    <bean id="neo4jTransactionManagerService"
-          class="org.neo4j.kernel.impl.transaction.SpringTransactionManager">
-        <constructor-arg ref="graphDatabase" />
-    </bean>
-
-    <bean id="neo4jUserTransactionService" class="org.neo4j.kernel.impl.transaction.UserTransactionImpl">
-        <constructor-arg ref="graphDatabase" />
-    </bean>
 </beans>

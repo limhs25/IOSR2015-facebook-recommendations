@@ -8,11 +8,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
-import pl.recommendations.db.interest.InterestEntityRepository;
-import pl.recommendations.db.person.PersonRepository;
+import pl.recommendations.db.interest.InterestNodeRepository;
+import pl.recommendations.db.person.PersonNodeRepository;
 import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 
 /**
  * Created by marekmagik on 2015-01-19.
@@ -25,9 +26,9 @@ public class MainPageController {
     @Autowired
     private FileRepositoryCrawler fileRepositoryCrawler;
     @Autowired
-    private PersonRepository personRepo;
+    private PersonNodeRepository personRepo;
     @Autowired
-    private InterestEntityRepository interestRepo;
+    private InterestNodeRepository interestRepo;
 
     @RequestMapping("/")
     public ModelAndView showLoginForm() {
@@ -39,6 +40,14 @@ public class MainPageController {
         ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
         mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
         mv.addObject("graphFiles", new GraphFiles());
+
+        /* Test users list until analiser is implemented */
+        ArrayList<String> users = new ArrayList<String>();
+        users.add("User1");
+        users.add("User2");
+        users.add("User3");
+        mv.addObject("recommendedUsers", users);
+
         return mv;
     }
 

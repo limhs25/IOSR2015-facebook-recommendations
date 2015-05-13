@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.recommendations.db.interest.InterestEntity;
-import pl.recommendations.db.interest.InterestEntityRepository;
-import pl.recommendations.db.person.Friendship;
-import pl.recommendations.db.person.Interest;
-import pl.recommendations.db.person.Person;
-import pl.recommendations.db.person.PersonRepository;
+import pl.recommendations.db.interest.InterestNode;
+import pl.recommendations.db.interest.InterestNodeRepository;
+import pl.recommendations.db.person.FriendshipEdge;
+import pl.recommendations.db.person.InterestEdge;
+import pl.recommendations.db.person.PersonNode;
+import pl.recommendations.db.person.PersonNodeRepository;
 
 import java.io.*;
 import java.util.HashMap;
@@ -22,12 +22,12 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
     private static final Logger logger = LogManager.getLogger(FileRepositoryCrawlerService.class.getName());
 
     @Autowired
-    protected InterestEntityRepository interestsRepo;
+    protected InterestNodeRepository interestsRepo;
     @Autowired
-    protected PersonRepository peopleRepo;
+    protected PersonNodeRepository peopleRepo;
 
-    private final HashMap<Long, Person> people = new HashMap<>();
-    private final HashMap<String, InterestEntity> interests = new HashMap<>();
+    private final HashMap<Long, PersonNode> people = new HashMap<>();
+    private final HashMap<String, InterestNode> interests = new HashMap<>();
 
 
     @Override
@@ -35,7 +35,7 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
         long start = System.currentTimeMillis();
 
         peopleRepo.save(people.values());
-        logger.info("saved database in {}s", ( System.currentTimeMillis() - start) / 1000.0);
+        logger.info("saved database in {}s", (System.currentTimeMillis() - start) / 1000.0);
     }
 
 
@@ -46,7 +46,7 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
             long userId = Long.parseLong(split[0]);
             String userName = split[1];
 
-            Person person = new Person();
+            PersonNode person = new PersonNode();
             person.setUuid(userId);
             person.setName(userName);
 
@@ -60,7 +60,7 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
         BufferedReader stream = new BufferedReader(new InputStreamReader(in));
 
         stream.lines().forEach(interestName -> {
-            InterestEntity interestEntity = new InterestEntity();
+            InterestNode interestEntity = new InterestNode();
             interestEntity.setName(interestName);
 
             interests.put(interestName, interestEntity);
@@ -76,11 +76,11 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
             long id1 = Long.parseLong(split[0]);
             long id2 = Long.parseLong(split[1]);
 
-            Person person = resolvePerson(id1);
-            Person friend = resolvePerson(id2);
+            PersonNode person = resolvePerson(id1);
+            PersonNode friend = resolvePerson(id2);
 
-            Friendship friendship = new Friendship();
-            friendship.setPerson(person);
+            FriendshipEdge friendship = new FriendshipEdge();
+            friendship.setPersonNode(person);
             friendship.setFriend(friend);
 
             person.addFriendship(friendship);
@@ -97,12 +97,12 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
                     String interestName = split[1];
                     long weight = Long.parseLong(split[2]);
 
-                    Person person = resolvePerson(userId);
-                    InterestEntity interestEntity = resolveInterest(interestName);
+                    PersonNode person = resolvePerson(userId);
+                    InterestNode interestEntity = resolveInterest(interestName);
 
-                    Interest interest = new Interest();
-                    interest.setPerson(person);
-                    interest.setInterest(interestEntity);
+                    InterestEdge interest = new InterestEdge();
+                    interest.setPersonNode(person);
+                    interest.setInterestNode(interestEntity);
                     interest.setWeight(weight);
 
                     person.addInterest(interest);
@@ -122,11 +122,11 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
         fileRepositoryCrawler.readInterestEdges(new FileInputStream(new File("db/interestRelations.csv")), separator);
     }
 
-    private InterestEntity resolveInterest(String interestName) {
-        InterestEntity interest = interests.get(interestName);
+    private InterestNode resolveInterest(String interestName) {
+        InterestNode interest = interests.get(interestName);
 
         if (interest == null) {
-            interest = new InterestEntity();
+            interest = new InterestNode();
             interest.setName(interestName);
             interests.put(interestName, interest);
         }
@@ -134,11 +134,11 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
         return interest;
     }
 
-    private Person resolvePerson(Long userId) {
-        Person person = people.get(userId);
+    private PersonNode resolvePerson(Long userId) {
+        PersonNode person = people.get(userId);
 
         if (person == null) {
-            person = new Person();
+            person = new PersonNode();
             person.setUuid(userId);
             peopleRepo.save(person);
             people.put(userId, person);
