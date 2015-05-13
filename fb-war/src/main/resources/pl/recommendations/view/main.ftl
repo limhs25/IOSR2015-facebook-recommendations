@@ -29,11 +29,16 @@
     </fieldset>
     <button id="fill-button" value="Submit">
 </form>
+
+<form id="clear" method="post" action="/twitter/clear" enctype="multipart/form-data">
+    <button class="clear-db-button">clear</button>
+</form>
 </body>
 <script>
     $("#fill-button").onclick(function () {
         $("#fill").submit({url: '/twitter/upload', type: 'post'});
     });
+
 
 </script>
 </html>

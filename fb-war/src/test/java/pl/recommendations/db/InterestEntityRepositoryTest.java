@@ -14,6 +14,7 @@ import pl.recommendations.db.interest.relationships.Contrast;
 import pl.recommendations.db.interest.relationships.Similarity;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,6 +38,17 @@ public class InterestEntityRepositoryTest extends EntityFactory {
 
         InterestEntity actual = interestRepo.findByName(NAME);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void removeAll(){
+        interestRepo.save(createInterest("1"));
+        interestRepo.save(createInterest("2"));
+        interestRepo.save(createInterest("3"));
+
+        interestRepo.deleteAll();
+
+        assertFalse(interestRepo.findAll().iterator().hasNext());
     }
 
     @Test

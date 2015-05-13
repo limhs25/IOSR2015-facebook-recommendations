@@ -1,5 +1,6 @@
 package pl.recommendations.controller;
 
+import com.google.common.collect.Iterators;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -7,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
+import pl.recommendations.db.interest.InterestEntityRepository;
+import pl.recommendations.db.person.PersonRepository;
 import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
@@ -20,7 +23,11 @@ public class MainPageController {
     private static final String MAIN_VIEW_NAME = "main";
 
     @Autowired
-    FileRepositoryCrawler fileRepositoryCrawler;
+    private FileRepositoryCrawler fileRepositoryCrawler;
+    @Autowired
+    private PersonRepository personRepo;
+    @Autowired
+    private InterestEntityRepository interestRepo;
 
     @RequestMapping("/")
     public ModelAndView showLoginForm() {
@@ -45,5 +52,17 @@ public class MainPageController {
         fileRepositoryCrawler.readInterestEdges(files.getInterestEdgesStream(), separator);
 
         fileRepositoryCrawler.persist();
+    }
+
+    @RequestMapping(value ="clear", method = RequestMethod.POST)
+    public void clearDatabase(){
+        System.out.println("size before" +Iterators.size(personRepo.findAll().iterator()));
+        System.out.println("size before" +Iterators.size(interestRepo.findAll().iterator()));
+
+        personRepo.deleteAll();
+        interestRepo.deleteAll();
+
+        System.out.println("size after" + Iterators.size(personRepo.findAll().iterator()));
+        System.out.println("size after" +Iterators.size(interestRepo.findAll().iterator()));
     }
 }

@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -41,6 +42,17 @@ public class PersonRepositoryTest extends EntityFactory {
 
         Person actual = personRepo.findByUuid(uuid);
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void removeAll(){
+        personRepo.save(createUser(1));
+        personRepo.save(createUser(2));
+        personRepo.save(createUser(3));
+
+        personRepo.deleteAll();
+
+        assertFalse(personRepo.findAll().iterator().hasNext());
     }
 
     @Test

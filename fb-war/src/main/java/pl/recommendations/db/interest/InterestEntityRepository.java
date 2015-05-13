@@ -10,6 +10,8 @@ import pl.recommendations.db.interest.relationships.Similarity;
 public interface InterestEntityRepository extends GraphRepository<InterestEntity> {
     InterestEntity findByName(String interestName);
 
+    void deleteAll();
+
     @Query("match i1-[s:" + RelationshipType.SIMILARITY + "]->i2 \n" +
             "where i1.name = {0} and i2.name = {1} \n" +
             "return s")

@@ -13,6 +13,8 @@ import java.util.Collection;
 public interface PersonRepository extends GraphRepository<Person> {
     Person findByUuid(Long uuid);
 
+    void deleteAll();
+
     @Query("match u-[" + RelationshipType.FRIENDSHIP + "]->u2 " +
             "where u.uuid = {0} " +
             "return u2")
