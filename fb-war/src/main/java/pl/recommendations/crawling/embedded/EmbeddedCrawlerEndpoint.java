@@ -47,7 +47,6 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     }
 
 
-
     @Override
     public void onNewInterest(String interestName) {
         if (interestsRepo.findByName(interestName) == null) {

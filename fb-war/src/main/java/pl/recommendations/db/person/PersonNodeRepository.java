@@ -22,6 +22,11 @@ public interface PersonNodeRepository extends NodeRepository {
             "return u2")
     Collection<InterestNode> getInterestsOf(Long id);
 
+    @Query("match u-[" + RelationshipType.SUGGESTION + "]->u2 " +
+            "where u.uuid = {0} " +
+            "return u2")
+    Collection<InterestNode> getSuggestionOf(Long id);
+
     PersonNode findByUuid(Long uuid);
 
     default void addFriend(PersonNode personNode, PersonNode friend) {
@@ -45,4 +50,14 @@ public interface PersonNodeRepository extends NodeRepository {
         personNode.addInterest(interestEdge);
 
     }
+
+    default void addSuggestion(PersonNode personNode, PersonNode suggestion) {
+        if (suggestion != null && !suggestion.equals(personNode)) {
+            SuggestionEdge suggestionEdge = new SuggestionEdge();
+            suggestionEdge.setPersonNode(personNode);
+            suggestionEdge.setSuggestion(suggestion);
+            personNode.addSuggestionEdge(suggestionEdge);
+        }
+    }
+
 }
