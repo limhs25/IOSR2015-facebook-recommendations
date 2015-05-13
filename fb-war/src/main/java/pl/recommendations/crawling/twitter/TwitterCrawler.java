@@ -140,7 +140,7 @@ public class TwitterCrawler implements Crawler {
         return false;
     }
 
-    @Scheduled(cron = "0 */15 * * * *")
+    @Scheduled(cron = "0 */15LP * * * *")
     public void resetRateLimit() {
         logger.info("Resetting rate limit");
         lock.lock();

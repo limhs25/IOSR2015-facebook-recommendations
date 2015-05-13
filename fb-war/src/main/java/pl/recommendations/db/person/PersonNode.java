@@ -15,6 +15,8 @@ import java.util.Set;
 public class PersonNode extends Node {
 
     @Indexed(unique = true)
+
+    @Fetch
     protected Long uuid;
 
     @Fetch
@@ -25,6 +27,9 @@ public class PersonNode extends Node {
 
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<InterestEdge> interestEdges = new HashSet<>();
+
+    @RelatedToVia(direction = Direction.OUTGOING)
+    private Set<SuggestionEdge> suggestionEdges = new HashSet<>();
 
     @Override
     public int hashCode() {
@@ -66,7 +71,6 @@ public class PersonNode extends Node {
         return name;
     }
 
-
     public Set<FriendshipEdge> getFriendshipEdges() {
         return ImmutableSet.copyOf(friendshipEdges);
     }
@@ -86,4 +90,12 @@ public class PersonNode extends Node {
             interestEdges.add(interestEdge);
         }
     }
+
+    public void addSuggestionEdge(SuggestionEdge suggestionEdge) {
+        if(!suggestionEdges.contains(suggestionEdge)) {
+            suggestionEdges.add(suggestionEdge);
+        }
+    }
+
+
 }

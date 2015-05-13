@@ -14,10 +14,7 @@ import pl.recommendations.db.person.InterestEdge;
 import pl.recommendations.db.person.PersonNode;
 import pl.recommendations.db.person.PersonNodeRepository;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -25,7 +22,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("classpath:testContext.xml")
 @PropertySource("classpath:conf/neo4j.properties")
-@Transactional
 public class PersonNodeRepositoryTest extends EntityFactory {
 
     @Autowired
@@ -60,9 +56,7 @@ public class PersonNodeRepositoryTest extends EntityFactory {
         personRepo.save(person3);
         personRepo.save(person1);
 
-        PersonNode person = personRepo.findByUuid(uuid1);
-        Set<FriendshipEdge> friendships = person.getFriendshipEdges();
-
+        Set<PersonNode> friendships = new HashSet<PersonNode>(personRepo.getFriendsOf(uuid1));
         assertEquals(friendships.size(), 2);
 
         Collection<PersonNode> firends = personRepo.getFriendsOf(person1.getUuid());
@@ -92,8 +86,7 @@ public class PersonNodeRepositoryTest extends EntityFactory {
         interestRepo.save(interestEntity2);
         personRepo.save(person1);
 
-        PersonNode person = personRepo.findByUuid(uuid1);
-        Set<InterestEdge> interestEntities = person.getInterestEdges();
+        Set<InterestEdge> interestEntities = new HashSet<InterestEdge>(personRepo.getInterestsOf(uuid1));
 
         assertEquals(interestEntities.size(), 2);
         interestEntities.forEach(i ->
