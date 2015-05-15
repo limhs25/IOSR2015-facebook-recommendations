@@ -3,7 +3,7 @@ package pl.recommendations.crawling;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import pl.recommendations.crawling.tasks.CrawlFriendsTask;
 import pl.recommendations.crawling.tasks.SimpleCrawlTask;
 
@@ -15,7 +15,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 
-@Component
+@Service
 public class CrawlerScheduler implements CrawlerService {
     private static final Logger logger = LogManager.getLogger(CrawlerScheduler.class.getName());
 

@@ -12,6 +12,8 @@
         http://www.springframework.org/schema/data/neo4j
         http://www.springframework.org/schema/data/neo4j/spring-neo4j.xsd">
 
+    <import resource="classpath:spring/beans.xml"/>
+
     <context:component-scan base-package="pl.recommendations"/>
     <context:annotation-config/>
     <tx:annotation-driven mode="proxy" transaction-manager="transactionManager"/>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="hpUsersQueue" class="pl.recommendations.db.queue.core.PersistentQueueImpl">
+        <constructor-arg value="HIGH_PRIORITY_USERS_QUEUE"/>
+    </bean>
+
+    <bean id="hpFriendsQueue" class="pl.recommendations.db.queue.core.PersistentQueueImpl">
+        <constructor-arg value="HIGH_PRIORITY_FRIENDS_QUEUE"/>
+    </bean>
+
+    <bean id="hpInterestsQueue" class="pl.recommendations.db.queue.core.PersistentQueueImpl">
+        <constructor-arg value="HIGH_PRIORITY_INTERESTS_QUEUE"/>
+    </bean>
+
+    <bean id="lpUsersQueue" class="pl.recommendations.db.queue.core.PersistentQueueImpl">
+        <constructor-arg value="LOW_PRIORITY_USERS_QUEUE"/>
+    </bean>
+
+    <bean id="lpFriendsQueue" class="pl.recommendations.db.queue.core.PersistentQueueImpl">
+        <constructor-arg value="LOW_PRIORITY_FRIENDS_QUEUE"/>
+    </bean>
+
+    <bean id="lpInterestsQueue" class="pl.recommendations.db.queue.core.PersistentQueueImpl">
+        <constructor-arg value="LOW_PRIORITY_INTERESTS_QUEUE"/>
+    </bean>
+</beans>
