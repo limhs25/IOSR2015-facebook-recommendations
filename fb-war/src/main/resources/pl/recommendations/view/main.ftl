@@ -29,12 +29,12 @@
 </nav>
 <div class="container">
     <div class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <div class="col-sm-3 col-md-2 col-lg-1 sidebar">
             <ul class="nav nav-sidebar">
                 <li><a href="crawl.htm">Run crawler</a></li>
             </ul>
         </div>
-        <div class="col-sm-9 col-md-10 main">
+        <div class="col-sm-9 col-md-10 col-lg-11 main">
             <h2 class="page-header">Dashboard</h2>
             <h4>Username: ${twitter.screenName}</h4>
             <h4>Twitter ID: ${twitter.id}</h4>
