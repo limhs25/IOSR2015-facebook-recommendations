@@ -11,6 +11,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.queue.core.PersistentQueue;
 import pl.recommendations.db.queue.core.QueueNode;
+import pl.recommendations.db.queue.exceptions.EmptyQueueException;
+import pl.recommendations.db.queue.exceptions.EntityAlreadyEnqueuedException;
+import pl.recommendations.db.queue.exceptions.FullQueueException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +43,7 @@ public class MultipleQueuesTest {
     }
 
     @Test
-    public void saveAndGetSimultaneously() {
+    public void saveAndGetSimultaneously() throws EmptyQueueException, EntityAlreadyEnqueuedException, FullQueueException {
 
         Long userId = 123L;
 

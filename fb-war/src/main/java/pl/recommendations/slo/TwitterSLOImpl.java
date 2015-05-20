@@ -1,7 +1,9 @@
 package pl.recommendations.slo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.recommendations.crawling.twitter.TwitterConfiguration;
+import pl.recommendations.db.queue.PersistentQueueFacade;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -18,6 +20,9 @@ import java.io.IOException;
 @Service
 public class TwitterSLOImpl implements TwitterSLO {
 
+    @Autowired
+    private PersistentQueueFacade queue;
+
     @Override
     public void setAuthorization(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Twitter twitter = (Twitter) request.getSession().getAttribute(TWITTER_SESSION_ATTRIBUTE);
@@ -27,9 +32,11 @@ public class TwitterSLOImpl implements TwitterSLO {
         try {
             twitter.getOAuthAccessToken(requestToken, verifier);
             request.getSession().removeAttribute("requestToken");
+            queue.enqueueUser(twitter.getId(), true);
         } catch (TwitterException e) {
             throw new ServletException(e);
         }
+
         response.sendRedirect(request.getContextPath() + "/twitter/main");
     }
 

@@ -12,9 +12,11 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.queue.PersistentQueueFacade;
 import pl.recommendations.db.queue.core.PersistentQueue;
 import pl.recommendations.db.queue.core.QueueNode;
+import pl.recommendations.db.queue.exceptions.EmptyQueueException;
+import pl.recommendations.db.queue.exceptions.EntityAlreadyEnqueuedException;
+import pl.recommendations.db.queue.exceptions.FullQueueException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -45,7 +47,7 @@ public class PersistentQueueFacadeTest {
     }
 
     @Test
-    public void saveInHighLowPriorityQueue() {
+    public void saveInHighLowPriorityQueue() throws EmptyQueueException, EntityAlreadyEnqueuedException, FullQueueException {
 
         Long userId = 123L;
 
@@ -77,7 +79,5 @@ public class PersistentQueueFacadeTest {
 
         QueueNode node = queue.dequeueUser();
         assertEquals(userId, node.getUserId());
-
-        assertNull(queue.dequeueUser());
     }
 }

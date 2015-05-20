@@ -83,7 +83,7 @@ public class FileStoreClient extends CrawlerClient {
 
         new Thread(client).start();
 
-        client.scheduleCrawling(17765013l);
+        client.scheduleCrawling(17765013l, false);
         while (true) {
             Thread.sleep(TimeUnit.MILLISECONDS.convert(24, TimeUnit.HOURS));
         }

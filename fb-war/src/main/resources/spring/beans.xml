@@ -26,4 +26,5 @@
     <bean id="lpInterestsQueue" class="pl.recommendations.db.queue.core.PersistentQueueImpl">
         <constructor-arg value="LOW_PRIORITY_INTERESTS_QUEUE"/>
     </bean>
+
 </beans>

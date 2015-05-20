@@ -3,15 +3,16 @@ package pl.recommendations.crawling;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
-import pl.recommendations.crawling.tasks.CrawlFriendsTask;
-import pl.recommendations.crawling.tasks.SimpleCrawlTask;
+import pl.recommendations.db.queue.PersistentQueueFacade;
+import pl.recommendations.db.queue.core.QueueNode;
+import pl.recommendations.db.queue.exceptions.EmptyQueueException;
 
+import javax.annotation.PostConstruct;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 
@@ -30,39 +31,37 @@ public class CrawlerScheduler implements CrawlerService {
     @Autowired
     private Crawler crawler;
 
-    private final BlockingQueue<SimpleCrawlTask> crawlUserQueue = new LinkedBlockingQueue<>(TASK_QUEUE_SIZE);
-    private final BlockingQueue<CrawlFriendsTask> crawlFriendsQueue = new LinkedBlockingQueue<>(TASK_QUEUE_SIZE);
-    private final BlockingQueue<SimpleCrawlTask> crawlInterestsQueue = new LinkedBlockingQueue<>(TASK_QUEUE_SIZE);
+    @Autowired
+    private PersistentQueueFacade queue;
 
-    Runnable userTaskConsumer = () -> run(this::consumeUserTask);
-    Runnable friendsTaskConsumer = () -> run(this::consumeFriendsTask);
-    Runnable interestTaskConsumer = () -> run(this::consumeInterestTask);
+    @Autowired(required = false)
+    private TaskExecutor taskExecutor;
 
-    public CrawlerScheduler() {
-        Thread t1 = new Thread(userTaskConsumer, "user task consumer");
-        Thread t2 = new Thread(friendsTaskConsumer, "friends task consumer");
-        Thread t3 = new Thread(interestTaskConsumer, "interest task consumer");
+    private final Runnable userTaskConsumer = () -> run(this::consumeUserTask);
+    private final Runnable friendsTaskConsumer = () -> run(this::consumeFriendsTask);
+    private final Runnable interestTaskConsumer = () -> run(this::consumeInterestTask);
 
-        t1.start();
-        t2.start();
-        t3.start();
+    @PostConstruct
+    private void init() {
+        if (taskExecutor != null) {
+            taskExecutor.execute(userTaskConsumer);
+            taskExecutor.execute(friendsTaskConsumer);
+            taskExecutor.execute(interestTaskConsumer);
+        }
     }
 
     @Override
-    public void scheduleCrawling(Long uuid) {
-        scheduleCrawling(uuid, RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT, PROCESSED_FRIENDS_PER_USER_LIMIT);
+    public void scheduleCrawling(Long uuid, boolean highPriority) {
+        scheduleCrawling(uuid, RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT, PROCESSED_FRIENDS_PER_USER_LIMIT, highPriority);
     }
 
-    public void scheduleCrawling(Long uuid, int depthLimit, int friendsPerUserLimit) {
-        if (cache.hasPerson(uuid) || crawlFriendsQueue.size() == TASK_QUEUE_SIZE) {
+    public void scheduleCrawling(Long uuid, int depthLimit, int friendsPerUserLimit, boolean highPriority) {
+        if (cache.hasPerson(uuid) || queue.getFriendsQueueSize() == TASK_QUEUE_SIZE) {
             logger.debug("Person {} already crawled", uuid);
         } else {
-            CrawlFriendsTask task1 = new CrawlFriendsTask(uuid, depthLimit, friendsPerUserLimit);
-            SimpleCrawlTask task2 = new SimpleCrawlTask(uuid);
-
-            crawlUserQueue.add(task2);
-            crawlInterestsQueue.add(task2);
-            crawlFriendsQueue.add(task1);
+            queue.enqueueUser(uuid, highPriority);
+            queue.enqueueInterest(uuid, highPriority);
+            queue.enqueueFriend(uuid, depthLimit, friendsPerUserLimit, highPriority);
 
 //            logger.info("Scheduled");
 //            logger.info("crawlUserQueue size: {}", crawlUserQueue.size());
@@ -79,9 +78,9 @@ public class CrawlerScheduler implements CrawlerService {
         cache.onAddInterests(uuid, interests);
     }
 
-    private void crawlFriends(Long uuid, CrawlFriendsTask task) throws InterruptedException {
-        int recursiveLimit = task.getRecursiveLimit();
-        int friendsLimit = task.getFriendsLimit();
+    private void crawlFriends(Long uuid, QueueNode node) throws InterruptedException {
+        int recursiveLimit = node.getRecursiveLimit();
+        int friendsLimit = node.getFriendsLimit();
 
         Set<Long> friendsUuids = crawler.getPersonFriends(uuid, friendsLimit);
 
@@ -89,7 +88,7 @@ public class CrawlerScheduler implements CrawlerService {
 
         if (recursiveLimit > 0) {
             logger.info("Scheduling new friends: {}", friendsUuids.size());
-            friendsUuids.forEach(f -> scheduleCrawling(f, recursiveLimit - 1, friendsLimit));
+            friendsUuids.forEach(f -> scheduleCrawling(f, recursiveLimit - 1, friendsLimit, false));
         }
     }
 
@@ -114,36 +113,48 @@ public class CrawlerScheduler implements CrawlerService {
     }
 
     private void consumeUserTask() throws InterruptedException {
-        if (crawlUserQueue.isEmpty()) {
-            Thread.sleep(TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS));
-        } else {
-            SimpleCrawlTask task = crawlUserQueue.poll();
-            logger.info("crawlUserQueue size: {}", crawlUserQueue.size());
-            Long uuid = task.getUserId();
-            crawlPersonName(uuid);
-        }
+        QueueNode user = null;
+        do {
+            try {
+                user = queue.dequeueUser();
+            } catch (EmptyQueueException e) {
+                Thread.sleep(TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS));
+            }
+        } while (user == null);
+
+        logger.info("crawlUserQueue size: {}", queue.getUserQueueSize());
+        Long uuid = user.getUserId();
+        crawlPersonName(uuid);
     }
 
     private void consumeFriendsTask() throws InterruptedException {
-        if (crawlUserQueue.isEmpty()) {
-            Thread.sleep(TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS));
-        } else {
-            CrawlFriendsTask task = crawlFriendsQueue.poll();
-            logger.info("crawlFriendsQueue size: {}", crawlFriendsQueue.size());
-            Long uuid = task.getUserId();
-            crawlFriends(uuid, task);
-        }
+        QueueNode friend = null;
+        do {
+            try {
+                friend = queue.dequeueFriend();
+            } catch (EmptyQueueException e) {
+                Thread.sleep(TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS));
+            }
+        } while (friend == null);
+
+        logger.info("crawlFriendsQueue size: {}", queue.getFriendsQueueSize());
+        Long uuid = friend.getUserId();
+        crawlFriends(uuid, friend);
     }
 
     private void consumeInterestTask() throws InterruptedException {
-        if (crawlInterestsQueue.isEmpty()) {
-            Thread.sleep(TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS));
-        } else {
-            SimpleCrawlTask task = crawlInterestsQueue.poll();
-            logger.info("crawlInterestsQueue size: {}", crawlInterestsQueue.size());
-            Long uuid = task.getUserId();
-            crawlInterests(uuid);
-        }
+        QueueNode interest = null;
+        do {
+            try {
+                interest = queue.dequeueInterest();
+            } catch (EmptyQueueException e) {
+                Thread.sleep(TimeUnit.MILLISECONDS.convert(30, TimeUnit.SECONDS));
+            }
+        } while (interest == null);
+
+        logger.info("crawlInterestsQueue size: {}", queue.getInterestsQueueSize());
+        Long uuid = interest.getUserId();
+        crawlInterests(uuid);
     }
 
 }

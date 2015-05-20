@@ -7,8 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -30,7 +30,7 @@ public class FileRepositoryCrawlerService extends EmbeddedCrawlerEndpoint implem
 
     public void setDbDir(File file) {
         this.dbDir = file;
-        Preconditions.checkArgument(dbDir != null && dbDir.isDirectory(), "invalid directory "+dbDir.getAbsolutePath());
+        Preconditions.checkArgument(dbDir != null && dbDir.isDirectory(), "invalid directory " + dbDir.getAbsolutePath());
     }
 
     @Override
@@ -96,7 +96,7 @@ public class FileRepositoryCrawlerService extends EmbeddedCrawlerEndpoint implem
     }
 
     public static void main(String[] args) throws InterruptedException {
-        File db= new File("csvDb");
+        File db = new File("csvDb");
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring/applicationContext.xml");
 
         FileRepositoryCrawler crawler = (FileRepositoryCrawler) context.getBean("fileCrawlerService");

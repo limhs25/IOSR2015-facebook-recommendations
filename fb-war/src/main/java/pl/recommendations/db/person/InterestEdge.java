@@ -1,6 +1,9 @@
 package pl.recommendations.db.person;
 
-import org.springframework.data.neo4j.annotation.*;
+import org.springframework.data.neo4j.annotation.EndNode;
+import org.springframework.data.neo4j.annotation.Fetch;
+import org.springframework.data.neo4j.annotation.RelationshipEntity;
+import org.springframework.data.neo4j.annotation.StartNode;
 import pl.recommendations.db.Edge;
 import pl.recommendations.db.RelationshipType;
 import pl.recommendations.db.interest.InterestNode;

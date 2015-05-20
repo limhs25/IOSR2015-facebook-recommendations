@@ -2,7 +2,10 @@ package pl.recommendations.db.person;
 
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
-import org.springframework.data.neo4j.annotation.*;
+import org.springframework.data.neo4j.annotation.Fetch;
+import org.springframework.data.neo4j.annotation.Indexed;
+import org.springframework.data.neo4j.annotation.NodeEntity;
+import org.springframework.data.neo4j.annotation.RelatedToVia;
 import pl.recommendations.db.Node;
 
 import java.util.HashSet;
@@ -44,7 +47,7 @@ public class PersonNode extends Node {
             friendshipEdges.add(relationship);
         }
     }
-    
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -58,11 +61,11 @@ public class PersonNode extends Node {
     public void setName(String name) {
         this.name = name;
     }
-    
+
     public String getName() {
         return name;
     }
-    
+
 
     public Set<FriendshipEdge> getFriendshipEdges() {
         return ImmutableSet.copyOf(friendshipEdges);
@@ -79,7 +82,7 @@ public class PersonNode extends Node {
     }
 
     public void addInterest(InterestEdge interestEdge) {
-        if(!interestEdges.contains(interestEdge)){
+        if (!interestEdges.contains(interestEdge)) {
             interestEdges.add(interestEdge);
         }
     }

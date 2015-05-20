@@ -4,7 +4,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import pl.recommendations.crawling.CrawlerEndpoint;
-import pl.recommendations.crawling.remote.messages.notice.*;
+import pl.recommendations.crawling.remote.messages.notice.AddFriends;
+import pl.recommendations.crawling.remote.messages.notice.AddInterests;
+import pl.recommendations.crawling.remote.messages.notice.NewInterest;
+import pl.recommendations.crawling.remote.messages.notice.NewPerson;
+import pl.recommendations.crawling.remote.messages.notice.NoticeMessage;
 import pl.recommendations.crawling.remote.messages.request.RequestCrawling;
 
 import java.io.IOException;
@@ -54,7 +58,7 @@ public abstract class CrawlerClient implements CrawlerEndpoint, Runnable {
     }
 
     @Override
-    public void scheduleCrawling(Long uuid) {
+    public void scheduleCrawling(Long uuid, boolean highPriority) {
         try {
             out.writeObject(new RequestCrawling(uuid));
         } catch (IOException e) {

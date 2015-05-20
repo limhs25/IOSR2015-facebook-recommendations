@@ -1,12 +1,12 @@
 package pl.recommendations.crawling.embedded;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.crawling.CrawledDataCache;
 import pl.recommendations.crawling.CrawlerScheduler;
 
-import org.springframework.transaction.annotation.Transactional;
+import javax.annotation.PostConstruct;
 
 @Transactional
 @Service("embeddedCrawlerService")
@@ -19,12 +19,13 @@ public class EmbeddedCrawler extends EmbeddedCrawlerEndpoint {
     protected CrawledDataCache cache;
 
     @Override
+    @PostConstruct
     public void init() {
         cache.register(this);
     }
 
     @Override
-    public void scheduleCrawling(Long uuid) {
-        scheduler.scheduleCrawling(uuid);
+    public void scheduleCrawling(Long uuid, boolean highPriority) {
+        scheduler.scheduleCrawling(uuid, highPriority);
     }
 }
