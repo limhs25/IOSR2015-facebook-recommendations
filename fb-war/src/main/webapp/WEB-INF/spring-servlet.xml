@@ -23,7 +23,7 @@
         <constructor-arg name="path" value="data/db/twdb2"/>
     </bean>
 
-    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/db/twdb1"/>
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/db/web6"/>
 
     <neo4j:repositories base-package="pl.recommendations"/>
 

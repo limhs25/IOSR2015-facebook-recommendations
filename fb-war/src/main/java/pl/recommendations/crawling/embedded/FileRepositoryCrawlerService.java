@@ -17,9 +17,10 @@ import java.io.*;
 import java.util.HashMap;
 
 @Transactional
-@Service("fileCrawlerService")
+@Service("fileRepositoryCrawlerService")
 public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
     private static final Logger logger = LogManager.getLogger(FileRepositoryCrawlerService.class.getName());
+    public static final String SEPARATOR = ",";
 
     @Autowired
     protected InterestNodeRepository interestsRepo;
@@ -39,10 +40,10 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
     }
 
 
-    public void readPeopleNodes(InputStream in, String separator) {
+    public void readPeopleNodes(InputStream in) {
         BufferedReader stream = new BufferedReader(new InputStreamReader(in));
         stream.lines().forEach((String line) -> {
-            String[] split = line.split(separator);
+            String[] split = line.split(SEPARATOR);
             long userId = Long.parseLong(split[0]);
             String userName = split[1];
 
@@ -56,7 +57,7 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
         peopleRepo.save(people.values());
     }
 
-    public void readInterestNodes(InputStream in, String separator) {
+    public void readInterestNodes(InputStream in) {
         BufferedReader stream = new BufferedReader(new InputStreamReader(in));
 
         stream.lines().forEach(interestName -> {
@@ -69,10 +70,10 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
         interestsRepo.save(interests.values());
     }
 
-    public void readPeopleEdges(InputStream in, String separator) {
+    public void readPeopleEdges(InputStream in) {
         BufferedReader stream = new BufferedReader(new InputStreamReader(in));
         stream.lines().forEach(line -> {
-            String[] split = line.split(separator);
+            String[] split = line.split(SEPARATOR);
             long id1 = Long.parseLong(split[0]);
             long id2 = Long.parseLong(split[1]);
 
@@ -89,10 +90,10 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
 
     }
 
-    public void readInterestEdges(InputStream in, String separator) {
+    public void readInterestEdges(InputStream in) {
         BufferedReader stream = new BufferedReader(new InputStreamReader(in));
         stream.lines().forEach((String line) -> {
-                    String[] split = line.split(separator);
+                    String[] split = line.split(SEPARATOR);
                     long userId = Long.parseLong(split[0]);
                     String interestName = split[1];
                     long weight = Long.parseLong(split[2]);
@@ -113,13 +114,13 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
 
     public static void main(String[] args) throws FileNotFoundException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring/applicationContext.xml");
-        FileRepositoryCrawlerService fileRepositoryCrawler = context.getBean(FileRepositoryCrawlerService.class);
 
-        String separator = ",";
-        fileRepositoryCrawler.readPeopleNodes(new FileInputStream(new File("db/peopleNodes.csv")), separator);
-        fileRepositoryCrawler.readInterestNodes(new FileInputStream(new File("db/interestNodes.csv")), separator);
-        fileRepositoryCrawler.readPeopleEdges(new FileInputStream(new File("db/peopleRelations.csv")), separator);
-        fileRepositoryCrawler.readInterestEdges(new FileInputStream(new File("db/interestRelations.csv")), separator);
+        FileRepositoryCrawler fileRepositoryCrawler = context.getBean("fileRepositoryCrawlerService", FileRepositoryCrawler.class);
+
+        fileRepositoryCrawler.readPeopleNodes(new FileInputStream(new File("db/peopleNodes.csv")));
+        fileRepositoryCrawler.readInterestNodes(new FileInputStream(new File("db/interestNodes.csv")));
+        fileRepositoryCrawler.readPeopleEdges(new FileInputStream(new File("db/peopleRelations.csv")));
+        fileRepositoryCrawler.readInterestEdges(new FileInputStream(new File("db/interestRelations.csv")));
     }
 
     private InterestNode resolveInterest(String interestName) {

@@ -33,28 +33,60 @@
             <ul class="nav nav-sidebar">
                 <li><a href="crawl.htm">Run crawler</a></li>
             </ul>
-        <@spring.bind "graphFiles"/>
-            <form id="fill" method="post" action="/twitter/upload" enctype="multipart/form-data">
-                <fieldset>
-                <@spring.bind "graphFiles.peopleNodes"/>
-                    <input type="file" name="peopleNodes" id="file"/>
-                <@spring.bind "graphFiles.interestNodes"/>
-                    <input type="file" name="interestNodes" id="file"/>
-                <@spring.bind "graphFiles.peopleEdges"/>
-                    <input type="file" name="peopleEdges" id="file"/>
-                <@spring.bind "graphFiles.interestEdges"/>
-                    <input type="file" name="interestEdges" id="file"/>
 
-                <@spring.formInput "graphFiles.separator"/>
-                    <label for="text">Separator</label>
-                </fieldset>
-                <button id="fill-button" value="Submit">
+            <form action="/dev/null">
+                <label>
+                    <select class="data-input-type">
+                        <option value="pajek">Pajek</option>
+                        <option value="stanford">Stanford</option>
+                        <option value="custom">Custom</option>
+                    </select>
+                </label>
             </form>
+
+            <div class="pajek-input">
+            <@spring.bind "pajekInput"/>
+                <form id="fill" method="post" action="/twitter/upload/pajek" enctype="multipart/form-data">
+                    <fieldset>
+                    <@spring.bind "pajekInput.edges"/>
+                        <input type="file" name="edges" id="file"/>
+                    </fieldset>
+                    <button id="fill-button" value="Submit">Fill</button>
+                </form>
+            </div>
+            <div class="stanford-input" style="display: none;">
+            <@spring.bind "stanfordInput"/>
+                <form id="fill" method="post" action="/twitter/upload/stanford" enctype="multipart/form-data">
+                    <fieldset>
+                    <@spring.bind "stanfordInput.edges"/>
+                        <input type="file" name="edges" id="file"/>
+                    </fieldset>
+                    <button id="fill-button" value="Submit">Fill</button>
+                </form>
+            </div>
+            <div class="custom-input" style="display: none;">
+            <@spring.bind "customFiles"/>
+                <form id="fill" method="post" action="/twitter/upload/custom" enctype="multipart/form-data">
+                    <fieldset>
+                    <@spring.bind "customFiles.peopleNodes"/>
+                        <input type="file" name="peopleNodes" id="file"/>
+                    <@spring.bind "customFiles.interestNodes"/>
+                        <input type="file" name="interestNodes" id="file"/>
+                    <@spring.bind "customFiles.peopleEdges"/>
+                        <input type="file" name="peopleEdges" id="file"/>
+                    <@spring.bind "customFiles.interestEdges"/>
+                        <input type="file" name="interestEdges" id="file"/>
+                    </fieldset>
+                    <button id="fill-button" value="Submit">Fill</button>
+                </form>
+            </div>
 
             <form id="clear" method="post" action="/twitter/clear" enctype="multipart/form-data">
                 <button class="clear-db-button">clear</button>
             </form>
         </div>
+
+
         <div class="col-sm-9 col-md-10 main">
             <h2 class="page-header">Dashboard</h2>
             <h4>Username: ${twitter.screenName}</h4>
@@ -92,6 +124,26 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script src="<@spring.url '/twitter/resources/js/bootstrap.js'/>"></script>
+<script>
+
+    $('.data-input-type').change(function () {
+        var val = $('.data-input-type').val();
+        if (val === 'stanford') {
+            $('.custom-input').hide();
+            $('.pajek-input').hide();
+            $('.stanford-input').show();
+        } else if (val === 'pajek') {
+            $('.custom-input').hide();
+            $('.stanford-input').hide();
+            $('.pajek-input').show();
+        } else {
+            $('.stanford-input').hide();
+            $('.pajek-input').hide();
+            $('.custom-input').show();
+        }
+    })
+    
+</script>
 <script>
     $("#fill-button").onclick(function () {
         $("#fill").submit({url: '/twitter/upload', type: 'post'});

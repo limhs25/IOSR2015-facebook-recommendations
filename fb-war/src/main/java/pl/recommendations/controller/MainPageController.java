@@ -2,12 +2,17 @@ package pl.recommendations.controller;
 
 import com.google.common.collect.Iterators;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import pl.recommendations.controller.data.CustomDatabaseFiles;
+import pl.recommendations.controller.data.SingleDatabaseFile;
 import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
+import pl.recommendations.crawling.embedded.PajekNetRepositoryReader;
+import pl.recommendations.crawling.embedded.StanfordRepositoryReader;
 import pl.recommendations.db.interest.InterestNodeRepository;
 import pl.recommendations.db.person.PersonNodeRepository;
 import pl.recommendations.slo.TwitterSLO;
@@ -24,7 +29,12 @@ public class MainPageController {
     private static final String MAIN_VIEW_NAME = "main";
 
     @Autowired
+    @Qualifier("fileRepositoryCrawlerService")
     private FileRepositoryCrawler fileRepositoryCrawler;
+    @Autowired
+    private StanfordRepositoryReader stanfordRepoReader;
+    @Autowired
+    private PajekNetRepositoryReader pajekRepoReader;
     @Autowired
     private PersonNodeRepository personRepo;
     @Autowired
@@ -39,7 +49,9 @@ public class MainPageController {
     public ModelAndView showMainForm(HttpSession session) {
         ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
         mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
-        mv.addObject("graphFiles", new GraphFiles());
+        mv.addObject("customFiles", new CustomDatabaseFiles());
+        mv.addObject("stanfordInput", new SingleDatabaseFile());
+        mv.addObject("pajekInput", new SingleDatabaseFile());
 
         /* Test users list until analiser is implemented */
         ArrayList<String> users = new ArrayList<String>();
@@ -51,27 +63,35 @@ public class MainPageController {
         return mv;
     }
 
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public void fillDatabase(@ModelAttribute("graphFiles") GraphFiles files) {
-        String separator = files.getSeparator();
-
-        fileRepositoryCrawler.readPeopleNodes(files.getPeopleNodesStream(), separator);
-        fileRepositoryCrawler.readInterestNodes(files.getInterestNodesStream(), separator);
-        fileRepositoryCrawler.readPeopleEdges(files.getPeopleEdgesStream(), separator);
-        fileRepositoryCrawler.readInterestEdges(files.getInterestEdgesStream(), separator);
+    @RequestMapping(value = "/upload/custom", method = RequestMethod.POST)
+    public void uploadCustom(@ModelAttribute("customFiles") CustomDatabaseFiles files) {
+        fileRepositoryCrawler.readPeopleNodes(files.getPeopleNodesStream());
+        fileRepositoryCrawler.readInterestNodes(files.getInterestNodesStream());
+        fileRepositoryCrawler.readPeopleEdges(files.getPeopleEdgesStream());
+        fileRepositoryCrawler.readInterestEdges(files.getInterestEdgesStream());
 
         fileRepositoryCrawler.persist();
     }
 
-    @RequestMapping(value ="clear", method = RequestMethod.POST)
-    public void clearDatabase(){
-        System.out.println("size before" +Iterators.size(personRepo.findAll().iterator()));
-        System.out.println("size before" +Iterators.size(interestRepo.findAll().iterator()));
+    @RequestMapping(value = "/upload/stanford", method = RequestMethod.POST)
+    public void uploadStanford(@ModelAttribute("stanfordInput") SingleDatabaseFile file) {
+        stanfordRepoReader.read(file.getPeopleEdgesStream());
+    }
+
+    @RequestMapping(value = "/upload/pajek", method = RequestMethod.POST)
+    public void uploadPajek(@ModelAttribute("pajekInput") SingleDatabaseFile file) {
+        pajekRepoReader.read(file.getPeopleEdgesStream());
+    }
+
+    @RequestMapping(value = "clear", method = RequestMethod.POST)
+    public void clearDatabase() {
+        System.out.println("size before" + Iterators.size(personRepo.findAll().iterator()));
+        System.out.println("size before" + Iterators.size(interestRepo.findAll().iterator()));
 
         personRepo.deleteAll();
         interestRepo.deleteAll();
 
         System.out.println("size after" + Iterators.size(personRepo.findAll().iterator()));
-        System.out.println("size after" +Iterators.size(interestRepo.findAll().iterator()));
+        System.out.println("size after" + Iterators.size(interestRepo.findAll().iterator()));
     }
 }

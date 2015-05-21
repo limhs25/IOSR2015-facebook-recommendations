@@ -1,4 +1,4 @@
-package pl.recommendations.controller;
+package pl.recommendations.controller.data;
 
 import org.springframework.web.multipart.MultipartFile;
 import pl.recommendations.exceptions.GettingInputStreamException;
@@ -6,13 +6,11 @@ import pl.recommendations.exceptions.GettingInputStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class GraphFiles {
+public class CustomDatabaseFiles {
     private MultipartFile peopleNodes;
     private MultipartFile interestNodes;
     private MultipartFile peopleEdges;
     private MultipartFile interestEdges;
-
-    private String separator;
 
     public InputStream getPeopleNodesStream()  {
         try {
@@ -75,13 +73,5 @@ public class GraphFiles {
 
     public void setInterestEdges(MultipartFile interestEdges) {
         this.interestEdges = interestEdges;
-    }
-
-    public String getSeparator() {
-        return separator;
-    }
-
-    public void setSeparator(String separator) {
-        this.separator = separator;
     }
 }
