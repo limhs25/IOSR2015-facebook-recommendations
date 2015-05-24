@@ -53,8 +53,8 @@ public class PersonNodeRepositoryTest extends EntityFactory {
         PersonNode person2 = createUser(uuid2);
         PersonNode person3 = createUser(uuid3);
 
-        personRepo.addFriend(person1 ,person2);
-        personRepo.addFriend(person1 ,person3);
+        personRepo.addFriend(person1, person2);
+        personRepo.addFriend(person1, person3);
 
         personRepo.save(person2);
         personRepo.save(person3);

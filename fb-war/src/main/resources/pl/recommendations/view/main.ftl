@@ -11,7 +11,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="<@spring.url '/twitter/resources/images/Twitter_logo_blue_48.ico'/>">
-    <@top.commonHeader/>
+<@top.commonHeader/>
     <link href="<@spring.url '/twitter/resources/css/bootstrap.min.css'/>" rel="stylesheet">
     <link href="<@spring.url '/twitter/resources/css/main.css'/>" rel="stylesheet">
 </head>

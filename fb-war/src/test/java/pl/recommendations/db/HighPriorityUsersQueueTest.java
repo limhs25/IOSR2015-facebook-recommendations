@@ -11,8 +11,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.queue.core.PersistentQueue;
 import pl.recommendations.db.queue.core.QueueNode;
-
-import javax.persistence.EntityExistsException;
+import pl.recommendations.db.queue.exceptions.EmptyQueueException;
+import pl.recommendations.db.queue.exceptions.EntityAlreadyEnqueuedException;
+import pl.recommendations.db.queue.exceptions.FullQueueException;
 
 import static org.junit.Assert.assertEquals;
 
@@ -35,7 +36,7 @@ public class HighPriorityUsersQueueTest {
     }
 
     @Test
-    public void saveInDB() {
+    public void saveInDB() throws EmptyQueueException, EntityAlreadyEnqueuedException, FullQueueException {
         Long userId = 123L;
 
         for (int i = 0; i < PersistentQueue.QUEUE_SIZE / 2; i++) {
@@ -68,8 +69,8 @@ public class HighPriorityUsersQueueTest {
 
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)
-    public void saveInDB_expectEnqueueException() {
+    @Test(expected = FullQueueException.class)
+    public void saveInDB_expectFullQueueException() throws EntityAlreadyEnqueuedException, FullQueueException {
         Long userId = 123L;
 
         for (int i = 0; i < PersistentQueue.QUEUE_SIZE; i++) {
@@ -78,11 +79,11 @@ public class HighPriorityUsersQueueTest {
 
         persistentQueue.reload();
 
-        persistentQueue.enqueue(userId++, 0, 0);
+        persistentQueue.enqueue(userId, 0, 0);
     }
 
     @Test
-    public void saveInDB_multipleReloads() {
+    public void saveInDB_multipleReloads() throws EntityAlreadyEnqueuedException, EmptyQueueException, FullQueueException {
         Long userId = 123L;
 
         for (int i = 0; i < PersistentQueue.QUEUE_SIZE / 2; i++) {
@@ -116,8 +117,8 @@ public class HighPriorityUsersQueueTest {
         }
     }
 
-    @Test(expected = EntityExistsException.class)
-    public void saveInDB_sameIDs() {
+    @Test(expected = EntityAlreadyEnqueuedException.class)
+    public void saveInDB_sameIDs() throws EntityAlreadyEnqueuedException, FullQueueException {
         persistentQueue.enqueue(500L, 0, 0);
         persistentQueue.enqueue(500L, 0, 0);
     }

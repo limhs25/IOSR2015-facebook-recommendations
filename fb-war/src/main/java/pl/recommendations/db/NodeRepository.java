@@ -3,7 +3,6 @@ package pl.recommendations.db;
 
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.data.neo4j.repository.GraphRepository;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.relationships.Contrast;
 import pl.recommendations.db.relationships.Similarity;

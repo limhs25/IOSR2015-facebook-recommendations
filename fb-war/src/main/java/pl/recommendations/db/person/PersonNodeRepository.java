@@ -2,7 +2,6 @@ package pl.recommendations.db.person;
 
 import com.google.common.base.Preconditions;
 import org.springframework.data.neo4j.annotation.Query;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.NodeRepository;
 import pl.recommendations.db.RelationshipType;

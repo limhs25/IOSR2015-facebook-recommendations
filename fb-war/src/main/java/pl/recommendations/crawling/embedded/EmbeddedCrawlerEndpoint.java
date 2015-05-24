@@ -29,8 +29,8 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     protected PersonNodeRepository peopleRepo;
 
     @Override
-    public void scheduleCrawling(Long uuid) {
-        scheduler.scheduleCrawling(uuid);
+    public void scheduleCrawling(Long uuid, boolean highPriority) {
+        scheduler.scheduleCrawling(uuid, highPriority);
     }
 
     @Override
@@ -45,7 +45,6 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
             logger.debug("User[{}] already exists", uuid);
         }
     }
-
 
 
     @Override

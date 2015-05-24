@@ -24,7 +24,4 @@
 
     <neo4j:config base-package="pl.recommendations.db" storeDirectory="testDB/test"/>
     <neo4j:repositories base-package="pl.recommendations"/>
-
-    <context:component-scan base-package="pl.recommendations"/>
-
 </beans>

@@ -3,11 +3,13 @@ package pl.recommendations.db.queue;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.queue.core.PersistentQueue;
 import pl.recommendations.db.queue.core.QueueNode;
+import pl.recommendations.db.queue.exceptions.EmptyQueueException;
+
+import javax.annotation.Resource;
 
 /**
  * Created by marekmagik on 2015-05-13.
@@ -19,27 +21,27 @@ public class PersistentQueueFacadeImpl implements PersistentQueueFacade {
     private static final Logger log = LogManager.getLogger(PersistentQueueFacadeImpl.class);
 
     @Autowired
-    @Qualifier("hpUsersQueue")
+    @Resource(name = "hpUsersQueue")
     private PersistentQueue highPriorityUsersQueue;
 
     @Autowired
-    @Qualifier("lpUsersQueue")
+    @Resource(name = "lpUsersQueue")
     private PersistentQueue lowPriorityUsersQueue;
 
     @Autowired
-    @Qualifier("hpFriendsQueue")
+    @Resource(name = "hpFriendsQueue")
     private PersistentQueue highPriorityFriendsQueue;
 
     @Autowired
-    @Qualifier("lpFriendsQueue")
+    @Resource(name = "lpFriendsQueue")
     private PersistentQueue lowPriorityFriendsQueue;
 
     @Autowired
-    @Qualifier("hpInterestsQueue")
+    @Resource(name = "hpInterestsQueue")
     private PersistentQueue highPriorityInterestsQueue;
 
     @Autowired
-    @Qualifier("lpInterestsQueue")
+    @Resource(name = "lpInterestsQueue")
     private PersistentQueue lowPriorityInterestsQueue;
 
 
@@ -89,35 +91,50 @@ public class PersistentQueueFacadeImpl implements PersistentQueueFacade {
     }
 
     @Override
-    public QueueNode dequeueUser() {
+    public QueueNode dequeueUser() throws EmptyQueueException {
         if (!highPriorityUsersQueue.isEmpty()) {
             return highPriorityUsersQueue.dequeue();
         }
         if (!lowPriorityUsersQueue.isEmpty()) {
             return lowPriorityUsersQueue.dequeue();
         }
-        return null;
+        throw new EmptyQueueException("Users queue is empty.");
     }
 
     @Override
-    public QueueNode dequeueFriend() {
+    public QueueNode dequeueFriend() throws EmptyQueueException {
         if (!highPriorityFriendsQueue.isEmpty()) {
             return highPriorityFriendsQueue.dequeue();
         }
         if (!lowPriorityFriendsQueue.isEmpty()) {
             return lowPriorityFriendsQueue.dequeue();
         }
-        return null;
+        throw new EmptyQueueException("Friends queue is empty.");
     }
 
     @Override
-    public QueueNode dequeueInterest() {
+    public QueueNode dequeueInterest() throws EmptyQueueException {
         if (!highPriorityInterestsQueue.isEmpty()) {
             return highPriorityInterestsQueue.dequeue();
         }
         if (!lowPriorityInterestsQueue.isEmpty()) {
             return lowPriorityInterestsQueue.dequeue();
         }
-        return null;
+        throw new EmptyQueueException("Interests queue is empty.");
+    }
+
+    @Override
+    public int getUserQueueSize() {
+        return highPriorityUsersQueue.size() + lowPriorityUsersQueue.size();
+    }
+
+    @Override
+    public int getFriendsQueueSize() {
+        return highPriorityFriendsQueue.size() + lowPriorityFriendsQueue.size();
+    }
+
+    @Override
+    public int getInterestsQueueSize() {
+        return highPriorityInterestsQueue.size() + highPriorityInterestsQueue.size();
     }
 }

@@ -8,8 +8,11 @@ import pl.recommendations.crawling.CrawledDataCache;
 import pl.recommendations.crawling.CrawledDataListener;
 import pl.recommendations.crawling.CrawlerScheduler;
 import pl.recommendations.crawling.CrawlerService;
-import pl.recommendations.crawling.remote.messages.CrawlerConnectionMessage;
-import pl.recommendations.crawling.remote.messages.notice.*;
+import pl.recommendations.crawling.remote.messages.notice.AddFriends;
+import pl.recommendations.crawling.remote.messages.notice.AddInterests;
+import pl.recommendations.crawling.remote.messages.notice.NewInterest;
+import pl.recommendations.crawling.remote.messages.notice.NewPerson;
+import pl.recommendations.crawling.remote.messages.notice.NoticeMessage;
 import pl.recommendations.crawling.remote.messages.request.RequestCrawling;
 import pl.recommendations.crawling.remote.messages.request.RequestMessage;
 
@@ -21,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Component
 public class CrawlerConnectionHandler implements CrawlerService, CrawledDataListener, Runnable {
@@ -35,7 +37,6 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    private final ConcurrentLinkedQueue<CrawlerConnectionMessage> commands = new ConcurrentLinkedQueue<>();
     private Socket socket;
 
     public synchronized void setStreams(Socket s) throws IOException {
@@ -91,14 +92,14 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     }
 
     @Override
-    public synchronized void scheduleCrawling(Long uuid) {
-        scheduler.scheduleCrawling(uuid);
+    public synchronized void scheduleCrawling(Long uuid, boolean highPriority) {
+        scheduler.scheduleCrawling(uuid, highPriority);
     }
 
     private void dispatch(RequestMessage msg) {
         long uuid = msg.getUuid();
         if (msg instanceof RequestCrawling) {
-            scheduleCrawling(uuid);
+            scheduleCrawling(uuid, false);
         }
     }
 

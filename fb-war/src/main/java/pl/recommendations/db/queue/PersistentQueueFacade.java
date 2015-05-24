@@ -1,6 +1,7 @@
 package pl.recommendations.db.queue;
 
 import pl.recommendations.db.queue.core.QueueNode;
+import pl.recommendations.db.queue.exceptions.EmptyQueueException;
 
 /**
  * Created by marekmagik on 2015-05-13.
@@ -14,9 +15,15 @@ public interface PersistentQueueFacade {
 
     boolean enqueueInterest(Long id, boolean highPriority);
 
-    QueueNode dequeueUser();
+    QueueNode dequeueUser() throws EmptyQueueException;
 
-    QueueNode dequeueFriend();
+    QueueNode dequeueFriend() throws EmptyQueueException;
 
-    QueueNode dequeueInterest();
+    QueueNode dequeueInterest() throws EmptyQueueException;
+
+    int getUserQueueSize();
+
+    int getFriendsQueueSize();
+
+    int getInterestsQueueSize();
 }

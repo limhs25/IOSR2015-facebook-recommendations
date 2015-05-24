@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.queue.core.counter.CursorNode;
 import pl.recommendations.db.queue.core.counter.CursorRepository;
+import pl.recommendations.db.queue.exceptions.EmptyQueueException;
+import pl.recommendations.db.queue.exceptions.EntityAlreadyEnqueuedException;
+import pl.recommendations.db.queue.exceptions.FullQueueException;
 import pl.recommendations.db.queue.types.QueueType;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityExistsException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,7 +32,7 @@ public class PersistentQueueImpl implements PersistentQueue {
     @Autowired
     private CursorRepository counterRepo;
 
-    public PersistentQueueImpl(QueueType queueType){
+    public PersistentQueueImpl(QueueType queueType) {
         this.queueType = queueType;
     }
 
@@ -40,15 +42,15 @@ public class PersistentQueueImpl implements PersistentQueue {
     }
 
     @Override
-    public synchronized void enqueue(Long userId, int recursiveLimit, int friendsLimit) {
+    public synchronized void enqueue(Long userId, int recursiveLimit, int friendsLimit) throws EntityAlreadyEnqueuedException, FullQueueException {
         Long index = counter.getEnqueueIndex();
         QueueNode node = queue.get(index);
         if (node != null) {
-            throw new IndexOutOfBoundsException("Queue is full. Requested index: " + index);
+            throw new FullQueueException("Queue is full. Requested index: " + index);
         }
 
         if (contains(userId)) {
-            throw new EntityExistsException("Element " + userId + " already exists in queue.");
+            throw new EntityAlreadyEnqueuedException("Element " + userId + " already exists in queue.");
         }
 
         QueueNodeConfig config = (new QueueNodeConfig.Builder())
@@ -69,12 +71,12 @@ public class PersistentQueueImpl implements PersistentQueue {
     }
 
     @Override
-    public synchronized QueueNode dequeue() {
+    public synchronized QueueNode dequeue() throws EmptyQueueException {
         Long index = counter.getDequeueIndex();
         QueueNode node = queue.get(index);
 
         if (node == null) {
-            throw new IndexOutOfBoundsException("Queue is empty. Requested index: " + index);
+            throw new EmptyQueueException("Queue is empty. Requested index: " + index);
         }
 
         queueRepo.delete(node);
@@ -99,7 +101,7 @@ public class PersistentQueueImpl implements PersistentQueue {
         return queue.isEmpty();
     }
 
-    public QueueType getQueueType(){
+    public QueueType getQueueType() {
         return queueType;
     }
 
@@ -109,5 +111,10 @@ public class PersistentQueueImpl implements PersistentQueue {
         queue = new LinkedHashMap<>(QUEUE_SIZE);
         Set<QueueNode> allNodes = queueRepo.getNodesForSpecifiedQueue(getQueueType());
         allNodes.forEach(queueNode -> queue.put(queueNode.getIndex(), queueNode));
+    }
+
+    @Override
+    public int size() {
+        return queue.size();
     }
 }
