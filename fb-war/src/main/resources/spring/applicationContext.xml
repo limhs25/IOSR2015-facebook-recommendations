@@ -17,11 +17,11 @@
     <context:annotation-config/>
     <tx:annotation-driven mode="proxy" transaction-manager="transactionManager"/>
 
-    <bean id="neo4jConfiguration" class="org.springframework.data.neo4j.config.Neo4jConfiguration">
+    <bean id="neo4jConfiguration" class="pl.recommendations.db.DatabaseConfiguration">
         <property name="basePackage" value="pl.recommendations.db"/>
     </bean>
 
-    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/facebook4"/>
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/facebook6"/>
     <neo4j:repositories base-package="pl.recommendations"/>
 
     <context:component-scan base-package="pl.recommendations"/>

@@ -15,15 +15,12 @@
     <context:component-scan base-package="pl.recommendations"/>
 
 
-    <bean id="graphDatabaseFactory" class="org.neo4j.graphdb.factory.GraphDatabaseFactory">
+
+    <bean id="neo4jConfiguration" class="pl.recommendations.db.DatabaseConfiguration">
 
     </bean>
 
-    <bean id="neo4jConfiguration" factory-bean="graphDatabaseFactory" factory-method="newEmbeddedDatabase">
-        <constructor-arg name="path" value="data/db/twdb2"/>
-    </bean>
-
-    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/db/web6"/>
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/db/web-with-ind"/>
 
     <neo4j:repositories base-package="pl.recommendations"/>
 
