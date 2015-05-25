@@ -8,17 +8,12 @@ import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import pl.recommendations.db.Node;
-import pl.recommendations.db.RelationshipType;
 import pl.recommendations.db.person.PersonNode;
 import pl.recommendations.db.person.PersonNodeRepository;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-
-import static pl.recommendations.util.MapUtil.sortByValue;
 
 @Transactional
 @Component
@@ -34,7 +29,7 @@ public class AnalyseServiceImpl implements AnalyseService {
     @Autowired
     Neo4jTemplate neo4jTemplate;
 
-    private Map<Long,Map<Long,Double>> obtainedSuggestions= new HashMap<>();
+    private Map<Long, Map<Long, Double>> obtainedSuggestions = new HashMap<>();
     private int suggestionSize = 5;
 
 
@@ -44,10 +39,10 @@ public class AnalyseServiceImpl implements AnalyseService {
     }
 
     @Override
-    public void analyse(Long uuid){
+    public void analyse(Long uuid) {
 
         PersonNode personNode = personRepo.findByUuid(uuid);
-        Map<Long, Double> suggestions = new TreeMap<Long,Double>();
+        Map<Long, Double> suggestions = new TreeMap<Long, Double>();
 
 //        if (personRepo.getFriendsOf(uuid).size()>0) {
 //
@@ -72,23 +67,22 @@ public class AnalyseServiceImpl implements AnalyseService {
 //                }
 //            }
 //        }
-        String query = "match (begin)-[:FRIENDSHIP]-(middle)-[:FRIENDSHIP]-(end) " +
-                "with begin, end, count(middle) as cnt " +
-                "where begin.uuid = {uuid} " +
-                "return end,cnt "+
-                "order by cnt DESC"+
+        String query = "match (begin)-[:FRIENDSHIP]-(middle)-[:FRIENDSHIP]-(end)\n" +
+                "with begin, end, count(middle) as cnt\n" +
+                "where begin.uuid = {uuid}\n" +
+                "return end,cnt\n" +
+                "order by cnt DESC\n" +
                 "limit 5";
 
-        Map<String,Object> map = new HashMap<>();
-        map.put("uuid",uuid);
+        Map<String, Object> map = new HashMap<>();
+        map.put("uuid", uuid);
 
         Result<Map<String, Object>> mapResult = neo4jTemplate.query(query, map);
 
-        for (Map<String, Object> r: mapResult){
+        for (Map<String, Object> r : mapResult) {
 
             for (Map.Entry<String, Object> entry : r.entrySet()) {
-                System.out.println(entry.getKey());
-                System.out.println(entry.getValue());
+                logger.info(entry.getKey() + ": " + entry.getValue());
 
             }
 //            PersonNode p = (PersonNode) r;
@@ -100,9 +94,9 @@ public class AnalyseServiceImpl implements AnalyseService {
     }
 
     @Override
-    public void updateDatabase(){
-        for(Long uuid:obtainedSuggestions.keySet()){
-            Map<Long,Double> suggestions = obtainedSuggestions.get(uuid);
+    public void updateDatabase() {
+        for (Long uuid : obtainedSuggestions.keySet()) {
+            Map<Long, Double> suggestions = obtainedSuggestions.get(uuid);
 //            Map<Long,Double> sortedSuggestions = sortByValue(suggestions);
             int amount = suggestionSize;
 //            Iterator entries = sortedSuggestions.entrySet().iterator();
@@ -116,7 +110,6 @@ public class AnalyseServiceImpl implements AnalyseService {
 //            }
         }
     }
-
 
 
 }

@@ -79,6 +79,10 @@ public class PersonNode extends Node {
         return interestEdges;
     }
 
+    public Set<SuggestionEdge> getSuggestionEdges() {
+        return suggestionEdges;
+    }
+
     public void addFriendship(FriendshipEdge relationship) {
         if (!friendshipEdges.contains(relationship)) {
             friendshipEdges.add(relationship);

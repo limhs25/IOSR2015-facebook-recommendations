@@ -1,7 +1,6 @@
 package pl.recommendations.db.person;
 
 import com.google.common.base.Preconditions;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.NodeRepository;
@@ -40,16 +39,16 @@ public interface PersonNodeRepository extends NodeRepository {
             personNode.addFriendship(relationship);
         }
     }
-    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP+ "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]- (end) " +
-            "where begin.uuid = {0} and end.uuid = {1} " +
+    @Query("match (begin)-[:"+RelationshipType.FRIENDSHIP+"]->(middle)<-[:"+RelationshipType.FRIENDSHIP +"]-(end)\n" +
+            "where begin.uuid = {0} and end.uuid = {1}\n" +
             "return count(middle)")
      Long countCommonFriend(Long firstUUID, Long secondUUID);
 
 
-    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP+ "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]- (end) " +
-            "with end, count(middle) as cnt" +
-            "where begin.uuid = {0} and end.uuid = {1} and cnt > 5 " +
-            "order by cnt" +
+    @Query("match (begin)-[:"+RelationshipType.FRIENDSHIP+"]->(middle)<-[:"+RelationshipType.FRIENDSHIP +"]-(end)\n" +
+            "with end, count(middle) as cnt\n" +
+            "where begin.uuid = {0} and end.uuid = {1} and cnt > 5\n" +
+            "order by cnt\n" +
             "return end")
     Long getCommonFriend(Long firstUUID, Long secondUUID);
 
