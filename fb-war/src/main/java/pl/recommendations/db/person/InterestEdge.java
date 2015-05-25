@@ -11,9 +11,11 @@ import pl.recommendations.db.interest.InterestNode;
 @RelationshipEntity(type = RelationshipType.INTEREST)
 public class InterestEdge extends Edge {
 
+    @Fetch
     @StartNode
     private PersonNode personNode;
 
+    @Fetch
     @EndNode
     private InterestNode interest;
 

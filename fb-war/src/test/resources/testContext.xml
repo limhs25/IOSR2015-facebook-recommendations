@@ -22,6 +22,6 @@
         <property name="basePackage" value="pl.recommendations.db"/>
     </bean>
 
-    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/twitter3"/>
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="testDB/test"/>
     <neo4j:repositories base-package="pl.recommendations"/>
 </beans>

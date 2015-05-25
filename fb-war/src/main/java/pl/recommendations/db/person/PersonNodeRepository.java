@@ -1,7 +1,6 @@
 package pl.recommendations.db.person;
 
 import com.google.common.base.Preconditions;
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.springframework.data.neo4j.annotation.Query;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.NodeRepository;
@@ -12,24 +11,16 @@ import java.util.Collection;
 
 @Transactional
 public interface PersonNodeRepository extends NodeRepository {
-    @Query("match (u)-[:`" + RelationshipType.FRIENDSHIP + "`]->(u2) " +
+    @Query("match u-[" + RelationshipType.FRIENDSHIP + "]->u2 " +
             "where u.uuid = {0} " +
             "return u2")
     Collection<PersonNode> getFriendsOf(Long id);
 
-    @Query("match u-[:" + RelationshipType.INTEREST + "]->u2 " +
+    @Query("match u-[" + RelationshipType.INTEREST + "]->u2 " +
             "where u.uuid = {0} " +
             "return u2")
-    Collection<InterestEdge> getInterestsOf(Long id);
+    Collection<InterestNode> getInterestsOf(Long id);
 
-    @Query("match u-[:" + RelationshipType.SUGGESTION + "]->u2 " +
-            "where u.uuid = {0} " +
-            "return u2")
-    Collection<SuggestionEdge> getSuggestionOf(Long id);
-
-//    @Query("match (n:`PersonNode`) " +
-//            "where n.uuid = {0} " +
-//            "return n")
     PersonNode findByUuid(Long uuid);
 
     default void addFriend(PersonNode personNode, PersonNode friend) {
@@ -40,18 +31,6 @@ public interface PersonNodeRepository extends NodeRepository {
             personNode.addFriendship(relationship);
         }
     }
-    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP+ "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]- (end) " +
-            "where begin.uuid = {0} and end.uuid = {1} " +
-            "return count(middle)")
-     Long countCommonFriend(Long firstUUID, Long secondUUID);
-
-
-    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP+ "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]- (end) " +
-            "with end, count(middle) as cnt" +
-            "where begin.uuid = {0} and end.uuid = {1} and cnt > 5 " +
-            "order by cnt" +
-            "return end")
-    Long getCommonFriend(Long firstUUID, Long secondUUID);
 
     default void addInterest(PersonNode personNode, InterestNode interestNode, Long weight) {
         Preconditions.checkArgument(weight > 0);
@@ -65,14 +44,4 @@ public interface PersonNodeRepository extends NodeRepository {
         personNode.addInterest(interestEdge);
 
     }
-
-    default void addSuggestion(PersonNode personNode, PersonNode suggestion) {
-        if (suggestion != null && !suggestion.equals(personNode)) {
-            SuggestionEdge suggestionEdge = new SuggestionEdge();
-            suggestionEdge.setPersonNode(personNode);
-            suggestionEdge.setSuggestion(suggestion);
-            personNode.addSuggestionEdge(suggestionEdge);
-        }
-    }
-
 }
