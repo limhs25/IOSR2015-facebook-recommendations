@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class CrawlerScheduler implements CrawlerService {
-    private static final Logger logger = LogManager.getLogger(CrawlerScheduler.class.getName());
+    private static final Logger logger = LogManager.getLogger(CrawlerScheduler.class);
 
     private static final int TASK_QUEUE_SIZE = 100000;
     private static final int RECURSIVE_FRIENDS_CRAWL_DEPTH_LIMIT = 5;
