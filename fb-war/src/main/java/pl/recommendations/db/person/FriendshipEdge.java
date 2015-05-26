@@ -1,9 +1,6 @@
 package pl.recommendations.db.person;
 
-import org.springframework.data.neo4j.annotation.EndNode;
-import org.springframework.data.neo4j.annotation.Indexed;
-import org.springframework.data.neo4j.annotation.RelationshipEntity;
-import org.springframework.data.neo4j.annotation.StartNode;
+import org.springframework.data.neo4j.annotation.*;
 import pl.recommendations.db.Edge;
 import pl.recommendations.db.RelationshipType;
 
@@ -16,6 +13,9 @@ public class FriendshipEdge extends Edge {
     @EndNode
     @Indexed
     private PersonNode friend;
+
+    @Fetch
+    private FriendshipType type;
 
     public PersonNode getFriend() {
         return friend;
@@ -31,5 +31,13 @@ public class FriendshipEdge extends Edge {
 
     public void setPersonNode(PersonNode personNode) {
         this.personNode = personNode;
+    }
+
+    public FriendshipType getType() {
+        return type;
+    }
+
+    public void setType(FriendshipType type) {
+        this.type = type;
     }
 }

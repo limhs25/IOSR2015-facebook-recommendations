@@ -12,6 +12,8 @@ import java.util.Set;
 public class PersonNode extends Node {
 
     @Indexed(unique = true)
+
+    @Fetch
     protected Long uuid;
 
     @Fetch
@@ -22,6 +24,8 @@ public class PersonNode extends Node {
 
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<InterestEdge> interestEdges = new HashSet<>();
+    @RelatedToVia(direction = Direction.OUTGOING)
+    private Set<SuggestionEdge> suggestionEdges = new HashSet<>();
 
     @Override
     public int hashCode() {
@@ -36,15 +40,6 @@ public class PersonNode extends Node {
         this.uuid = uuid;
     }
 
-    public void addFriend(PersonNode friend) {
-        if (friend != null && !this.equals(friend)) {
-            FriendshipEdge relationship = new FriendshipEdge();
-            relationship.setPersonNode(this);
-            relationship.setFriend(friend);
-            friendshipEdges.add(relationship);
-        }
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -62,7 +57,6 @@ public class PersonNode extends Node {
     public String getName() {
         return name;
     }
-    
 
     public Set<FriendshipEdge> getFriendshipEdges() {
         return ImmutableSet.copyOf(friendshipEdges);
@@ -70,6 +64,10 @@ public class PersonNode extends Node {
 
     public Set<InterestEdge> getInterestEdges() {
         return interestEdges;
+    }
+
+    public Set<SuggestionEdge> getSuggestionEdges() {
+        return suggestionEdges;
     }
 
     public void addFriendship(FriendshipEdge relationship) {
@@ -81,6 +79,12 @@ public class PersonNode extends Node {
     public void addInterest(InterestEdge interestEdge) {
         if(!interestEdges.contains(interestEdge)){
             interestEdges.add(interestEdge);
+        }
+    }
+
+    public void addSuggestionEdge(SuggestionEdge suggestionEdge) {
+        if(!suggestionEdges.contains(suggestionEdge)) {
+            suggestionEdges.add(suggestionEdge);
         }
     }
 }

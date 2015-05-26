@@ -64,7 +64,7 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
         if (personNode != null) {
             friends.stream()
                     .map(peopleRepo::findByUuid)
-                    .forEach(personNode::addFriend);
+                    .forEach(friend -> peopleRepo.addFriend(personNode, friend));
         } else {
             logger.debug("Cannot add friends to non-existing user");
         }
