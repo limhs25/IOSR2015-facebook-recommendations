@@ -55,7 +55,6 @@ public class EmbeddedCrawlerEndpointTest {
     @Test
     public void addNewInterestNode() {
         endpoint.onNewInterest(NAME);
-
         assertNotNull(interestsRepo.findByName(NAME));
     }
 

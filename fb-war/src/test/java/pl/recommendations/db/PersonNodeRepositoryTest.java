@@ -9,13 +9,13 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.interest.InterestNode;
 import pl.recommendations.db.interest.InterestNodeRepository;
-import pl.recommendations.db.person.FriendshipEdge;
 import pl.recommendations.db.person.InterestEdge;
 import pl.recommendations.db.person.PersonNode;
 import pl.recommendations.db.person.PersonNodeRepository;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -60,9 +60,7 @@ public class PersonNodeRepositoryTest extends EntityFactory {
         personRepo.save(person3);
         personRepo.save(person1);
 
-        PersonNode person = personRepo.findByUuid(uuid1);
-        Set<FriendshipEdge> friendships = person.getFriendshipEdges();
-
+        Set<PersonNode> friendships = new HashSet<>(personRepo.getFriendsOf(uuid1));
         assertEquals(friendships.size(), 2);
 
         Collection<PersonNode> firends = personRepo.getFriendsOf(person1.getUuid());

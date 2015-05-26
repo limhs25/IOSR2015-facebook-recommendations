@@ -11,15 +11,20 @@ import java.util.Collection;
 
 @Transactional
 public interface PersonNodeRepository extends NodeRepository {
-    @Query("match u-[" + RelationshipType.FRIENDSHIP + "]->u2 " +
+    @Query("match (u)-[:" + RelationshipType.FRIENDSHIP + "]->(u2) " +
             "where u.uuid = {0} " +
             "return u2")
     Collection<PersonNode> getFriendsOf(Long id);
 
-    @Query("match u-[" + RelationshipType.INTEREST + "]->u2 " +
+    @Query("match (u)-[:" + RelationshipType.INTEREST + "]->(u2) " +
             "where u.uuid = {0} " +
             "return u2")
-    Collection<InterestNode> getInterestsOf(Long id);
+    Collection<InterestEdge> getInterestsOf(Long id);
+
+    @Query("match (u)-[r:" + RelationshipType.SUGGESTION + "]->(u2) " +
+            "where u.uuid = {0} " +
+            "return r")
+    Collection<SuggestionEdge> getSuggestionOf(Long id);
 
     PersonNode findByUuid(Long uuid);
 
@@ -31,6 +36,20 @@ public interface PersonNodeRepository extends NodeRepository {
             personNode.addFriendship(relationship);
         }
     }
+
+    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP+ "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]- (end) " +
+            "where begin.uuid = {0} and end.uuid = {1} " +
+            "return count(middle)")
+     Long countCommonFriend(Long firstUUID, Long secondUUID);
+
+
+    @Query("match (begin)-[:"+RelationshipType.FRIENDSHIP+"]->(middle)<-[:"+RelationshipType.FRIENDSHIP +"]-(end)\n" +
+            "with end, count(middle) as cnt\n" +
+            "where begin.uuid = {0} and end.uuid = {1} and cnt > 5\n" +
+            "order by cnt\n" +
+            "return end")
+    Long getCommonFriend(Long firstUUID, Long secondUUID);
+
 
     default void addInterest(PersonNode personNode, InterestNode interestNode, Long weight) {
         Preconditions.checkArgument(weight > 0);
@@ -44,4 +63,13 @@ public interface PersonNodeRepository extends NodeRepository {
         personNode.addInterest(interestEdge);
 
     }
+
+    default void addSuggestion(PersonNode personNode, PersonNode suggestion) {
+        if (suggestion != null && !suggestion.equals(personNode)) {
+            SuggestionEdge suggestionEdge = new SuggestionEdge();
+            suggestionEdge.setPersonNode(personNode);
+            suggestionEdge.setSuggestion(suggestion);
+            personNode.addSuggestionEdge(suggestionEdge);
+            }
+        }
 }
