@@ -34,6 +34,10 @@ public class LoginPageController {
 
     @RequestMapping(value = "/twitter-login-callback", method = RequestMethod.GET)
     public void facebookLoginCallback(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        twitterSLO.setAuthorization(request, response);
+        try {
+            twitterSLO.setAuthorization(request, response);
+        } catch (ServletException e) {
+            response.sendRedirect(request.getContextPath());
+        }
     }
 }

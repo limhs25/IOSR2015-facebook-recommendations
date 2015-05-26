@@ -33,7 +33,7 @@ public class TwitterSLOImpl implements TwitterSLO {
             twitter.getOAuthAccessToken(requestToken, verifier);
             request.getSession().removeAttribute("requestToken");
             queue.enqueueUser(twitter.getId(), true);
-        } catch (TwitterException e) {
+        } catch (Exception e) {
             throw new ServletException(e);
         }
 
