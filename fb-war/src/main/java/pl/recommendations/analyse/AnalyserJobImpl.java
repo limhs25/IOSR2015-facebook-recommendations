@@ -34,8 +34,10 @@ public class AnalyserJobImpl implements Job {
         int failedProcessing = 0;
         for (Node node : personRepo.findAll()) {
             try {
-                analyseService.analyse(((PersonNode) node).getUuid(), AnalyseService.PREFFERED_SUGGESTION_SIZE);
-                processedNodes++;
+                if(node instanceof PersonNode) {
+                    analyseService.analyse(((PersonNode) node).getUuid(), AnalyseService.PREFFERED_SUGGESTION_SIZE);
+                    processedNodes++;
+                }
             } catch (Exception e) {
                 log.warn("Analyzer job error for node: " + node.getId());
                 failedProcessing++;

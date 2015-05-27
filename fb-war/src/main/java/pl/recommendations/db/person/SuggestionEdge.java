@@ -14,7 +14,6 @@ public class SuggestionEdge extends Edge {
     private PersonNode personNode;
 
     @EndNode
-    @Fetch
     private PersonNode suggestion;
 
     public PersonNode getPersonNode(){

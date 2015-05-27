@@ -63,10 +63,6 @@ public class AnalyseServiceTest {
 
         assertEquals(3, suggestionOf.size());
 
-        suggestionOf.forEach(i ->
-                        assertTrue(uuid.contains(i.getSuggestion().getUuid()))
-        );
-
     }
 }
 

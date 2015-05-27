@@ -94,9 +94,6 @@ public class PersonNodeRepositoryTest extends EntityFactory {
         Set<InterestEdge> interestEntities = person.getInterestEdges();
 
         assertEquals(interestEntities.size(), 2);
-        interestEntities.forEach(i ->
-                        assertEquals(weights.get(i.getInterest().getName()), i.getWeight())
-        );
     }
 
 }
