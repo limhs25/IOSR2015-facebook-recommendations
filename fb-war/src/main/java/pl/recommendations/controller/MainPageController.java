@@ -1,5 +1,6 @@
 package pl.recommendations.controller;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,6 +9,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
+import pl.recommendations.analyse.AnalyseService;
+import pl.recommendations.analyse.Metric;
+import pl.recommendations.analyse.metrices.AdamicAdarMetric;
+import pl.recommendations.analyse.metrices.CommonNeighbourMetric;
+import pl.recommendations.analyse.metrices.JaccardMetric;
+import pl.recommendations.analyse.metrices.ResourceAllocationMetric;
 import pl.recommendations.controller.data.CustomDatabaseFiles;
 import pl.recommendations.controller.data.SingleDatabaseFile;
 import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
@@ -19,6 +26,7 @@ import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by marekmagik on 2015-01-19.
@@ -39,6 +47,20 @@ public class MainPageController {
     private PersonNodeRepository personRepo;
     @Autowired
     private InterestNodeRepository interestRepo;
+
+    @Autowired
+    private AnalyseService analysis;
+
+    @Autowired
+    private AdamicAdarMetric adamicAdarMetric;
+    @Autowired
+    private CommonNeighbourMetric commonNeighbourMetric;
+    @Autowired
+    private JaccardMetric jaccardMetric;
+    @Autowired
+    private ResourceAllocationMetric resourceAllocationMetric;
+
+    private final List<Metric> metrics = ImmutableList.of(adamicAdarMetric, commonNeighbourMetric, jaccardMetric, resourceAllocationMetric);
 
     @RequestMapping("/")
     public ModelAndView showLoginForm() {
@@ -93,5 +115,13 @@ public class MainPageController {
 
         System.out.println("size after" + Iterators.size(personRepo.findAll().iterator()));
         System.out.println("size after" + Iterators.size(interestRepo.findAll().iterator()));
+    }
+
+    @RequestMapping(value = "calculate", method = RequestMethod.POST)
+    public void calculate(){
+        metrics.stream().map(m -> {
+            analysis.setMetric(m);
+            analysis.analyse();
+        })
     }
 }

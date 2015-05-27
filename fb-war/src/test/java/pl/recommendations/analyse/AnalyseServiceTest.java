@@ -3,6 +3,7 @@ package pl.recommendations.analyse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,8 +31,13 @@ public class AnalyseServiceTest {
     @Autowired
     private PersonNodeRepository personRepo;
 
+    @Autowired
+    @Qualifier("JaccardMetric")
+    private Metric metric;
     @Test
     public void analyseNode() {
+
+        analyseService.setMetric(metric);
         int size = 5;
         Set<Long> uuid = new HashSet<>();
         PersonNode[] peoples = new PersonNode[size];

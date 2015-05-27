@@ -39,7 +39,7 @@ public class ResourceAllocationMetric implements Metric {
             "order by score DESC";
 
     @Override
-    public List<Long> getSuggestionList(Long UUID) {
+    public Map<Long, List<Long>> getSuggestionList(Long UUID) {
         LinkedList<Long> result = new LinkedList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("uuid", UUID);

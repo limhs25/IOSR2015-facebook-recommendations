@@ -1,7 +1,10 @@
 package pl.recommendations.analyse;
 
-import java.util.List;
+import pl.recommendations.db.person.PersonNode;
+
+import java.util.LinkedList;
+import java.util.Map;
 
 public interface Metric {
-    List<Long> getSuggestionList(Long UUID);
+    Map<PersonNode, LinkedList<PersonNode>> getSuggestionList(Long UUID);
 }

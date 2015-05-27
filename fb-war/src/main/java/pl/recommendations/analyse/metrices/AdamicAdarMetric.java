@@ -24,7 +24,8 @@ public class AdamicAdarMetric implements Metric {
     @Autowired
     private Neo4jTemplate neo4jTemplate;
 
-    private static final String query = "match (begin)\n" +
+    private static final String query =
+            "match (begin)\n" +
             "where begin.uuid = {uuid}\n" + //
             "with begin\n" + //
             "match (begin)-[:FRIENDSHIP]-(middle)-[:FRIENDSHIP]-(new_friend)\n" + //
@@ -39,7 +40,7 @@ public class AdamicAdarMetric implements Metric {
             "order by score DESC";
 
     @Override
-    public List<Long> getSuggestionList(Long UUID) {
+    public Map<Long, List<Long>> getSuggestionList(Long UUID) {
         LinkedList<Long> result = new LinkedList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("uuid", UUID);

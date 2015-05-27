@@ -1,5 +1,7 @@
 package pl.recommendations.analyse;
 
 public interface AnalyseService {
-    void analyse(Long uuid, int suggestionSize);
+    void analyse();
+
+    void setMetric(Metric m);
 }
