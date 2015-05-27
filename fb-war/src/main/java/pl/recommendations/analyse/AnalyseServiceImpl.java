@@ -20,7 +20,7 @@ public class AnalyseServiceImpl implements AnalyseService {
     private PersonNodeRepository personRepo;
 
     @Autowired
-    @Qualifier("JaccardMetric")
+    @Qualifier("AdamicAdarMetric")
     private Metric metric;
 
     @Override

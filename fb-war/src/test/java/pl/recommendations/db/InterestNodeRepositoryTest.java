@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,8 +26,6 @@ public class InterestNodeRepositoryTest extends EntityFactory {
 
     @Autowired
     private InterestNodeRepository interestRepo;
-    @Autowired
-    Neo4jTemplate template;
 
     @Test
     public void saveAndGet() {
@@ -101,4 +98,5 @@ public class InterestNodeRepositoryTest extends EntityFactory {
         assertNotNull(contrast);
         assertEquals(contrast.getValue(), val, Double.MIN_VALUE);
     }
+
 }

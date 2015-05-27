@@ -15,7 +15,6 @@ import java.util.Set;
 public class PersonNode extends Node {
 
     @Indexed(unique = true)
-
     @Fetch
     protected Long uuid;
 
@@ -41,15 +40,6 @@ public class PersonNode extends Node {
 
     public void setUuid(Long uuid) {
         this.uuid = uuid;
-    }
-
-    public void addFriend(PersonNode friend) {
-        if (friend != null && !this.equals(friend)) {
-            FriendshipEdge relationship = new FriendshipEdge();
-            relationship.setPersonNode(this);
-            relationship.setFriend(friend);
-            friendshipEdges.add(relationship);
-        }
     }
 
     @Override
@@ -95,7 +85,7 @@ public class PersonNode extends Node {
     }
 
     public void addSuggestionEdge(SuggestionEdge suggestionEdge) {
-        if(!suggestionEdges.contains(suggestionEdge)) {
+        if (!suggestionEdges.contains(suggestionEdge)) {
             suggestionEdges.add(suggestionEdge);
         }
     }

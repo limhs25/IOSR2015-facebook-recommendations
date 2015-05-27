@@ -2,12 +2,17 @@ package pl.recommendations.db;
 
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.data.neo4j.annotation.GraphId;
 import org.springframework.data.neo4j.annotation.NodeEntity;
 import org.springframework.data.neo4j.annotation.RelatedToVia;
+import org.springframework.data.neo4j.core.GraphDatabase;
 import pl.recommendations.db.relationships.Contrast;
 import pl.recommendations.db.relationships.Similarity;
 
+import javax.transaction.TransactionManager;
 import java.util.HashSet;
 import java.util.Set;
 

@@ -3,10 +3,11 @@ package pl.recommendations.crawling.embedded;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import pl.recommendations.crawling.CrawledDataCache;
 import pl.recommendations.crawling.CrawlerEndpoint;
-import pl.recommendations.crawling.CrawlerScheduler;
+import pl.recommendations.crawling.CrawlerService;
 import pl.recommendations.db.interest.InterestNode;
 import pl.recommendations.db.interest.InterestNodeRepository;
 import pl.recommendations.db.person.PersonNode;
@@ -20,11 +21,15 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
     private final static Logger logger = LogManager.getLogger(EmbeddedCrawlerEndpoint.class.getName());
 
     @Autowired
-    private CrawlerScheduler scheduler;
+    @Qualifier("crawlerScheduler")
+    private CrawlerService scheduler;
+
     @Autowired
     protected CrawledDataCache cache;
+
     @Autowired
     protected InterestNodeRepository interestsRepo;
+
     @Autowired
     protected PersonNodeRepository peopleRepo;
 
@@ -65,7 +70,7 @@ public abstract class EmbeddedCrawlerEndpoint implements CrawlerEndpoint {
         if (personNode != null) {
             friends.stream()
                     .map(peopleRepo::findByUuid)
-                    .forEach(personNode::addFriend);
+                    .forEach(friendNode ->  peopleRepo.addFriend(personNode, friendNode));
         } else {
             logger.debug("Cannot add friends to non-existing user");
         }

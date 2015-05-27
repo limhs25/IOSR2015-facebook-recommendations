@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.db.queue.PersistentQueueFacade;
 import pl.recommendations.db.queue.core.QueueNode;
 import pl.recommendations.db.queue.exceptions.EmptyQueueException;
@@ -15,8 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-
-@Service
+@Service("crawlerScheduler")
 public class CrawlerScheduler implements CrawlerService {
     private static final Logger logger = LogManager.getLogger(CrawlerScheduler.class);
 

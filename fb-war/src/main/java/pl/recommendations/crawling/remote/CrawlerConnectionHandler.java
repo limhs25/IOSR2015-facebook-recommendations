@@ -3,10 +3,10 @@ package pl.recommendations.crawling.remote;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import pl.recommendations.crawling.CrawledDataCache;
 import pl.recommendations.crawling.CrawledDataListener;
-import pl.recommendations.crawling.CrawlerScheduler;
 import pl.recommendations.crawling.CrawlerService;
 import pl.recommendations.crawling.remote.messages.notice.AddFriends;
 import pl.recommendations.crawling.remote.messages.notice.AddInterests;
@@ -30,7 +30,9 @@ public class CrawlerConnectionHandler implements CrawlerService, CrawledDataList
     public static final Logger logger = LogManager.getLogger(CrawlerConnectionHandler.class.getName());
 
     @Autowired
-    private CrawlerScheduler scheduler;
+    @Qualifier("crawlerScheduler")
+    private CrawlerService scheduler;
+
     @Autowired
     protected CrawledDataCache cache;
 
