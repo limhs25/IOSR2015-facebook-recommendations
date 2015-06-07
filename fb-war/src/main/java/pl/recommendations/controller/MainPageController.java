@@ -1,7 +1,8 @@
 package pl.recommendations.controller;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterators;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -11,10 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 import pl.recommendations.analyse.AnalyseService;
 import pl.recommendations.analyse.Metric;
-import pl.recommendations.analyse.metrices.AdamicAdarMetric;
-import pl.recommendations.analyse.metrices.CommonNeighbourMetric;
-import pl.recommendations.analyse.metrices.JaccardMetric;
-import pl.recommendations.analyse.metrices.ResourceAllocationMetric;
 import pl.recommendations.controller.data.CustomDatabaseFiles;
 import pl.recommendations.controller.data.SingleDatabaseFile;
 import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
@@ -26,15 +23,17 @@ import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by marekmagik on 2015-01-19.
  */
 @RestController
 public class MainPageController {
+    private static final Logger logger = LogManager.getLogger(MainPageController.class.getSimpleName());
+
     private static final String LOGIN_VIEW_NAME = "login";
     private static final String MAIN_VIEW_NAME = "main";
+    private static final String RESULTS_NAME = "results";
 
     @Autowired
     @Qualifier("fileRepositoryCrawlerService")
@@ -52,15 +51,16 @@ public class MainPageController {
     private AnalyseService analysis;
 
     @Autowired
-    private AdamicAdarMetric adamicAdarMetric;
+    @Qualifier("AdamicAdarMetric")
+    private Metric adamicAdarMetric;
     @Autowired
-    private CommonNeighbourMetric commonNeighbourMetric;
+    @Qualifier("CommonNeighbourMetric")
+    private Metric commonNeighbourMetric;
     @Autowired
-    private JaccardMetric jaccardMetric;
-    @Autowired
-    private ResourceAllocationMetric resourceAllocationMetric;
+    @Qualifier("ResourceAllocationMetric")
+    private Metric resourceAllocationMetric;
 
-    private final List<Metric> metrics = ImmutableList.of(adamicAdarMetric, commonNeighbourMetric, jaccardMetric, resourceAllocationMetric);
+
 
     @RequestMapping("/")
     public ModelAndView showLoginForm() {
@@ -117,11 +117,19 @@ public class MainPageController {
         System.out.println("size after" + Iterators.size(interestRepo.findAll().iterator()));
     }
 
-    @RequestMapping(value = "calculate", method = RequestMethod.POST)
-    public void calculate(){
-        metrics.stream().map(m -> {
-            analysis.setMetric(m);
+    @RequestMapping(value = "suggest", method = RequestMethod.POST)
+    public ModelAndView getSuggestions(){
+        ModelAndView mv = new ModelAndView(RESULTS_NAME);
+        try {
+            analysis.setMetric(resourceAllocationMetric);
             analysis.analyse();
-        })
+            Double quality = personRepo.getSuggestionQuality();
+            logger.info("Quality: {}", quality);
+            mv.addObject("adamic", quality);
+        }catch(Exception e){
+            logger.error("Error during suggesting: {}", e.getMessage(), e);
+        }
+
+        return mv;
     }
 }

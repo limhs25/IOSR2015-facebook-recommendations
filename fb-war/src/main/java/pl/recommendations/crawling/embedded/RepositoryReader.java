@@ -17,6 +17,9 @@ public class RepositoryReader {
 
         if(random.nextDouble() < RETAIN_EDGES){
             friendship.setType(FriendshipType.RETAINED);
+        }else{
+            friendship.setType(FriendshipType.COMMON);
+
         }
 
         return friendship;

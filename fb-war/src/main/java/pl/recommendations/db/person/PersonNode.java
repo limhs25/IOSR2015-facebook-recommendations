@@ -87,4 +87,9 @@ public class PersonNode extends Node {
             suggestionEdges.add(suggestionEdge);
         }
     }
+
+    @Override
+    public String toString() {
+        return uuid.toString();
+    }
 }

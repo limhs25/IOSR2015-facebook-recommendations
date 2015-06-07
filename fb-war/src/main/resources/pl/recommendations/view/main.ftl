@@ -84,6 +84,10 @@
             <form id="clear" method="post" action="/twitter/clear" enctype="multipart/form-data">
                 <button class="clear-db-button">clear</button>
             </form>
+
+            <form id="clear" method="post" action="/twitter//suggest" enctype="multipart/form-data">
+                <button class="clear-db-button">suggest</button>
+            </form>
         </div>
 
 

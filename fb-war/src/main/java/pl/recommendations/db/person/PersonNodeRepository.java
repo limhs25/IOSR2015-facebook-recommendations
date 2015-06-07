@@ -53,6 +53,11 @@ public interface PersonNodeRepository extends NodeRepository {
             "return end")
     Long getCommonFriend(Long firstUUID, Long secondUUID);
 
+    @Query("match (b)-[s:FRIENDSHIP{type:'RETAINED'}]->(e)\n" +
+            "with b, s, e, count(s) as totalRetained\n" +
+            "match (b)-[r:" + RelationshipType.SUGGESTION + "]->(e)\n" +
+            "return totalRetained"            )
+    Double getSuggestionQuality();
 
     default void addInterest(PersonNode personNode, InterestNode interestNode, Long weight) {
         Preconditions.checkArgument(weight > 0);

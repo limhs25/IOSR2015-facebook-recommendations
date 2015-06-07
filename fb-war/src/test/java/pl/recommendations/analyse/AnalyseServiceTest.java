@@ -32,7 +32,7 @@ public class AnalyseServiceTest {
     private PersonNodeRepository personRepo;
 
     @Autowired
-    @Qualifier("JaccardMetric")
+    @Qualifier("CommonNeighbourMetric")
     private Metric metric;
     @Test
     public void analyseNode() {
@@ -63,7 +63,7 @@ public class AnalyseServiceTest {
 
         int suggestionSize = 5;
 
-        analyseService.analyse(0l, suggestionSize);
+        analyseService.analyse();
 
         Collection<SuggestionEdge> suggestionOf = personRepo.getSuggestionOf(0l);
 

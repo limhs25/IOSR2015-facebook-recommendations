@@ -8,6 +8,7 @@ import pl.recommendations.db.person.PersonNode;
 import pl.recommendations.db.person.PersonNodeRepository;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AnalyseServiceImpl implements AnalyseService {
@@ -16,17 +17,20 @@ public class AnalyseServiceImpl implements AnalyseService {
     @Autowired
     private PersonNodeRepository personRepo;
 
-
     private Metric metric;
 
     @Override
     public void analyse() {
-        List<Long> suggestions = metric.getSuggestionList(uuid);
+        Map<PersonNode, List<PersonNode>> suggestions = metric.getSuggestions();
+        logger.info("Suggestions: {}", suggestions.size());
 
-        for (int i = 0; i < suggestionSize && i < suggestions.size(); i++) {
-            personRepo.addSuggestion(personNode, personRepo.findByUuid(suggestions.get(i)));
+        for (Map.Entry<PersonNode, List<PersonNode>> entry : suggestions.entrySet()) {
+            PersonNode node1 = entry.getKey();
+            for (PersonNode suggestion : entry.getValue()) {
+                personRepo.addSuggestion(node1, suggestion);
+                logger.info("Suggesting {} to {}", node1, suggestion);
+            }
         }
-
     }
 
     public void setMetric(Metric metric) {

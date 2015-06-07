@@ -73,9 +73,7 @@ public class PajekNetRepositoryReader {
             PersonNode person = resolvePerson(uuid1);
             PersonNode friend = resolvePerson(uuid2);
 
-            FriendshipEdge friendship = new FriendshipEdge();
-            friendship.setPersonNode(person);
-            friendship.setFriend(friend);
+            FriendshipEdge friendship = RepositoryReader.createFriendship(person, friend);
 
             peopleRelations.get(person).add(friendship);
         }
