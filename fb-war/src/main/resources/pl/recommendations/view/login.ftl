@@ -25,10 +25,10 @@
 </nav>
 <div class="jumbotron">
     <div class="container">
-        <h1>Need more friends ? We can lend a hand !</h1>
+        <h1>Need more friends ?</h1>
+        <h1>We can lend a hand !</h1>
 
         <p>To run application login by Twitter !</p>
-
         <p><a class="btn btn-primary btn-lg" href="twitter-login.htm" role="button">Login &raquo;</a></p>
     </div>
 </div>
@@ -39,7 +39,7 @@
     </footer>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="<@spring.url '/twitter/resources/js/jquery-2.1.3.js'/>"></script>
 <script src="<@spring.url '/twitter/resources/js/bootstrap.js'/>"></script>
 </body>
 </html>

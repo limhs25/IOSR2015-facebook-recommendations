@@ -16,7 +16,7 @@
 <#macro commonHeader>
 <link href="<@spring.url '/twitter/resources/css/style.css'/>" rel="stylesheet" type="text/css">
 <link href="<@spring.url '/twitter/resources/css/buttons.css'/>" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="<@spring.url '/fb/resources/js/jquery-2.1.3.js'/>"></script>
+<script type="text/javascript" src="<@spring.url '/twitter/resources/js/jquery-2.1.3.js'/>"></script>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <title>Twitter Recommendations</title>
 </#macro>

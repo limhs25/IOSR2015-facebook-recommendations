@@ -1,5 +1,6 @@
 package pl.recommendations.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -22,22 +23,21 @@ public class MainPageController {
 
     private static final String MAIN_VIEW_NAME = "main";
 
+    @Autowired
+    private TwitterSLO twitterSLO;
+
     @RequestMapping("/")
     public ModelAndView showLoginForm() {
         return new ModelAndView(LOGIN_VIEW_NAME);
     }
 
     @RequestMapping("/main")
-    public ModelAndView showMainForm(HttpSession session) {
+    public ModelAndView showMainForm(HttpSession session) throws TwitterException {
         ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
         mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
 
-        /* Test users list until analiser is implemented */
-        ArrayList<String> users = new ArrayList<String>();
-        users.add("User1");
-        users.add("User2");
-        users.add("User3");
-        mv.addObject("recommendedUsers", users);
+        Twitter twitter = (Twitter) session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE);
+        mv.addObject("recommendedUsers", twitterSLO.getRecommendations(twitter));
 
         return mv;
     }

@@ -35,45 +35,21 @@
                 <li><a href="graph.htm">Neo4j Graph</a></li>
             </ul>
         </div>
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 col-lg-10 col-lg-offset-2 main">
-            <h2 class="page-header">Dashboard</h2>
-            <h4>Username: <a href="https://twitter.com/${twitter.screenName}">${twitter.screenName}</a></h4>
-            <h4>Twitter ID: ${twitter.id}</h4>
-            <hr>
-            <h2 class="page-header">People You should stalk !</h2>
-        <#if recommendedUsers?has_content>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        <#list recommendedUsers as user>
-                        <tr>
-                            <td>${user_index + 1}</td>
-                            <td>${user}</td>
-                        </tr>
-                        </#list>
-                    </tbody>
-                </table>
-            </div>
-        <#else>
-            <h4>Nobody has been found to stalk :( ! Please try again after few minutes...</h4>
-        </#if>
+        <div id="sigma-parent" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 col-lg-10 col-lg-offset-2 main">
+            <div id="sigma-container"><input type="hidden" id="graph-data" value='${graphData}'/></div>
         </div>
     </div>
 </div>
 <div class="container">
     <hr>
     <footer>
-        <p>&copy; IOSR 2015</p>
+        <p>&copy; IOSR Twitter Recommendations
+            2015</p>
     </footer>
 </div>
-
-<script src="<@spring.url '/twitter/resources/js/jquery-2.1.3.js'/>"></script>
-<script src="<@spring.url '/twitter/resources/js/bootstrap.js'/>"></script>
+<script type="text/javascript" src="<@spring.url '/twitter/resources/js/jquery-2.1.3.js'/>"></script>
+<script type="text/javascript" src="<@spring.url '/twitter/resources/js/bootstrap.js'/>"></script>
+<script type="text/javascript" src="<@spring.url '/twitter/resources/js/sigma.min.js'/>"></script>
+<script type="text/javascript" src="<@spring.url '/twitter/resources/js/graph.js'/>"></script>
 </body>
 </html>
