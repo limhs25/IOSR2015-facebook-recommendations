@@ -5,6 +5,7 @@ import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pl.recommendations.analyse.Metric;
+import pl.recommendations.db.SuggestionType;
 
 @Transactional
 @Component("JaccardMetric")
@@ -38,4 +39,16 @@ public class JaccardMetric implements Metric {
     public String getQuery(Long count) {
         return query;
     }
+
+    @Override
+    public SuggestionType getType() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return "null";
+    }
+
+
 }

@@ -3,6 +3,7 @@ package pl.recommendations.analyse;
 import org.springframework.data.neo4j.conversion.Result;
 import org.springframework.data.neo4j.support.Neo4jTemplate;
 import org.springframework.transaction.annotation.Transactional;
+import pl.recommendations.db.SuggestionType;
 import pl.recommendations.db.person.PersonNode;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Map;
 public interface Metric {
     Neo4jTemplate getNeo4jTemplate();
     String getQuery(Long count);
+    SuggestionType getType();
 
     default Map<PersonNode, List<PersonNode>> getSuggestions(Long count){
         Map<PersonNode, List<PersonNode>> result = new HashMap<>();
@@ -34,4 +36,6 @@ public interface Metric {
 
         return result;
     }
+
+    String getName();
 }

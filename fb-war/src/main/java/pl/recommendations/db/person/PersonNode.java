@@ -2,10 +2,15 @@ package pl.recommendations.db.person;
 
 import com.google.common.collect.ImmutableSet;
 import org.neo4j.graphdb.Direction;
-import org.springframework.data.neo4j.annotation.*;
+import org.springframework.data.neo4j.annotation.Fetch;
+import org.springframework.data.neo4j.annotation.Indexed;
+import org.springframework.data.neo4j.annotation.NodeEntity;
+import org.springframework.data.neo4j.annotation.RelatedToVia;
 import pl.recommendations.db.Node;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @NodeEntity
@@ -22,8 +27,6 @@ public class PersonNode extends Node {
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<FriendshipEdge> friendshipEdges = new HashSet<>();
 
-    @RelatedToVia(direction = Direction.OUTGOING)
-    private Set<InterestEdge> interestEdges = new HashSet<>();
     @RelatedToVia(direction = Direction.OUTGOING)
     private Set<SuggestionEdge> suggestionEdges = new HashSet<>();
 
@@ -63,7 +66,7 @@ public class PersonNode extends Node {
     }
 
     public Set<InterestEdge> getInterestEdges() {
-        return interestEdges;
+        return Collections.emptySet();
     }
 
     public Set<SuggestionEdge> getSuggestionEdges() {
@@ -77,15 +80,17 @@ public class PersonNode extends Node {
     }
 
     public void addInterest(InterestEdge interestEdge) {
-        if(!interestEdges.contains(interestEdge)){
-            interestEdges.add(interestEdge);
-        }
+       
     }
 
     public void addSuggestionEdge(SuggestionEdge suggestionEdge) {
         if(!suggestionEdges.contains(suggestionEdge)) {
             suggestionEdges.add(suggestionEdge);
         }
+    }
+
+    public void addSuggestions(List<SuggestionEdge> ss){
+        suggestionEdges.addAll(ss);
     }
 
     @Override

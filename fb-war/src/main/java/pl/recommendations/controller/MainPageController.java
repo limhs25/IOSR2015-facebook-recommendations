@@ -121,15 +121,26 @@ public class MainPageController {
     public ModelAndView getSuggestions(){
         ModelAndView mv = new ModelAndView(RESULTS_NAME);
         try {
-            analysis.setMetric(commonNeighbourMetric);
-            analysis.analyse();
-            Double quality = personRepo.getSuggestionQuality();
-            logger.info("Quality: {}", quality);
-            mv.addObject("adamic", quality);
+            logger.info("Starting analysis");
+            Double adamicQuality = getMetricQuality(adamicAdarMetric);
+            Double resourceQuality = getMetricQuality(resourceAllocationMetric);
+            Double commonQuality = getMetricQuality(commonNeighbourMetric);
+
+            mv.addObject("adamic", adamicQuality);
+            mv.addObject("resource", resourceQuality);
+            mv.addObject("common", commonQuality);
         }catch(Exception e){
             logger.error("Error during suggesting: {}", e.getMessage(), e);
         }
 
         return mv;
+    }
+
+    private Double getMetricQuality(Metric metric) {
+        analysis.setMetric(metric);
+        analysis.analyse();
+        Double quality = personRepo.getSuggestionQuality(metric.getType());
+        logger.info("Quality for {} = {}", metric.getName(), quality);
+        return quality;
     }
 }

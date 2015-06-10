@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.recommendations.db.person.PersonNode;
 import pl.recommendations.db.person.PersonNodeRepository;
+import pl.recommendations.db.person.SuggestionEdge;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class AnalyseServiceImpl implements AnalyseService {
@@ -28,10 +30,18 @@ public class AnalyseServiceImpl implements AnalyseService {
 
         for (Map.Entry<PersonNode, List<PersonNode>> entry : suggestions.entrySet()) {
             PersonNode node1 = entry.getKey();
-            for (PersonNode suggestion : entry.getValue()) {
-                personRepo.addSuggestion(node1, suggestion);
-                logger.info("Suggesting {} to {}", node1, suggestion);
-            }
+
+            List<SuggestionEdge> ss = entry.getValue().stream().map(suggestion -> {
+                SuggestionEdge edge = new SuggestionEdge();
+                edge.setPersonNode(node1);
+                edge.setSuggestion(suggestion);
+                edge.setType(metric.getType());
+                return edge;
+            }).collect(Collectors.toList());
+
+            personRepo.addSuggestions(node1, ss);
+            logger.info("Suggesting {} friends to {}", ss.size(), node1);
+
         }
     }
 

@@ -7,7 +7,7 @@ import pl.recommendations.db.person.PersonNode;
 import java.util.Random;
 
 public class RepositoryReader {
-    public static final double RETAIN_EDGES = 0.3;
+    public static final double RETAIN_EDGES = 0.33;
     private static Random random = new Random();;
 
     public static FriendshipEdge createFriendship(PersonNode person, PersonNode friend) {

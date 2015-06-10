@@ -6,6 +6,7 @@ import org.springframework.data.neo4j.annotation.RelationshipEntity;
 import org.springframework.data.neo4j.annotation.StartNode;
 import pl.recommendations.db.Edge;
 import pl.recommendations.db.RelationshipType;
+import pl.recommendations.db.SuggestionType;
 
 @RelationshipEntity(type = RelationshipType.SUGGESTION)
 public class SuggestionEdge extends Edge {
@@ -16,6 +17,8 @@ public class SuggestionEdge extends Edge {
     @EndNode
     @Fetch
     private PersonNode suggestion;
+
+    private SuggestionType type;
 
     public PersonNode getPersonNode(){
         return personNode;
@@ -33,4 +36,11 @@ public class SuggestionEdge extends Edge {
         this.suggestion = suggestion;
     }
 
+    public SuggestionType getType() {
+        return type;
+    }
+
+    public void setType(SuggestionType type) {
+        this.type = type;
+    }
 }

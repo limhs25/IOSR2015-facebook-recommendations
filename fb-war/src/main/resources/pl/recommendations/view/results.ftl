@@ -17,5 +17,7 @@
 </head>
 <body>
     adamic: ${adamic}
+    common neighbour: ${common}
+    resource allocation: ${resource}
 </body>
 </html>

@@ -21,7 +21,7 @@
         <property name="basePackage" value="pl.recommendations.db"/>
     </bean>
 
-    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/db-com"/>
+    <neo4j:config base-package="pl.recommendations.db" storeDirectory="data/db-d"/>
     <neo4j:repositories base-package="pl.recommendations"/>
 
     <context:component-scan base-package="pl.recommendations"/>
