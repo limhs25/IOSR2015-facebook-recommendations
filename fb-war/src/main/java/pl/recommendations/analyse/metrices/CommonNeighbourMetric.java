@@ -28,10 +28,10 @@ public class CommonNeighbourMetric implements Metric {
                     "with begin, middle,new_friend, count(middle) as friendliness\n" + //
                     "return begin, new_friend,friendliness\n" + //
                     "order by friendliness DESC\n" + //
-                    "limit 50;";
+                    "limit ";
 
     @Override
-    public String getQuery() {
-        return query;
+    public String getQuery(Long count) {
+        return query + count.toString() + ";";
     }
 }

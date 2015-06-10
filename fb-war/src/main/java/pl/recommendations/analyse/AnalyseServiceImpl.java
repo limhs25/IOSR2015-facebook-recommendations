@@ -21,7 +21,9 @@ public class AnalyseServiceImpl implements AnalyseService {
 
     @Override
     public void analyse() {
-        Map<PersonNode, List<PersonNode>> suggestions = metric.getSuggestions();
+        Long count = personRepo.getRetainedAmount();
+        logger.info("retained suggestions: " + count);
+        Map<PersonNode, List<PersonNode>> suggestions = metric.getSuggestions(count);
         logger.info("Suggestions: {}", suggestions.size());
 
         for (Map.Entry<PersonNode, List<PersonNode>> entry : suggestions.entrySet()) {

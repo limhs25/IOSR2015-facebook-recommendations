@@ -40,24 +40,27 @@ public interface PersonNodeRepository extends NodeRepository {
         }
     }
 
-    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP+ "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]- (end) " +
+    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP + "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]- (end) " +
             "where begin.uuid = {0} and end.uuid = {1} " +
             "return count(middle)")
-     Long countCommonFriend(Long firstUUID, Long secondUUID);
+    Long countCommonFriend(Long firstUUID, Long secondUUID);
 
 
-    @Query("match (begin)-[:"+RelationshipType.FRIENDSHIP+"]->(middle)<-[:"+RelationshipType.FRIENDSHIP +"]-(end)\n" +
+    @Query("match (begin)-[:" + RelationshipType.FRIENDSHIP + "]->(middle)<-[:" + RelationshipType.FRIENDSHIP + "]-(end)\n" +
             "with end, count(middle) as cnt\n" +
             "where begin.uuid = {0} and end.uuid = {1} and cnt > 5\n" +
             "order by cnt\n" +
             "return end")
     Long getCommonFriend(Long firstUUID, Long secondUUID);
 
-    @Query("match (b)-[s:FRIENDSHIP{type:'RETAINED'}]->(e)\n" +
-            "with b, s, e, count(s) as totalRetained\n" +
-            "match (b)-[r:" + RelationshipType.SUGGESTION + "]->(e)\n" +
-            "return totalRetained"            )
+    @Query("match (b)-[r:FRIENDSHIP{type:'RETAINED'}]-(c)\n" +
+            "\twith count(r) as totalRet\n" +
+            "match (a)-[r:FRIENDSHIP{type:'RETAINED'}]-(c)-[s:SUGGESTION]-(a)\n" +
+            "\treturn count(r) * 1.0 / totalRet")
     Double getSuggestionQuality();
+
+    @Query("match ()-[r:FRIENDSHIP{type:'RETAINED'}]-() return count(r)")
+    Long getRetainedAmount();
 
     default void addInterest(PersonNode personNode, InterestNode interestNode, Long weight) {
         Preconditions.checkArgument(weight > 0);
@@ -78,6 +81,8 @@ public interface PersonNodeRepository extends NodeRepository {
             suggestionEdge.setPersonNode(personNode);
             suggestionEdge.setSuggestion(suggestion);
             personNode.addSuggestionEdge(suggestionEdge);
-            }
         }
+    }
+
+
 }

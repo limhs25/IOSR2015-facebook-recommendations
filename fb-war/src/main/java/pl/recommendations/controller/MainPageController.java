@@ -121,7 +121,7 @@ public class MainPageController {
     public ModelAndView getSuggestions(){
         ModelAndView mv = new ModelAndView(RESULTS_NAME);
         try {
-            analysis.setMetric(resourceAllocationMetric);
+            analysis.setMetric(commonNeighbourMetric);
             analysis.analyse();
             Double quality = personRepo.getSuggestionQuality();
             logger.info("Quality: {}", quality);

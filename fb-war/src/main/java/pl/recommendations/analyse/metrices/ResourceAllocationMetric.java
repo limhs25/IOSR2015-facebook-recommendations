@@ -29,10 +29,10 @@ public class ResourceAllocationMetric implements Metric {
                     "with begin,new_friend,sum(1.0/friendliness) as score\n" +//
                     "return begin,new_friend,score \n" +//
                     "order by score DESC\n" +//
-                    "limit 50;";
+                    "limit ";
 
     @Override
-    public String getQuery() {
-        return query;
+    public String getQuery(Long count) {
+        return query+ count.toString() + ";";
     }
 }

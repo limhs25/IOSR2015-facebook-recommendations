@@ -35,7 +35,7 @@ public class JaccardMetric implements Metric {
 
 
     @Override
-    public String getQuery() {
+    public String getQuery(Long count) {
         return query;
     }
 }

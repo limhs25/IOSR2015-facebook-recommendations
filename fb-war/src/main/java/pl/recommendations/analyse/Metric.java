@@ -13,13 +13,13 @@ import java.util.Map;
 @Transactional
 public interface Metric {
     Neo4jTemplate getNeo4jTemplate();
-    String getQuery();
+    String getQuery(Long count);
 
-    default Map<PersonNode, List<PersonNode>> getSuggestions(){
+    default Map<PersonNode, List<PersonNode>> getSuggestions(Long count){
         Map<PersonNode, List<PersonNode>> result = new HashMap<>();
         Map<String, Object> map = new HashMap<>();
 
-        Result<Map<String, Object>> mapResult = getNeo4jTemplate().query(getQuery(), map);
+        Result<Map<String, Object>> mapResult = getNeo4jTemplate().query(getQuery(count), map);
 
         for (Map<String, Object> r : mapResult) {
             PersonNode begin = getNeo4jTemplate().convert(r.get("begin"), PersonNode.class);

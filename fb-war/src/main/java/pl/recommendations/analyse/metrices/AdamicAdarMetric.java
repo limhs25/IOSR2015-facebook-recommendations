@@ -30,10 +30,10 @@ public class AdamicAdarMetric implements Metric {
                     "with begin, new_friend,sum(1.0/log(friendliness)) as score\n" + //
                     "return begin, new_friend\n" + //
                     "order by score DESC\n" + //
-                    "limit 50;";
+                    "limit ";
 
     @Override
-    public String getQuery(){
-        return query;
+    public String getQuery(Long count){
+        return query + count.toString() + ";";
     }
 }
