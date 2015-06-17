@@ -92,37 +92,19 @@
 
 
         <div class="col-sm-9 col-md-10 main">
-            <h2 class="page-header">Dashboard</h2>
-            <h4>Username: ${twitter.screenName}</h4>
-            <h4>Twitter ID: ${twitter.id}</h4>
+            <h3 class="page-header">Link prediction results [%]</h3>
 
-            <h2 class="page-header">People You should stalk !</h2>
+            <h4>adamic: ${adamic}% <br></h4>
+            <h4>common neighbour: ${common}%<br></h4>
+            <h4>resource allocation: ${resource}%<br></h4>
 
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <#list recommendedUsers as user>
-                    <tr>
-                        <td>${user_index + 1}</td>
-                        <td>${user}</td>
-                    </tr>
-                    </#list>
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
 </div>
 <div class="container">
     <hr>
     <footer>
-        <p>&copy; IOSR 2015</p>
+        <p>&copy; TOiK 2015</p>
     </footer>
 </div>
 

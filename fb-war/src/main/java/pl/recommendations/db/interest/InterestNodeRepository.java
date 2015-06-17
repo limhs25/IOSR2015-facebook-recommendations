@@ -7,6 +7,7 @@ import pl.recommendations.db.NodeRepository;
 public interface InterestNodeRepository extends NodeRepository {
     InterestNode findByName(String interestName);
 
-    @Override
-    void deleteAll();
+    default void clear(){
+        delete(findAll());
+    }
 }

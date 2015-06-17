@@ -1,6 +1,5 @@
 package pl.recommendations.controller;
 
-import com.google.common.collect.Iterators;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,6 @@ import pl.recommendations.db.person.PersonNodeRepository;
 import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 
 /**
  * Created by marekmagik on 2015-01-19.
@@ -61,7 +59,6 @@ public class MainPageController {
     private Metric resourceAllocationMetric;
 
 
-
     @RequestMapping("/")
     public ModelAndView showLoginForm() {
         return new ModelAndView(LOGIN_VIEW_NAME);
@@ -69,67 +66,58 @@ public class MainPageController {
 
     @RequestMapping("/main")
     public ModelAndView showMainForm(HttpSession session) {
-        ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
-        mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
-        mv.addObject("customFiles", new CustomDatabaseFiles());
-        mv.addObject("stanfordInput", new SingleDatabaseFile());
-        mv.addObject("pajekInput", new SingleDatabaseFile());
-
-        /* Test users list until analiser is implemented */
-        ArrayList<String> users = new ArrayList<String>();
-        users.add("User1");
-        users.add("User2");
-        users.add("User3");
-        mv.addObject("recommendedUsers", users);
+        ModelAndView mv = getMainModel(session);
 
         return mv;
     }
 
     @RequestMapping(value = "/upload/custom", method = RequestMethod.POST)
-    public void uploadCustom(@ModelAttribute("customFiles") CustomDatabaseFiles files) {
+    public ModelAndView uploadCustom(@ModelAttribute("customFiles") CustomDatabaseFiles files) {
+        ModelAndView mv = getMainModel(null);
         fileRepositoryCrawler.readPeopleNodes(files.getPeopleNodesStream());
         fileRepositoryCrawler.readInterestNodes(files.getInterestNodesStream());
         fileRepositoryCrawler.readPeopleEdges(files.getPeopleEdgesStream());
         fileRepositoryCrawler.readInterestEdges(files.getInterestEdgesStream());
 
         fileRepositoryCrawler.persist();
+        return mv;
     }
 
     @RequestMapping(value = "/upload/stanford", method = RequestMethod.POST)
-    public void uploadStanford(@ModelAttribute("stanfordInput") SingleDatabaseFile file) {
+    public ModelAndView uploadStanford(@ModelAttribute("stanfordInput") SingleDatabaseFile file) {
+        ModelAndView mv = getMainModel(null);
         stanfordRepoReader.read(file.getPeopleEdgesStream());
+        return mv;
     }
 
     @RequestMapping(value = "/upload/pajek", method = RequestMethod.POST)
-    public void uploadPajek(@ModelAttribute("pajekInput") SingleDatabaseFile file) {
+    public ModelAndView uploadPajek(@ModelAttribute("pajekInput") SingleDatabaseFile file) {
+        ModelAndView mv = getMainModel(null);
         pajekRepoReader.read(file.getPeopleEdgesStream());
+        return mv;
     }
 
     @RequestMapping(value = "clear", method = RequestMethod.POST)
-    public void clearDatabase() {
-        System.out.println("size before" + Iterators.size(personRepo.findAll().iterator()));
-        System.out.println("size before" + Iterators.size(interestRepo.findAll().iterator()));
-
-        personRepo.deleteAll();
-        interestRepo.deleteAll();
-
-        System.out.println("size after" + Iterators.size(personRepo.findAll().iterator()));
-        System.out.println("size after" + Iterators.size(interestRepo.findAll().iterator()));
+    public ModelAndView clearDatabase(HttpSession session) {
+        ModelAndView mv = getMainModel(session);
+        personRepo.clear();
+        interestRepo.clear();
+        return mv;
     }
 
     @RequestMapping(value = "suggest", method = RequestMethod.POST)
-    public ModelAndView getSuggestions(){
-        ModelAndView mv = new ModelAndView(RESULTS_NAME);
+    public ModelAndView getSuggestions(HttpSession session) {
+        ModelAndView mv = getMainModel(session);
         try {
             logger.info("Starting analysis");
-            Double adamicQuality = getMetricQuality(adamicAdarMetric);
-            Double resourceQuality = getMetricQuality(resourceAllocationMetric);
-            Double commonQuality = getMetricQuality(commonNeighbourMetric);
+            Double adamicQuality = getMetricQuality(adamicAdarMetric) * 100.0d;
+            Double resourceQuality = getMetricQuality(resourceAllocationMetric) * 100.0d;
+            Double commonQuality = getMetricQuality(commonNeighbourMetric) * 100.0d;
 
             mv.addObject("adamic", adamicQuality);
             mv.addObject("resource", resourceQuality);
             mv.addObject("common", commonQuality);
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error("Error during suggesting: {}", e.getMessage(), e);
         }
 
@@ -142,5 +130,21 @@ public class MainPageController {
         Double quality = personRepo.getSuggestionQuality(metric.getType());
         logger.info("Quality for {} = {}", metric.getName(), quality);
         return quality;
+    }
+
+    private ModelAndView getMainModel(HttpSession session) {
+        ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
+        if (session != null)
+            mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
+
+        mv.addObject("customFiles", new CustomDatabaseFiles());
+        mv.addObject("stanfordInput", new SingleDatabaseFile());
+        mv.addObject("pajekInput", new SingleDatabaseFile());
+
+        mv.addObject("adamic", "NaN");
+        mv.addObject("resource", "NaN");
+        mv.addObject("common", "NaN");
+
+        return mv;
     }
 }

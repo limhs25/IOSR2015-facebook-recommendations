@@ -16,8 +16,9 @@
     <link href="<@spring.url '/twitter/resources/css/main.css'/>" rel="stylesheet">
 </head>
 <body>
-    adamic: ${adamic}
-    common neighbour: ${common}
-    resource allocation: ${resource}
+Reults of link predictions [%]
+    adamic: ${adamic} <br>
+    common neighbour: ${common}<br>
+    resource allocation: ${resource}<br>
 </body>
 </html>

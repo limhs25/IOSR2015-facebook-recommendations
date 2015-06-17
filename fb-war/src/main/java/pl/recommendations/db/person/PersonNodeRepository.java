@@ -25,8 +25,9 @@ public interface PersonNodeRepository extends NodeRepository {
 
     PersonNode findByUuid(Long uuid);
 
-    @Override
-    void deleteAll();
+  default void clear(){
+      delete(findAll());
+  }
 
     default void addFriend(PersonNode personNode, PersonNode friend) {
         if (friend != null && !friend.equals(personNode)) {
