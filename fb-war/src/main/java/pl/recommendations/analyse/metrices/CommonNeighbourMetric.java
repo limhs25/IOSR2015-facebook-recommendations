@@ -25,7 +25,7 @@ public class CommonNeighbourMetric implements Metric {
                     "match (begin)-[:FRIENDSHIP{type:'COMMON'}]-(middle)\n" + //
                     "with begin, middle\n" + //
                     "match (middle)-[:FRIENDSHIP{type:'COMMON'}]-(new_friend) \n" + //
-                    "where not (begin)-[:FRIENDSHIP{type:'COMMON'}]-(new_friend) and begin <> new_friend\n" + //
+                    "where not (begin)-[:FRIENDSHIP{type:'NEIGHBOUR'}]-(new_friend) and begin <> new_friend\n" + //
                     "with begin, middle,new_friend, count(middle) as friendliness\n" + //
                     "return begin, new_friend,friendliness\n" + //
                     "order by friendliness DESC\n" + //

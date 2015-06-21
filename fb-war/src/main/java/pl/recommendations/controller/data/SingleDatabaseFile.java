@@ -6,7 +6,7 @@ import pl.recommendations.exceptions.GettingInputStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class SingleDatabaseFile {
+public class SingleDatabaseFile extends DatabaseFile{
     private MultipartFile edges;
 
     public InputStream getPeopleEdgesStream()  {

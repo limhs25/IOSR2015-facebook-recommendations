@@ -17,16 +17,9 @@
 </head>
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-        <div class="innerInlineElement">
-            <img src="<@spring.url '/twitter/resources/images/top.png'/>" alt="top banner"/>
-        </div>
-    </div>
 </nav>
 <div class="jumbotron">
     <div class="container">
-        <h1>Need more friends ? We can lend a hand !</h1>
-
         <p>To run application login by Twitter !</p>
 
         <p><a class="btn btn-primary btn-lg" href="twitter-login.htm" role="button">Login &raquo;</a></p>

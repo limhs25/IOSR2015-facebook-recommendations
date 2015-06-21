@@ -1,5 +1,6 @@
 package pl.recommendations.slo;
 
+import pl.recommendations.db.SuggestionType;
 import twitter4j.TwitterException;
 
 import javax.servlet.ServletException;
@@ -17,5 +18,7 @@ public interface TwitterSLO {
 
     void login(HttpServletRequest request, HttpServletResponse response) throws TwitterException, IOException;
 
-    void loguot(HttpServletRequest request, HttpServletResponse response) throws IOException;
+    void logout(HttpServletRequest request, HttpServletResponse response) throws IOException;
+
+    String getGraphData(SuggestionType type);
 }

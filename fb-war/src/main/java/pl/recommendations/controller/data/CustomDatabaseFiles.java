@@ -6,7 +6,7 @@ import pl.recommendations.exceptions.GettingInputStreamException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class CustomDatabaseFiles {
+public class CustomDatabaseFiles  extends DatabaseFile{
     private MultipartFile peopleNodes;
     private MultipartFile interestNodes;
     private MultipartFile peopleEdges;

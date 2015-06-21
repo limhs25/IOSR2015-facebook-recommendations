@@ -23,6 +23,21 @@ public interface PersonNodeRepository extends NodeRepository {
             "return r")
     Collection<SuggestionEdge> getSuggestionOf(Long id);
 
+    @Query("match (u)-[r:" + RelationshipType.SUGGESTION + "]->(u2) " +
+            "where u.uuid = {0} and r.type = {1}" +
+            "return u2 ")
+    Collection<PersonNode> getSuggestionOf(Long id, String suggestionType);
+
+    @Query("match (u)-[:FRIENDSHIP{type:'RETAINED'}]->(u2) " +
+            "return u \n" +
+            "limit 50")
+    Collection<PersonNode> getPeopleWithRetainedEdges();
+
+    @Query("match (u)-[:FRIENDSHIP{type:'RETAINED'}]->(u2) \n" +
+            "where u.uuid = {0} \n" +
+            "return u2\n")
+    Collection<PersonNode> getRetainedEdges(Long id);
+
     PersonNode findByUuid(Long uuid);
 
   default void clear(){
@@ -62,4 +77,6 @@ public interface PersonNodeRepository extends NodeRepository {
     default void addSuggestions(PersonNode node1, List<SuggestionEdge> ss) {
         node1.addSuggestions(ss);
     }
+
+
 }

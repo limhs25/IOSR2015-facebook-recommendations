@@ -21,7 +21,7 @@ public class DatabaseConfiguration extends Neo4jConfiguration {
     public GraphDatabaseService graphDatabaseService() {
         return new GraphDatabaseFactory().
                 newEmbeddedDatabaseBuilder(DB).
-                setConfig(GraphDatabaseSettings.relationship_keys_indexable, "friend").
+                setConfig(GraphDatabaseSettings.relationship_keys_indexable, "p2").
                 setConfig(GraphDatabaseSettings.node_auto_indexing, "true").
                 setConfig(GraphDatabaseSettings.relationship_auto_indexing, "true").
                 newGraphDatabase();

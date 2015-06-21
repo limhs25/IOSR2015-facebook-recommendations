@@ -7,7 +7,7 @@ import pl.recommendations.db.person.PersonNode;
 import java.util.Random;
 
 public class RepositoryReader {
-    public static final double RETAIN_EDGES = 0.33;
+    public static double dropRatio = 0.33;
     private static Random random = new Random();;
 
     public static FriendshipEdge createFriendship(PersonNode person, PersonNode friend) {
@@ -15,7 +15,7 @@ public class RepositoryReader {
         friendship.setPersonNode(person);
         friendship.setFriend(friend);
 
-        if(random.nextDouble() < RETAIN_EDGES){
+        if(random.nextDouble() < dropRatio){
             friendship.setType(FriendshipType.RETAINED);
         }else{
             friendship.setType(FriendshipType.COMMON);
@@ -24,4 +24,9 @@ public class RepositoryReader {
 
         return friendship;
     }
+
+    public static void setDropRation(String value) {
+        dropRatio = Double.parseDouble(value);
+    }
+
 }

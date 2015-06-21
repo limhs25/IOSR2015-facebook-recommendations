@@ -15,9 +15,12 @@ import pl.recommendations.controller.data.CustomDatabaseFiles;
 import pl.recommendations.controller.data.SingleDatabaseFile;
 import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
 import pl.recommendations.crawling.embedded.PajekNetRepositoryReader;
+import pl.recommendations.crawling.embedded.RepositoryReader;
 import pl.recommendations.crawling.embedded.StanfordRepositoryReader;
+import pl.recommendations.db.SuggestionType;
 import pl.recommendations.db.interest.InterestNodeRepository;
 import pl.recommendations.db.person.PersonNodeRepository;
+import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
 
@@ -28,6 +31,8 @@ import javax.servlet.http.HttpSession;
 public class MainPageController {
     private static final Logger logger = LogManager.getLogger(MainPageController.class.getSimpleName());
 
+
+    private static final String GRAPH_VIEW_NAME = "graph";
     private static final String LOGIN_VIEW_NAME = "login";
     private static final String MAIN_VIEW_NAME = "main";
     private static final String RESULTS_NAME = "results";
@@ -57,9 +62,17 @@ public class MainPageController {
     @Qualifier("ResourceAllocationMetric")
     private Metric resourceAllocationMetric;
 
+    @Autowired
+    private TwitterSLO twitterSLO;
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
     @RequestMapping("/")
-    public ModelAndView showLoginForm(HttpSession session) {
-        return showMainForm(session);
+    public ModelAndView showLoginForm() {
+        return new ModelAndView(LOGIN_VIEW_NAME);
     }
 
     @RequestMapping("/main")
@@ -72,6 +85,7 @@ public class MainPageController {
     @RequestMapping(value = "/upload/custom", method = RequestMethod.POST)
     public ModelAndView uploadCustom(@ModelAttribute("customFiles") CustomDatabaseFiles files) {
         ModelAndView mv = getMainModel(null);
+        RepositoryReader.setDropRation(files.getDropRate());
         fileRepositoryCrawler.readPeopleNodes(files.getPeopleNodesStream());
         fileRepositoryCrawler.readInterestNodes(files.getInterestNodesStream());
         fileRepositoryCrawler.readPeopleEdges(files.getPeopleEdgesStream());
@@ -84,6 +98,7 @@ public class MainPageController {
     @RequestMapping(value = "/upload/stanford", method = RequestMethod.POST)
     public ModelAndView uploadStanford(@ModelAttribute("stanfordInput") SingleDatabaseFile file) {
         ModelAndView mv = getMainModel(null);
+        RepositoryReader.setDropRation(file.getDropRate());
         stanfordRepoReader.read(file.getPeopleEdgesStream());
         return mv;
     }
@@ -91,6 +106,7 @@ public class MainPageController {
     @RequestMapping(value = "/upload/pajek", method = RequestMethod.POST)
     public ModelAndView uploadPajek(@ModelAttribute("pajekInput") SingleDatabaseFile file) {
         ModelAndView mv = getMainModel(null);
+        RepositoryReader.setDropRation(file.getDropRate());
         pajekRepoReader.read(file.getPeopleEdgesStream());
         return mv;
     }
@@ -101,6 +117,27 @@ public class MainPageController {
         personRepo.clear();
         interestRepo.clear();
         return mv;
+    }
+
+    @RequestMapping(value = "/show/adamic", method = RequestMethod.POST)
+    public ModelAndView showAdamic(HttpSession session) {
+        ModelAndView view = new ModelAndView(GRAPH_VIEW_NAME);
+        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.ADAMIC));
+        return view;
+    }
+
+    @RequestMapping(value =  "/show/common", method = RequestMethod.POST)
+    public ModelAndView showCommon(HttpSession session) {
+        ModelAndView view = new ModelAndView(GRAPH_VIEW_NAME);
+        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.NEIGHBOUR));
+        return view;
+    }
+
+    @RequestMapping(value = "/show/resource", method = RequestMethod.POST)
+    public ModelAndView showResource(HttpSession session) {
+        ModelAndView view = new ModelAndView(GRAPH_VIEW_NAME);
+        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.RESOURCE));
+        return view;
     }
 
     @RequestMapping(value = "suggest", method = RequestMethod.POST)
@@ -115,6 +152,8 @@ public class MainPageController {
             mv.addObject("adamic", adamicQuality);
             mv.addObject("resource", resourceQuality);
             mv.addObject("common", commonQuality);
+
+            mv.addObject("display", "block");
         } catch (Exception e) {
             logger.error("Error during suggesting: {}", e.getMessage(), e);
         }
@@ -142,6 +181,8 @@ public class MainPageController {
         mv.addObject("adamic", "NaN");
         mv.addObject("resource", "NaN");
         mv.addObject("common", "NaN");
+
+        mv.addObject("display", "none");
 
         return mv;
     }

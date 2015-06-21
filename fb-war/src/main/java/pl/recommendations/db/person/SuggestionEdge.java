@@ -1,7 +1,6 @@
 package pl.recommendations.db.person;
 
 import org.springframework.data.neo4j.annotation.EndNode;
-import org.springframework.data.neo4j.annotation.Fetch;
 import org.springframework.data.neo4j.annotation.RelationshipEntity;
 import org.springframework.data.neo4j.annotation.StartNode;
 import pl.recommendations.db.Edge;
@@ -15,7 +14,6 @@ public class SuggestionEdge extends Edge {
     private PersonNode personNode;
 
     @EndNode
-    @Fetch
     private PersonNode suggestion;
 
     private SuggestionType type;

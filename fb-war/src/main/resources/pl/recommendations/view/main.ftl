@@ -22,10 +22,6 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-3 col-md-2 sidebar">
-            <ul class="nav nav-sidebar">
-                <li><a href="crawl.htm">Run crawler</a></li>
-            </ul>
-
             <form action="/dev/null">
                 <label>
                     <select class="data-input-type">
@@ -40,6 +36,8 @@
             <@spring.bind "pajekInput"/>
                 <form id="fill" method="post" action="/twitter/upload/pajek" enctype="multipart/form-data">
                     <fieldset>
+                    <@spring.bind "customFiles.dropRate"/>
+                        <input type="text" name="dropRate" id="file"/>
                     <@spring.bind "pajekInput.edges"/>
                         <input type="file" name="edges" id="file"/>
                     </fieldset>
@@ -50,6 +48,8 @@
             <@spring.bind "stanfordInput"/>
                 <form id="fill" method="post" action="/twitter/upload/stanford" enctype="multipart/form-data">
                     <fieldset>
+                    <@spring.bind "customFiles.dropRate"/>
+                        <input type="text" name="dropRate" id="file"/>
                     <@spring.bind "stanfordInput.edges"/>
                         <input type="file" name="edges" id="file"/>
                     </fieldset>
@@ -60,6 +60,8 @@
             <@spring.bind "customFiles"/>
                 <form id="fill" method="post" action="/twitter/upload/custom" enctype="multipart/form-data">
                     <fieldset>
+                    <@spring.bind "customFiles.dropRate"/>
+                        <input type="text" name="dropRate" id="file"/>
                     <@spring.bind "customFiles.peopleNodes"/>
                         <input type="file" name="peopleNodes" id="file"/>
                     <@spring.bind "customFiles.interestNodes"/>
@@ -86,9 +88,23 @@
         <div class="col-sm-9 col-md-10 main">
             <h3 class="page-header">Link prediction results [%]</h3>
 
-            <h4>adamic: ${adamic}% <br></h4>
-            <h4>common neighbour: ${common}%<br></h4>
-            <h4>resource allocation: ${resource}%<br></h4>
+            <h4>adamic: ${adamic}% </h4>
+            <form id="clear" method="post" action="/twitter/show/adamic" enctype="multipart/form-data">
+                <button class="clear-db-button">Show</button>
+            </form>
+            <br>
+
+            <h4>common neighbour: ${common}%</h4>
+            <form id="clear" method="post" action="/twitter/show/common" enctype="multipart/form-data">
+                <button class="clear-db-button">Show</button>
+            </form>
+            <br>
+
+            <h4>resource allocation: ${resource}%</h4>
+            <form id="clear" method="post" action="/twitter/show/resource" enctype="multipart/form-data">
+                <button class="clear-db-button">Show</button>
+            </form>
+            <br>
 
         </div>
     </div>
@@ -100,7 +116,7 @@
     </footer>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="<@spring.url '/twitter/resources/js/jquery-2.1.3.js'/>"></script>
 <script src="<@spring.url '/twitter/resources/js/bootstrap.js'/>"></script>
 <script>
 
@@ -120,7 +136,7 @@
             $('.custom-input').show();
         }
     })
-    
+
 </script>
 <script>
     $("#fill-button").onclick(function () {
