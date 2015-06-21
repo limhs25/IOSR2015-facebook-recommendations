@@ -28,8 +28,10 @@ public interface PersonNodeRepository extends NodeRepository {
             "return u2 ")
     Collection<PersonNode> getSuggestionOf(Long id, String suggestionType);
 
-    @Query("match (u)-[:FRIENDSHIP{type:'RETAINED'}]->(u2) " +
-            "return u \n" +
+    @Query("match (u)-[r:FRIENDSHIP{type:'RETAINED'}]->(u2) \n" +
+            "with u, count(r) as c\n" +
+            "where c > 2\n" +
+            "return u\n" +
             "limit 50")
     Collection<PersonNode> getPeopleWithRetainedEdges();
 
