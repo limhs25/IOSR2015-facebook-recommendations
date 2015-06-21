@@ -18,7 +18,6 @@ import pl.recommendations.crawling.embedded.PajekNetRepositoryReader;
 import pl.recommendations.crawling.embedded.StanfordRepositoryReader;
 import pl.recommendations.db.interest.InterestNodeRepository;
 import pl.recommendations.db.person.PersonNodeRepository;
-import pl.recommendations.slo.TwitterSLO;
 
 import javax.servlet.http.HttpSession;
 
@@ -58,10 +57,9 @@ public class MainPageController {
     @Qualifier("ResourceAllocationMetric")
     private Metric resourceAllocationMetric;
 
-
     @RequestMapping("/")
-    public ModelAndView showLoginForm() {
-        return new ModelAndView(LOGIN_VIEW_NAME);
+    public ModelAndView showLoginForm(HttpSession session) {
+        return showMainForm(session);
     }
 
     @RequestMapping("/main")
@@ -134,8 +132,8 @@ public class MainPageController {
 
     private ModelAndView getMainModel(HttpSession session) {
         ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
-        if (session != null)
-            mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
+//        if (session != null)
+//            mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
 
         mv.addObject("customFiles", new CustomDatabaseFiles());
         mv.addObject("stanfordInput", new SingleDatabaseFile());
