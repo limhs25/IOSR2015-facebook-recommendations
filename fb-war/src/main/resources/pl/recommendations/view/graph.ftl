@@ -35,7 +35,7 @@
             </ul>
         </div>
 
-        <div id="sigma-parent" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 col-lg-10 col-lg-offset-2 main">
+        <div id="sigma-parent" class="main">
             <div id="sigma-container"><input type="hidden" id="graph-data" value='${graphData}'/></div>
         </div>
     </div>

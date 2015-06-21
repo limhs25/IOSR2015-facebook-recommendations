@@ -8,9 +8,7 @@ import java.io.InputStream;
 
 public class CustomDatabaseFiles  extends DatabaseFile{
     private MultipartFile peopleNodes;
-    private MultipartFile interestNodes;
     private MultipartFile peopleEdges;
-    private MultipartFile interestEdges;
 
     public InputStream getPeopleNodesStream()  {
         try {
@@ -20,15 +18,7 @@ public class CustomDatabaseFiles  extends DatabaseFile{
         }
     }
 
-    public InputStream getInterestNodesStream()  {
-        try {
-            return interestNodes.getInputStream();
-        }catch (IOException e){
-            throw new GettingInputStreamException(e);
-        }
-    }
-
-    public InputStream getPeopleEdgesStream()  {
+   public InputStream getPeopleEdgesStream()  {
         try {
             return peopleEdges.getInputStream();
         }catch (IOException e){
@@ -36,14 +26,7 @@ public class CustomDatabaseFiles  extends DatabaseFile{
         }
     }
 
-    public InputStream getInterestEdgesStream()  {
-        try {
-            return interestEdges.getInputStream();
-        }catch (IOException e){
-            throw new GettingInputStreamException(e);
-        }
-    }
-    public MultipartFile getPeopleNodes() {
+       public MultipartFile getPeopleNodes() {
         return peopleNodes;
     }
 
@@ -51,13 +34,6 @@ public class CustomDatabaseFiles  extends DatabaseFile{
         this.peopleNodes = peopleNodes;
     }
 
-    public MultipartFile getInterestNodes() {
-        return interestNodes;
-    }
-
-    public void setInterestNodes(MultipartFile interestNodes) {
-        this.interestNodes = interestNodes;
-    }
 
     public MultipartFile getPeopleEdges() {
         return peopleEdges;
@@ -67,11 +43,4 @@ public class CustomDatabaseFiles  extends DatabaseFile{
         this.peopleEdges = peopleEdges;
     }
 
-    public MultipartFile getInterestEdges() {
-        return interestEdges;
-    }
-
-    public void setInterestEdges(MultipartFile interestEdges) {
-        this.interestEdges = interestEdges;
-    }
 }

@@ -37,7 +37,7 @@
                 <form id="fill" method="post" action="/twitter/upload/pajek" enctype="multipart/form-data">
                     <fieldset>
                     <@spring.bind "customFiles.dropRate"/>
-                        <input type="text" name="dropRate" id="file"/>
+                        <input type="text" name="dropRate" id="file" value="edge drop ratio">
                     <@spring.bind "pajekInput.edges"/>
                         <input type="file" name="edges" id="file"/>
                     </fieldset>
@@ -49,7 +49,7 @@
                 <form id="fill" method="post" action="/twitter/upload/stanford" enctype="multipart/form-data">
                     <fieldset>
                     <@spring.bind "customFiles.dropRate"/>
-                        <input type="text" name="dropRate" id="file"/>
+                        <input type="text" name="dropRate" id="file" value="edge drop ratio">
                     <@spring.bind "stanfordInput.edges"/>
                         <input type="file" name="edges" id="file"/>
                     </fieldset>
@@ -61,15 +61,11 @@
                 <form id="fill" method="post" action="/twitter/upload/custom" enctype="multipart/form-data">
                     <fieldset>
                     <@spring.bind "customFiles.dropRate"/>
-                        <input type="text" name="dropRate" id="file"/>
+                        <input type="text" name="dropRate" id="file" value="edge drop ratio">
                     <@spring.bind "customFiles.peopleNodes"/>
-                        <input type="file" name="peopleNodes" id="file"/>
-                    <@spring.bind "customFiles.interestNodes"/>
-                        <input type="file" name="interestNodes" id="file"/>
+                        <input type="file" name="peopleNodes" id="file" />
                     <@spring.bind "customFiles.peopleEdges"/>
                         <input type="file" name="peopleEdges" id="file"/>
-                    <@spring.bind "customFiles.interestEdges"/>
-                        <input type="file" name="interestEdges" id="file"/>
                     </fieldset>
                     <button id="fill-button" value="Submit">Fill</button>
                 </form>

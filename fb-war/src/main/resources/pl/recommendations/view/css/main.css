@@ -17,10 +17,12 @@ body {
 }
 
 #sigma-parent {
-    width: 768px;
-    height: 768px;
+    width: 850px;
+    height: 850px;
     position: relative;
 }
+
+
 
 #sigma-container {
     position: absolute;

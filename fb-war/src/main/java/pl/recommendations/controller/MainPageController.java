@@ -87,9 +87,7 @@ public class MainPageController {
         ModelAndView mv = getMainModel(null);
         RepositoryReader.setDropRation(files.getDropRate());
         fileRepositoryCrawler.readPeopleNodes(files.getPeopleNodesStream());
-        fileRepositoryCrawler.readInterestNodes(files.getInterestNodesStream());
         fileRepositoryCrawler.readPeopleEdges(files.getPeopleEdgesStream());
-        fileRepositoryCrawler.readInterestEdges(files.getInterestEdgesStream());
 
         fileRepositoryCrawler.persist();
         return mv;

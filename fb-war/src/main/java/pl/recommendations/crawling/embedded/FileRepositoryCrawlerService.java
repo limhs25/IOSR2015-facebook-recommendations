@@ -80,9 +80,7 @@ public class FileRepositoryCrawlerService implements FileRepositoryCrawler {
             PersonNode person = resolvePerson(id1);
             PersonNode friend = resolvePerson(id2);
 
-            FriendshipEdge friendship = new FriendshipEdge();
-            friendship.setPersonNode(person);
-            friendship.setFriend(friend);
+            FriendshipEdge friendship = RepositoryReader.createFriendship(person, friend);
 
             person.addFriendship(friendship);
         });
