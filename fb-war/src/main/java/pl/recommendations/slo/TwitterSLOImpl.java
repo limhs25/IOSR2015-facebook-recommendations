@@ -87,13 +87,13 @@ public class TwitterSLOImpl implements TwitterSLO {
     }
 
     @Override
-    public String getGraphData(SuggestionType type) {
+    public String getGraphData(SuggestionType type, Long edgeCount, Long limit) {
         JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 
         JsonArrayBuilder nodeArray = Json.createArrayBuilder();
         JsonArrayBuilder edgeArray = Json.createArrayBuilder();
 
-        Collection<PersonNode> peopleWithRetainedEdges = personRepo.getPeopleWithRetainedEdges();
+        Collection<PersonNode> peopleWithRetainedEdges = personRepo.getPeopleWithRetainedEdges(edgeCount, limit);
         logger.info("People with retained edges: {}", peopleWithRetainedEdges.size());
 
         Set<Long> nodes = new HashSet<>();

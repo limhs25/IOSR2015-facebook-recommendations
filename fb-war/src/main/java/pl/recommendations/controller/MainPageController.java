@@ -13,6 +13,7 @@ import pl.recommendations.analyse.AnalyseService;
 import pl.recommendations.analyse.Metric;
 import pl.recommendations.controller.data.CustomDatabaseFiles;
 import pl.recommendations.controller.data.SingleDatabaseFile;
+import pl.recommendations.controller.data.VisualizationForm;
 import pl.recommendations.crawling.embedded.FileRepositoryCrawler;
 import pl.recommendations.crawling.embedded.PajekNetRepositoryReader;
 import pl.recommendations.crawling.embedded.RepositoryReader;
@@ -118,23 +119,26 @@ public class MainPageController {
     }
 
     @RequestMapping(value = "/show/adamic", method = RequestMethod.POST)
-    public ModelAndView showAdamic(HttpSession session) {
+    public ModelAndView showAdamic(@ModelAttribute("adamicForm") VisualizationForm form) {
+        logger.info("form:" + form);
         ModelAndView view = new ModelAndView(GRAPH_VIEW_NAME);
-        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.ADAMIC));
+        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.ADAMIC, form.getCountLong(), form.getMaxNodesLong()));
         return view;
     }
 
-    @RequestMapping(value =  "/show/common", method = RequestMethod.POST)
-    public ModelAndView showCommon(HttpSession session) {
+    @RequestMapping(value = "/show/common", method = RequestMethod.POST)
+    public ModelAndView showCommon(@ModelAttribute("commonForm") VisualizationForm form) {
+        logger.info("form:" + form);
         ModelAndView view = new ModelAndView(GRAPH_VIEW_NAME);
-        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.NEIGHBOUR));
+        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.NEIGHBOUR, form.getCountLong(), form.getMaxNodesLong()));
         return view;
     }
 
     @RequestMapping(value = "/show/resource", method = RequestMethod.POST)
-    public ModelAndView showResource(HttpSession session) {
+    public ModelAndView showResource(@ModelAttribute("resForm") VisualizationForm form) {
+        logger.info("form:" + form);
         ModelAndView view = new ModelAndView(GRAPH_VIEW_NAME);
-        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.RESOURCE));
+        view.addObject("graphData", twitterSLO.getGraphData(SuggestionType.RESOURCE, form.getCountLong(), form.getMaxNodesLong()));
         return view;
     }
 
@@ -169,8 +173,8 @@ public class MainPageController {
 
     private ModelAndView getMainModel(HttpSession session) {
         ModelAndView mv = new ModelAndView(MAIN_VIEW_NAME);
-//        if (session != null)
-//            mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
+        if (session != null)
+            mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
 
         mv.addObject("customFiles", new CustomDatabaseFiles());
         mv.addObject("stanfordInput", new SingleDatabaseFile());
@@ -181,6 +185,10 @@ public class MainPageController {
         mv.addObject("common", "NaN");
 
         mv.addObject("display", "none");
+
+        mv.addObject("adamicForm", new VisualizationForm());
+        mv.addObject("commonForm", new VisualizationForm());
+        mv.addObject("resForm", new VisualizationForm());
 
         return mv;
     }

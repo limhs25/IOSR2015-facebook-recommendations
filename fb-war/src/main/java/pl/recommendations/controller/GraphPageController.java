@@ -28,7 +28,7 @@ public class GraphPageController {
         mv.addObject(TwitterSLO.TWITTER_SESSION_ATTRIBUTE, session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE));
 
         Twitter twitter = (Twitter) session.getAttribute(TwitterSLO.TWITTER_SESSION_ATTRIBUTE);
-        mv.addObject("graphData", twitterSLO.getGraphData(SuggestionType.NEIGHBOUR));
+        mv.addObject("graphData", twitterSLO.getGraphData(SuggestionType.NEIGHBOUR, 2l, 50l));
 
         return mv;
     }

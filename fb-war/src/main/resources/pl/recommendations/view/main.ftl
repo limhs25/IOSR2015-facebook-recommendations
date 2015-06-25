@@ -63,7 +63,7 @@
                     <@spring.bind "customFiles.dropRate"/>
                         <input type="text" name="dropRate" id="file" value="edge drop ratio">
                     <@spring.bind "customFiles.peopleNodes"/>
-                        <input type="file" name="peopleNodes" id="file" />
+                        <input type="file" name="peopleNodes" id="file"/>
                     <@spring.bind "customFiles.peopleEdges"/>
                         <input type="file" name="peopleEdges" id="file"/>
                     </fieldset>
@@ -85,19 +85,34 @@
             <h3 class="page-header">Link prediction results [%]</h3>
 
             <h4>adamic: ${adamic}% </h4>
+        <@spring.bind "adamicForm"/>
             <form id="clear" method="post" action="/twitter/show/adamic" enctype="multipart/form-data">
+            <@spring.bind "adamicForm.count"/>
+                <input type="text" name="count" id="file" value="removed edges count">
+            <@spring.bind "adamicForm.maxNodes"/>
+                <input type="text" name="maxNodes" id="file" value="max starting nodes">
                 <button class="clear-db-button">Show</button>
             </form>
             <br>
 
             <h4>common neighbour: ${common}%</h4>
+        <@spring.bind "commonForm"/>
             <form id="clear" method="post" action="/twitter/show/common" enctype="multipart/form-data">
+            <@spring.bind "commonForm.count"/>
+                <input type="text" name="count" id="file" value="removed edges count">
+            <@spring.bind "commonForm.maxNodes"/>
+                <input type="text" name="maxNodes" id="file" value="max starting nodes">
                 <button class="clear-db-button">Show</button>
             </form>
             <br>
 
             <h4>resource allocation: ${resource}%</h4>
+        <@spring.bind "resForm"/>
             <form id="clear" method="post" action="/twitter/show/resource" enctype="multipart/form-data">
+            <@spring.bind "resForm.count"/>
+                <input type="text" name="count" id="file" value="removed edges count">
+            <@spring.bind "resForm.maxNodes"/>
+                <input type="text" name="maxNodes" id="file" value="max starting nodes">
                 <button class="clear-db-button">Show</button>
             </form>
             <br>

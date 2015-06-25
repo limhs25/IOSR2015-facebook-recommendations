@@ -15,3 +15,4 @@ public abstract class DatabaseFile {
         return Double.parseDouble(dropRate);
     }
 }
+

@@ -20,5 +20,5 @@ public interface TwitterSLO {
 
     void logout(HttpServletRequest request, HttpServletResponse response) throws IOException;
 
-    String getGraphData(SuggestionType type);
+    String getGraphData(SuggestionType type, Long edgeCount, Long limit);
 }

@@ -30,10 +30,10 @@ public interface PersonNodeRepository extends NodeRepository {
 
     @Query("match (u)-[r:FRIENDSHIP{type:'RETAINED'}]->(u2) \n" +
             "with u, count(r) as c\n" +
-            "where c > 2\n" +
+            "where c >= {0}\n" +
             "return u\n" +
-            "limit 50")
-    Collection<PersonNode> getPeopleWithRetainedEdges();
+            "limit {1}")
+    Collection<PersonNode> getPeopleWithRetainedEdges(Long edges, Long limit);
 
     @Query("match (u)-[:FRIENDSHIP{type:'RETAINED'}]->(u2) \n" +
             "where u.uuid = {0} \n" +

@@ -18,14 +18,6 @@
 <body>
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
-        <div class="innerInlineElement">
-            <img src="<@spring.url '/twitter/resources/images/top.png'/>" alt="top banner"/>
-        </div>
-        <div>
-            <form class="navbar-form navbar-right">
-                <a class="btn btn-success" href="logout.htm">Logout</a>
-            </form>
-        </div>
 </nav>
 <div class="container">
     <div class="row">
